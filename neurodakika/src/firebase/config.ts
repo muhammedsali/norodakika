@@ -11,9 +11,20 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID ?? "",
 };
 
-const app = initializeApp(firebaseConfig);
+const isConfigValid = Object.values(firebaseConfig).every(
+  (value) => typeof value === "string" && value.trim().length > 0
+);
 
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
-export const db = getFirestore(app);
+const app = isConfigValid ? initializeApp(firebaseConfig) : null;
+
+if (!app) {
+  console.warn(
+    "Firebase yapılandırması eksik. .env dosyasına VITE_FIREBASE_* değişkenlerini ekleyene kadar auth özellikleri devre dışı."
+  );
+}
+
+export const auth = app ? getAuth(app) : null;
+export const googleProvider = app ? new GoogleAuthProvider() : null;
+export const db = app ? getFirestore(app) : null;
+export const isFirebaseReady = Boolean(app);
 

@@ -9,13 +9,17 @@ import {
   Tooltip,
 } from "recharts";
 import { onAuthStateChanged, signInWithPopup, signOut, type User } from "firebase/auth";
-import { auth, googleProvider } from "../firebase/config";
+import { auth, googleProvider, isFirebaseReady } from "../firebase/config";
 import { games } from "../data/games";
 
 const Profile = () => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    if (!auth) {
+      setUser(null);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => setUser(nextUser));
     return () => unsubscribe();
   }, []);
@@ -46,6 +50,10 @@ const Profile = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      if (!auth || !googleProvider) {
+        console.warn("Firebase yapılandırması eksik, giriş yapılamıyor.");
+        return;
+      }
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Google login failed", error);
@@ -53,6 +61,9 @@ const Profile = () => {
   };
 
   const handleLogout = async () => {
+    if (!auth) {
+      return;
+    }
     await signOut(auth);
   };
 
@@ -90,7 +101,7 @@ const Profile = () => {
               {user?.email ?? "Performansını kaydetmek için giriş yap."}
             </p>
           </div>
-          {user ? (
+          {isFirebaseReady && user ? (
             <button
               type="button"
               onClick={handleLogout}
@@ -98,7 +109,7 @@ const Profile = () => {
             >
               Çıkış
             </button>
-          ) : (
+          ) : isFirebaseReady ? (
             <button
               type="button"
               onClick={handleGoogleLogin}
@@ -107,6 +118,10 @@ const Profile = () => {
               <span className="material-symbols-outlined text-base">login</span>
               Google ile Giriş Yap
             </button>
+          ) : (
+            <span className="rounded-full border border-white/10 px-4 py-2 text-xs font-medium text-white/60">
+              Firebase yapılandırılınca giriş açılacak
+            </span>
           )}
         </div>
       </section>
