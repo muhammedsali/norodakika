@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply min-h-screen bg-background-light font-display text-slate-900 antialiased dark:bg-background-dark dark:text-white;
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+.glass-panel {
+  @apply rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl dark:bg-white/5;
+}
+
+.pill-button {
+  @apply flex h-8 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full px-4 text-sm font-medium transition-colors duration-200;
+}
+
+.pill-button-active {
+  @apply bg-primary/30 text-white shadow-glow;
+}
+
+.pill-button-inactive {
+  @apply bg-white/5 text-white/70 hover:bg-white/10;
+}
+
+.section-title {
+  @apply px-4 text-lg font-bold tracking-tight text-slate-900 dark:text-white;
+}
+
