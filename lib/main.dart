@@ -11,13 +11,13 @@ void main() async {
   
   runApp(
     const ProviderScope(
-      child: NöroDakikaApp(),
+      child: NorodakikaApp(),
     ),
   );
 }
 
-class NöroDakikaApp extends StatelessWidget {
-  const NöroDakikaApp({super.key});
+class NorodakikaApp extends StatelessWidget {
+  const NorodakikaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class NöroDakikaApp extends StatelessWidget {
           secondary: const Color(0xFF00E0FF),
         ),
         useMaterial3: true,
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),

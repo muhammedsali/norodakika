@@ -31,14 +31,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
 
       if (mounted) {
-        ref.read(authNotifierProvider).whenData((_) {
-          // Başarılı giriş - AuthGate otomatik yönlendirecek
-        });
-        ref.read(authNotifierProvider).whenError((error, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Giriş hatası: $error')),
-          );
-        });
+        final authState = ref.read(authNotifierProvider);
+        authState.when(
+          data: (_) {
+            // Başarılı giriş - AuthGate otomatik yönlendirecek
+          },
+          loading: () {},
+          error: (error, _) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Giriş hatası: $error')),
+            );
+          },
+        );
       }
     }
   }

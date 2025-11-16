@@ -3,8 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/memory/memory_bank.dart';
-import '../../../core/models/user_model.dart';
-import '../../../services/firebase_service.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class StatsScreen extends ConsumerWidget {
@@ -98,11 +96,6 @@ class StatsScreen extends ConsumerWidget {
                             text: categories[index],
                             angle: angle,
                             positionPercentageOffset: 0.15,
-                            textStyle: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
                           );
                         },
                       ),

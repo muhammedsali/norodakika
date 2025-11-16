@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import '../core/memory/memory_bank.dart';
 
 class UnityBridgeService {
-  static const MethodChannel _channel = MethodChannel(MemoryBank.unityChannels['sendMessageToUnity']!);
-  static const EventChannel _eventChannel = EventChannel(MemoryBank.unityChannels['onUnityMessage']!);
+  static final MethodChannel _channel = MethodChannel('unity_channel');
+  static final EventChannel _eventChannel = EventChannel('unity_callback');
 
   static StreamSubscription? _unityMessageSubscription;
 

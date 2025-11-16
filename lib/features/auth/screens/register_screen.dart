@@ -32,14 +32,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           );
 
       if (mounted) {
-        ref.read(authNotifierProvider).whenData((_) {
-          Navigator.pop(context);
-        });
-        ref.read(authNotifierProvider).whenError((error, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Kayıt hatası: $error')),
-          );
-        });
+        final authState = ref.read(authNotifierProvider);
+        authState.when(
+          data: (_) {
+            Navigator.pop(context);
+          },
+          loading: () {},
+          error: (error, _) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Kayıt hatası: $error')),
+            );
+          },
+        );
       }
     }
   }
