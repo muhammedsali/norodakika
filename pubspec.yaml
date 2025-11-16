@@ -1,0 +1,49 @@
+name: norodakika
+description: NöroDakika - Bilişsel Eğitim Mobil Uygulaması
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.5.1
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_analytics: ^10.7.4
+  
+  # HTTP & API
+  http: ^1.2.0
+  dio: ^5.4.0
+  
+  # Unity Integration
+  flutter_unity_widget: ^2022.2.0
+  
+  # UI & Design
+  fl_chart: ^0.66.0
+  google_fonts: ^6.1.0
+  
+  # Utils
+  shared_preferences: ^2.2.2
+  intl: ^0.19.0
+  uuid: ^4.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+
