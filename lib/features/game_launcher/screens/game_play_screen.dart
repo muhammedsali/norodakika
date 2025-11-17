@@ -10,6 +10,10 @@ import '../../auth/providers/auth_provider.dart';
 import '../widgets/reflex_tap_game.dart';
 import '../widgets/quick_math_game.dart';
 import '../widgets/memory_board_game.dart';
+import '../widgets/stroop_tap_game.dart';
+import '../widgets/n_back_mini_game.dart';
+import '../widgets/logic_puzzle_game.dart';
+import '../widgets/recall_phase_game.dart';
 
 class GamePlayScreen extends ConsumerStatefulWidget {
   final GameModel game;
@@ -173,6 +177,14 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
         return QuickMathGame(onComplete: _onGameComplete);
       case 'MEM02':
         return MemoryBoardGame(onComplete: _onGameComplete);
+      case 'ATT01':
+        return StroopTapGame(onComplete: _onGameComplete);
+      case 'MEM01':
+        return NBackMiniGame(onComplete: _onGameComplete);
+      case 'LOG01':
+        return LogicPuzzleGame(onComplete: _onGameComplete);
+      case 'MEM03':
+        return RecallPhaseGame(onComplete: _onGameComplete);
       default:
         return Center(
           child: Column(
