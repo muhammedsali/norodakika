@@ -9,23 +9,13 @@ class AuthGateScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
+    final currentUser = ref.watch(currentUserProvider);
 
-    return authState.when(
-      data: (user) {
-        if (user != null) {
-          return const HomeScreen();
-        } else {
-          return const LoginScreen();
-        }
-      },
-      loading: () => const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (error, stack) => const LoginScreen(),
-    );
+    if (currentUser == null) {
+      return const LoginScreen();
+    } else {
+      return const HomeScreen();
+    }
   }
 }
 

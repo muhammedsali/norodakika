@@ -4,10 +4,12 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/game_model.dart';
 import '../../../core/models/attempt_model.dart';
 import '../../../core/memory/memory_bank.dart';
-import '../../../services/unity_bridge_service.dart';
-import '../../../services/firebase_service.dart';
+import '../../../services/local_storage_service.dart';
 import '../../../core/api/api_service.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../widgets/reflex_tap_game.dart';
+import '../widgets/quick_math_game.dart';
+import '../widgets/memory_board_game.dart';
 
 class GamePlayScreen extends ConsumerStatefulWidget {
   final GameModel game;
@@ -33,33 +35,30 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
   }
 
   Future<void> _startGame() async {
-    final user = ref.read(currentUserProvider);
-    if (user == null) return;
-
-    // Zorluk seviyesini getir
-    final difficulty = await FirebaseService.getGameDifficulty(
-      userId: user.uid,
-      gameId: widget.game.id,
-    );
+    final userEmail = ref.read(currentUserProvider);
+    if (userEmail == null) return;
 
     setState(() {
       _isGameStarted = true;
     });
+  }
 
-    // Unity oyununu başlat
-    await UnityBridgeService.launchGame(
+  Future<void> _onGameComplete(Map<String, dynamic> result) async {
+    final userEmail = ref.read(currentUserProvider);
+    if (userEmail == null) return;
+
+    final difficulty = await LocalStorageService.getGameDifficulty(
+      userId: userEmail,
       gameId: widget.game.id,
-      difficulty: difficulty,
-      onGameComplete: (result) async {
-        setState(() {
-          _isGameComplete = true;
-          _gameResult = result;
-        });
-
-        // Attempt kaydet
-        await _saveAttempt(result, difficulty, user.uid);
-      },
     );
+
+    setState(() {
+      _isGameComplete = true;
+      _gameResult = result;
+    });
+
+    // Attempt kaydet
+    await _saveAttempt(result, difficulty, userEmail);
   }
 
   Future<void> _saveAttempt(
@@ -83,8 +82,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
         area: widget.game.area,
       );
 
-      // Firebase'e kaydet
-      await FirebaseService.saveAttempt(attempt);
+      // Local storage'a kaydet
+      await LocalStorageService.saveAttempt(attempt);
 
       // API'ye gönder (opsiyonel)
       try {
@@ -99,7 +98,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
         difficulty,
         successRate,
       );
-      await FirebaseService.updateGameDifficulty(
+      await LocalStorageService.updateGameDifficulty(
         userId: userId,
         gameId: widget.game.id,
         newDifficulty: newDifficulty,
@@ -162,6 +161,45 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
     );
   }
 
+  Widget _buildGameWidget() {
+    if (!_isGameStarted) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    switch (widget.game.id) {
+      case 'REF01':
+        return ReflexTapGame(onComplete: _onGameComplete);
+      case 'NUM01':
+        return QuickMathGame(onComplete: _onGameComplete);
+      case 'MEM02':
+        return MemoryBoardGame(onComplete: _onGameComplete);
+      default:
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '${widget.game.name}',
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Bu oyun yakında eklenecek!',
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  color: Colors.grey[400],
+                ),
+              ),
+            ],
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isGameComplete && _gameResult != null) {
@@ -200,53 +238,13 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
               ),
             ),
             
-            // Unity oyun alanı (placeholder - gerçek Unity widget buraya gelecek)
+            // Oyun alanı
             Expanded(
-              child: Container(
-                color: Colors.grey[900],
-                child: Center(
-                  child: _isGameStarted
-                      ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const CircularProgressIndicator(
-                              color: Color(0xFF6E00FF),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Unity oyunu yükleniyor...',
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Gerçek Unity entegrasyonu için\nflutter_unity_widget kullanılacak',
-                              style: GoogleFonts.poppins(
-                                color: Colors.grey[400],
-                                fontSize: 12,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        )
-                      : const CircularProgressIndicator(
-                          color: Color(0xFF6E00FF),
-                        ),
-                ),
-              ),
+              child: _buildGameWidget(),
             ),
           ],
         ),
       ),
     );
   }
-
-  @override
-  void dispose() {
-    UnityBridgeService.dispose();
-    super.dispose();
-  }
 }
-

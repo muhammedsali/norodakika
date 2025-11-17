@@ -10,15 +10,15 @@ class StatsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
+    final userEmail = ref.watch(currentUserProvider);
     
-    if (user == null) {
+    if (userEmail == null) {
       return const Scaffold(
         body: Center(child: Text('Kullanıcı bulunamadı')),
       );
     }
 
-    final userDataAsync = ref.watch(userDataProvider(user.uid));
+    final userDataAsync = ref.watch(userDataProvider(userEmail));
 
     return Scaffold(
       backgroundColor: Colors.grey[50],

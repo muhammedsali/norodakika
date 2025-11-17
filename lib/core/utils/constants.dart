@@ -5,9 +5,5 @@ class AppConstants {
   
   // API
   static const apiBaseUrl = 'https://api.norodakika.com'; // TODO: Gerçek URL
-  
-  // Unity
-  static const unityChannel = 'unity_channel';
-  static const unityCallback = 'unity_callback';
 }
 

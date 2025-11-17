@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'features/auth/screens/auth_gate_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // Firebase'i başlat
-  await Firebase.initializeApp();
-  
+void main() {
   runApp(
     const ProviderScope(
       child: NorodakikaApp(),

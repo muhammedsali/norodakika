@@ -8,7 +8,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
+    final userEmail = ref.watch(currentUserProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -43,7 +43,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 child: Center(
                   child: Text(
-                    user?.email?.substring(0, 1).toUpperCase() ?? 'U',
+                    userEmail?.substring(0, 1).toUpperCase() ?? 'U',
                     style: GoogleFonts.poppins(
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
@@ -54,7 +54,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                user?.email ?? 'Kullanıcı',
+                userEmail ?? 'Kullanıcı',
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,

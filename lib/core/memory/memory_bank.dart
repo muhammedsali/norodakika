@@ -12,55 +12,48 @@ class MemoryBank {
     "Dil"
   ];
 
-  // 2) Mini Oyun Listesi (Unity Oyun ID'leri ile)
+  // 2) Mini Oyun Listesi
   static const games = [
     {
       "id": "REF01",
       "name": "Reflex Tap",
       "area": "Refleks",
-      "unityScene": "ReflexTapScene",
       "description": "Tepki süresi ölçümü + Go/No-Go mekanizması."
     },
     {
       "id": "ATT01",
       "name": "Stroop Tap",
       "area": "Dikkat",
-      "unityScene": "StroopTapScene",
       "description": "Renk-kelime uyumsuzluğu ile dikkat testi."
     },
     {
       "id": "MEM01",
       "name": "N-Back Mini",
       "area": "Hafıza + Dikkat",
-      "unityScene": "NBackMiniScene",
       "description": "Çalışan bellek testi (1-back / 2-back)."
     },
     {
       "id": "LOG01",
       "name": "Logic Puzzle",
       "area": "Mantık + Görsel Algı",
-      "unityScene": "LogicSequenceScene",
       "description": "Mantık dizisi çözme + görsel algı."
     },
     {
       "id": "NUM01",
       "name": "Quick Math",
       "area": "Sayısal Zeka",
-      "unityScene": "QuickMathScene",
       "description": "Zaman baskılı mental aritmetik."
     },
     {
       "id": "MEM02",
       "name": "Memory Board",
       "area": "Hafıza + Görsel Algı",
-      "unityScene": "MemoryBoardScene",
       "description": "Kart eşleştirme + görsel hafıza."
     },
     {
       "id": "MEM03",
       "name": "Recall Phase",
       "area": "Dil + Hafıza",
-      "unityScene": "RecallPhaseScene",
       "description": "Kelime gösterim ve hatırlama testi."
     }
   ];
@@ -158,10 +151,5 @@ class MemoryBank {
     return result;
   }
 
-  // 8) Unity – Flutter Bridge Ayarları
-  static const unityChannels = {
-    "sendMessageToUnity": "unity_channel",
-    "onUnityMessage": "unity_callback",
-  };
 }
 

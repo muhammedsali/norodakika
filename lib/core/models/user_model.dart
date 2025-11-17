@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../memory/memory_bank.dart';
 
 class UserModel {
@@ -16,23 +15,22 @@ class UserModel {
     required this.createdAt,
   });
 
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      uid: data['uid'] ?? doc.id,
-      dailyPlan: List<Map<String, dynamic>>.from(data['dailyPlan'] ?? []),
+      uid: json['uid'] ?? '',
+      dailyPlan: List<Map<String, dynamic>>.from(json['dailyPlan'] ?? []),
       stats: Map<String, double>.from(
-        (data['stats'] ?? MemoryBank.createUserModel(doc.id)['stats'])
+        (json['stats'] ?? MemoryBank.createUserModel(json['uid'] ?? '')['stats'])
             .map((key, value) => MapEntry(key, (value as num).toDouble())),
       ),
-      history: List<Map<String, dynamic>>.from(data['history'] ?? []),
-      createdAt: data['createdAt'] != null
-          ? DateTime.parse(data['createdAt'])
+      history: List<Map<String, dynamic>>.from(json['history'] ?? []),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
     );
   }
 
-  Map<String, dynamic> toFirestore() {
+  Map<String, dynamic> toJson() {
     return {
       'uid': uid,
       'dailyPlan': dailyPlan,
