@@ -34,6 +34,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
   bool _isGameComplete = false;
   Map<String, dynamic>? _gameResult;
   int _runId = 0; // oyun tekrarları için
+  bool _isPaused = false;
 
   @override
   void initState() {
@@ -303,6 +304,150 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
     );
   }
 
+  Future<bool> _showExitConfirmDialog() async {
+    // Oyun sonucu zaten gösteriliyorsa veya hiç başlamadıysa direkt çık
+    if (!_isGameStarted || _isGameComplete) {
+      return true;
+    }
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF111827) : Colors.white;
+    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+
+    setState(() {
+      _isPaused = true;
+    });
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 420,
+                  minHeight: 200,
+                ),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 32,
+                      offset: Offset(0, 16),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Oyundan çıkmak istiyor musun?',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'İlerleyişin kaydedildi (varsa) fakat bu oyunu şimdi sonlandıracaksın.',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 13,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop(false); // oyuna devam et
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: isDark
+                                    ? const Color(0xFF4B5563)
+                                    : const Color(0xFF4F46E5),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                            child: Text(
+                              'Devam et',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: titleColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SizedBox(
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(ctx).pop(true); // çıkışı onayla
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4F46E5),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                              ),
+                              child: Text(
+                                'Ana ekrana dön',
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    // true => çıkışa izin ver, false/null => kal
+    final shouldExit = result ?? false;
+
+    if (!shouldExit) {
+      // Oyuna devam
+      setState(() {
+        _isPaused = false;
+      });
+    }
+
+    return shouldExit;
+  }
+
   Widget _buildGameWidget() {
     if (!_isGameStarted) {
       return const Center(child: CircularProgressIndicator());
@@ -313,6 +458,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
         return ReflexTapGame(
           key: ValueKey('reflex_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'NUM01':
         return QuickMathGame(
@@ -392,9 +538,12 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
 
     return Theme(
       data: themedData,
-      child: Scaffold(
-        backgroundColor: bgColor,
-        body: _buildGameWidget(),
+      child: WillPopScope(
+        onWillPop: _showExitConfirmDialog,
+        child: Scaffold(
+          backgroundColor: bgColor,
+          body: _buildGameWidget(),
+        ),
       ),
     );
   }
