@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/auth/screens/auth_gate_screen.dart';
+import 'features/home/screens/home_screen.dart';
 
 void main() {
   runApp(
@@ -32,7 +32,7 @@ class NorodakikaApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const AuthGateScreen(),
+      home: const HomeScreen(),
     );
   }
 }

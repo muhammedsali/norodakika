@@ -1,0 +1,371 @@
+
+
+
+
+
+
+
+
+
+
+TÜBİTAK–2209-A ÜNİVERSİTE ÖĞRENCİLERİ ARAŞTIRMA PROJELERİ DESTEĞİ PROGRAMI
+
+
+
+ARAŞTIRMA ÖNERİSİ FORMU
+
+
+
+NöroDakika: Mikro Süreli Adaptif Zihin Egzersizi Uygulaması ile Bilişsel Gelişim Takibi
+
+
+
+      Proje Ekibi
+Ahmet Bera HASANOĞLU
+Muhammed Enes CANSABUNCU
+Muhammed SALİ
+Serhat SERÇE
+
+
+
+                                                  Danışman
+Dr. Öğr. Üyesi Hakan ÜSTÜNEL
+
+
+
+2025 Yılı
+2. Dönem Başvurusu 
+A. GENEL BİLGİLER
+
+Başvuru Sahibinin Adı Soyadı: Ahmet Bera HASANOĞLU
+Araştırma Önerisinin Başlığı: Nörodakika
+Danışmanın Adı Soyadı: Dr. Öğr. Üyesi Hakan ÜSTÜNEL
+Araştırmanın Yürütüleceği Kurum/Kuruluş: KIRKLARELİ ÜNİVERSİTESİ – YAZILIM MÜHENDİSLİĞİ BÖLÜMÜ
+
+
+ÖZET
+
+     Türkçe özetin araştırma önerisinin (a) özgün değeri, (b) yöntemi, (c) yönetimi ve (d) yaygın etkisi hakkında bilgileri      kapsaması beklenir. Bu bölümün en son yazılması önerilir. 
+
+Özet
+Günümüzde bireylerin zihinsel performansını artırmak için dijital çözümler giderek yaygınlaşmaktadır. Ancak mevcut uygulamaların çoğu uzun süreli oyun seanslarına, karmaşık görev yapılarına veya bilimsel temelden yoksun ölçümlere dayanmaktadır. “NöroDakika” projesi, kullanıcıların yalnızca 1–3 dakikalık kısa seanslarla dikkat, hafıza, refleks, görsel algı, mantık, sayısal zeka ve dil gibi temel bilişsel alanlarda egzersiz yapmalarını sağlayan adaptif zorluk sistemine sahip bir mobil oyun platformudur.
+
+Uygulama, React Native ile geliştirilecek ve oyunları Unity ile yapılıp kullanıcı verileri işlenerek bireysel zorluk seviyeleri dinamik olarak belirlenecektir. 
+
+Proje, oyunlaştırılmış bilişsel egzersizleri bilimsel temellerle birleştirerek hem eğlenceli hem de ölçülebilir bir zihinsel gelişim ortamı sunmayı hedeflemektedir. Çalışma sonucunda, kısa süreli ve tekrarlanabilir egzersizlerin bilişsel performans üzerindeki etkisi hakkında veri toplanarak literatüre katkı sağlanması planlanmaktadır.
+
+Anahtar Kelimeler: zihin egzersizi, bilişsel gelişim, Unity, adaptif zorluk, yapay zekâ destekli oyun
+
+
+1.	ÖZGÜN DEĞER 
+
+ 1.1. Konunun Önemi, Araştırma Önerisinin Özgün Değeri ve Araştırma Sorusu/Hipotezi
+
+Araştırma önerisinde ele alınan konunun kapsamı ve sınırları ile önemi literatürün eleştirel bir değerlendirmesinin yanı sıra nitel veya nicel verilerle açıklanır.
+
+Özgün değer yazılırken araştırma önerisinin bilimsel değeri, farklılığı ve yeniliği, hangi eksikliği nasıl gidereceği veya hangi soruna nasıl bir çözüm geliştireceği ve/veya ilgili bilim veya teknoloji alan(lar)ına kavramsal, kuramsal ve/veya metodolojik olarak ne gibi özgün katkılarda bulunacağı literatüre atıf yapılarak açıklanır. 
+ 
+Önerilen çalışmanın araştırma sorusu ve varsa hipotezi veya ele aldığı problem(ler)i açık bir şekilde ortaya konulur.
+
+Teknolojinin yoğun kullanımıyla birlikte bireylerin dikkat süreleri ve bilişsel esneklikleri azalma eğilimindedir. Bu durum, modern yaşamda zihinsel performansı koruma ve geliştirme ihtiyacını ortaya çıkarmıştır. Mevcut literatürde yer alan “beyin eğitimi” uygulamalarının büyük kısmı ya bilimsel ölçümden uzak eğlencelik oyunlardan oluşmakta ya da kullanıcı bağlılığı düşüktür.
+
+“NöroDakika” bu eksikliği gidermek amacıyla, mikro seans temelli, bilimsel dayanaklı bir dijital platform önerir. Kullanıcılar, her gün yalnızca bir dakikalık seanslarla farklı bilişsel alanlara yönelik mini oyunlar oynayacak ve ilerlemeleri radar grafiğiyle görselleştirilecektir.
+
+Bu çalışmanın özgün değeri, hem oyunlaştırma hem de bilişsel modelleme yaklaşımlarını birleştirerek kişiselleştirilmiş zihinsel egzersiz ortamı sunmasıdır. Proje, kısa süreli düzenli egzersizlerin bilişsel gelişime etkisini ölçmekte ve bunu veri odaklı bir şekilde raporlamaktadır. Bu yönüyle araştırma, Türkiye’de henüz yaygınlaşmamış olan “mikro bilişsel antrenman” konseptine öncülük edecektir.
+
+AraştırmaSorusu:
+Kısa süreli ve adaptif zorluk temelli mikro oyun seansları, kullanıcıların dikkat, hafıza ve refleks gelişiminde istatistiksel olarak anlamlı bir ilerleme sağlar mı?
+
+
+1.2.	Amaç ve Hedefler
+   
+Araştırma önerisinin amacı ve hedefleri açık, ölçülebilir, gerçekçi ve araştırma süresince ulaşılabilir nitelikte olacak şekilde yazılır.
+
+Bu projenin temel amacı, kısa süreli ve düzenli bilişsel egzersizlerin bireylerin dikkat, hafıza, refleks ve zihinsel işlem hızı üzerindeki etkisini ölçebilen, bilimsel temele dayalı bir mobil oyun uygulaması geliştirmektir. NöroDakika adlı bu sistem, kullanıcıların yalnızca 1–3 dakikalık günlük seanslarla farklı bilişsel alanlarda egzersiz yapmalarına olanak tanırken, her kullanıcının performansına göre zorluk seviyesini dinamik olarak belirleyen adaptif bir yapay zekâ algoritması içerecektir.
+
+Proje kapsamında geliştirilecek uygulama, Unity oyun motoru ile çok platformlu olarak tasarlanacak, Firebase veritabanında saklanacaktır. Bu sayede bireysel performans takibi yapılabilecek, radar grafikleriyle kullanıcıya gelişim verileri sunulacaktır.
+
+Projenin spesifik hedefleri şunlardır:
+
+1.	Bilişsel egzersizler için 7 ana kategori (Hafıza, Dikkat, Refleks, Sayısal Zeka, Mantık, Görsel Algı, Dil) altında mini oyunlar tasarlamak.
+2.	Kullanıcının performansına göre zorluk seviyesini otomatik ayarlayan adaptif bir model geliştirmek.
+3.	Kullanıcı verilerini anonim biçimde analiz ederek kısa süreli egzersizlerin bilişsel performans üzerindeki etkisini istatistiksel olarak değerlendirmek.
+4.	Geliştirilen sistemin erişilebilir, düşük donanımlı cihazlarda çalışabilir ve offline kullanılabilir olmasını sağlamak.
+5.	Akademik çıktı olarak, mikro süreli dijital egzersizlerin zihinsel performansa katkısını gösteren bir model önermek.
+
+Bu hedeflere ulaşıldığında, proje hem dijital sağlık teknolojileri hem de oyun tabanlı öğrenme alanında yenilikçi bir örnek ortaya koyacak, TÜBİTAK 2209-A’nın “bilimsel araştırma temelli yenilikçi yaklaşım” amacına katkı sağlayacaktır.
+
+2.	YÖNTEM
+
+Araştırma önerisinde uygulanacak yöntem ve araştırma teknikleri (veri toplama araçları ve analiz yöntemleri dahil) ilgili literatüre atıf yapılarak açıklanır. Yöntem ve tekniklerin çalışmada öngörülen amaç ve hedeflere ulaşmaya elverişli olduğu ortaya konulur. 
+
+Yöntem bölümünün araştırmanın tasarımını, bağımlı ve bağımsız değişkenleri ve istatistiksel yöntemleri kapsaması gerekir. Araştırma önerisinde herhangi bir ön çalışma veya fizibilite yapıldıysa bunların sunulması beklenir. Araştırma önerisinde sunulan yöntemlerin iş paketleri ile ilişkilendirilmesi gerekir.
+
+Araştırma yöntemi, yazılım geliştirme ve deneysel veri toplama süreçlerini bütünleştiren karma bir tasarıma dayanmaktadır. Uygulama, Unity oyun motoru kullanılarak geliştirilecek, mini oyunlar bilişsel psikoloji literatüründe yer alan Stroop, N-Back, Go/No-Go gibi testlerin oyunlaştırılmış versiyonları temel alınarak oluşturulacaktır. Kullanıcı performansı (doğruluk oranı, tepki süresi, hata sayısı) her oyun sonunda kaydedilecek ve bu veriler firebase veritabanına aktarılacaktır.
+
+Elde edilen veriler, analiz edilerek her kullanıcının bireysel beceri katsayısı (μ) güncellenecektir. Böylece kullanıcı, bir sonraki oturumda kendi performansına göre optimize edilmiş zorluk seviyesine sahip oyunlar oynayacaktır.
+
+Uygulamanın etkinliği, 4 haftalık gönüllü kullanıcı grubu testleriyle değerlendirilecektir. Her haftanın sonunda dikkat, hafıza ve refleks skorlarındaki değişim istatistiksel olarak analiz edilerek, mikro süreli egzersizlerin bilişsel gelişime etkisi nicel olarak belirlenecektir.
+
+Bu yöntem, hem yazılım mühendisliği hem de bilişsel bilim alanlarını bir araya getirerek bilimsel ölçüm yapılabilen, kullanıcı merkezli bir oyun tabanlı araştırma ortamı sunmaktadır.
+
+ 
+3.	 PROJE YÖNETİMİ 
+Mobil uygulama arayüzü React Native ile tasarlanmış, mini oyunlar Unity ile geliştirilmiştir. Bu iki ortam, köprü (bridge) yöntemi ile entegre edilmiştir.
+
+
+3.1	İş- Zaman Çizelgesi
+
+Araştırma önerisinde yer alacak başlıca iş paketleri ve hedefleri, her bir iş paketinin hangi sürede gerçekleştirileceği, başarı ölçütü ve araştırmanın başarısına katkısı “İş-Zaman Çizelgesi” doldurularak verilir. Literatür taraması, gelişme ve sonuç raporu hazırlama aşamaları, araştırma sonuçlarının paylaşımı, makale yazımı ve malzeme alımı ayrı birer iş paketi olarak gösterilmemelidir.
+Başarı ölçütü olarak her bir iş paketinin hangi kriterleri sağladığında başarılı sayılacağı açıklanır. Başarı ölçütü, ölçülebilir ve izlenebilir nitelikte olacak şekilde nicel veya nitel ölçütlerle (ifade, sayı, yüzde, vb.) belirtilir.
+
+
+İŞ-ZAMAN ÇİZELGESİ (*)
+        
+İP No	İş Paketlerinin Adı ve Hedefleri	Kim(ler) Tarafından Gerçekleştirileceği	Zaman Aralığı
+(..-.. Ay)	Başarı Ölçütü ve Projenin Başarısına Katkısı 
+1	React Native ile Unity Bağlantısı kurularak, React native ile geliştirilen uygulamada Unity ile yapılan oyunların optimize bir şekilde çalışması sağlanır.	Tüm ekip, danışman desteğiyle	3. Ay	React uygulaması içindeki oyunlara tıkladığımızda oyunlar sorunsuz bir şekilde açılır. Uygulama daha optimize çalışmış olur.
+
+
+2	
+Oyun Tasarımı ve UI/UX Çalışması: 7 bilişsel kategoriye uygun mini oyunların tasarım ilkeleri ve kullanıcı arayüz prototipleri hazırlanır.
+	Muhammed, Enes	1. Ay	Figma prototipleri, kullanıcı akışı ve renk paleti tamamlanır.
+3	Unity Proje Kurulumu ve Oyun İskeletinin Geliştirilmesi: Unity projesi oluşturulur, ilk mini oyun (Refleks Tap) tamamlanır.	Ahmet, Serhat	2.–3. Ay	İlk oynanabilir prototip (60 FPS) ve oyun motoru yapısı hazır hale gelir.
+
+
+4	Veritabanı Entegrasyonu: Kullanıcı kayıt, veri toplama, adaptif zorluk hesaplaması ve API bağlantıları kurulur.	Ahmet, Muhammed	3.–4. Ay	Veritabanı bağlantısı, /attempt ve /daily-plan API uçları sorunsuz çalışır.
+
+
+5	Adaptif Zorluk Sistemi ve Veri Analizi: Kullanıcı performansına göre zorluk seviyeleri dinamikleştirilir.	Enes , Serhat	4.–5. Ay	Adaptif sistem doğru çalışır; başarı oranı %60–70 bandında kalır.
+
+
+6	Radar Grafiği ve Gelişim Takibi Modülü: Kullanıcı sonuçlarının 7 bilişsel alanda görselleştirilmesi sağlanır.	Ahmet, Enes	                         5. Ay
+
+	Radar grafiği verileri doğru görüntüler; bireysel ilerleme izlenebilir.
+
+
+7	Test, Performans Optimizasyonu ve Beta Yayın: Uygulama 20–30 kullanıcıyla test edilir, hata raporları toplanır.	Muhammed, Serhat	5.–6. Ay	Performans ≥60 FPS, kullanıcı memnuniyeti ≥%80.
+
+
+8	Sonuç Analizi, Raporlama ve Jüri Sunumu: Elde edilen veriler analiz edilir, sonuç raporu ve tanıtım videosu hazırlanır.
+
+	         Tüm ekip
+
+	                         6. Ay
+
+	Proje sunumu tamamlanır, rapor teslim edilir.
+
+
+
+(*) Çizelgedeki satırlar ve sütunlar gerektiği kadar genişletilebilir ve çoğaltılabilir. 
+
+3.2	Risk Yönetimi
+   Araştırmanın başarısını olumsuz yönde etkileyebilecek riskler ve bu risklerle karşılaşıldığında araştırmanın başarıyla yürütülmesini sağlamak için alınacak tedbirler (B Planı) ilgili iş paketleri belirtilerek ana hatlarıyla aşağıdaki Risk Yönetimi Tablosu’nda ifade edilir. B planlarının uygulanması araştırmanın temel hedeflerinden sapmaya yol açmamalıdır.
+
+                                                       RİSK YÖNETİMİ TABLOSU*
+İP No	En Önemli Riskler	Risk Yönetimi (B Planı)
+1	Unity oyunlarının React arayüzüne entegre edilirken performans düşüşü yaşanması	Gerekirse oyunlar standalone (bağımsız) şekilde iframe olarak çağrılır; Unity URP ve Addressables optimizasyonu uygulanır. FPS testleriyle düşük cihazlara özel mod hazırlanır.
+2	7 oyundan bazılarının planlanan zamanda tamamlanamaması	Öncelik temel 3 oyun (Reflex, Stroop, N-Back) üzerinde olur. Diğerleri varyasyon olarak eklenir. Oyun sayısı azaltılıp zorluk çeşitliliği artırılarak denge korunur.
+3	Firebase bağlantısında gecikme veya veri senkronizasyon hataları	Geçici olarak localStorage tabanlı yedek veri kaydı tutulur. İnternet bağlantısı geldiğinde otomatik senkronizasyon yapılır. Firestore offline mode aktif edilir.
+4	Adaptif zorluk sistemi hatalı sonuçlar verirse oyun dengesizleşir	%60 hedef başarı oranı ELO tabanlı denge sistemiyle test edilir. Gerektiğinde zorluk katsayısı (K değeri) 16–24–32 aralığında yeniden ayarlanır.
+5	Kullanıcı izinleri ve veri gizliliği ile ilgili etik sorunlar	Tüm kullanıcı verileri anonimleştirilir; kişisel bilgi (PII) toplanmaz. Uygulamada “Veri Paylaşım İzni” ekranı eklenir. Kullanıcı onayı olmadan hiçbir veri paylaşılmaz.
+6	Kullanıcı etkileşimi (beğeni, mesaj, geri bildirim) sisteminin pasif kalması	Oyun sonlarında motivasyon mesajları ve beğeni butonları otomatik tetiklenir. Firebase’den gelen geri bildirimler arayüzde bildirim olarak gösterilir.
+7	Sunum veya rapor teslimine yetişememe riski	Her iş paketi sonunda ara teslim planı oluşturulur. Geliştirilen modüller sırasıyla teslim edilerek son haftada yalnızca test ve dokümantasyon yapılır.
+   (*) Tablodaki satırlar gerektiği kadar genişletilebilir ve çoğaltılabilir.
+
+3.3.	Araştırma Olanakları
+Bu bölümde projenin yürütüleceği kurum ve kuruluşlarda var olan ve projede kullanılacak olan altyapı/ekipman (laboratuvar, araç, makine-teçhizat, vb.) olanakları belirtilir.
+
+ARAŞTIRMA OLANAKLARI TABLOSU (*)
+
+Kuruluşta Bulunan Altyapı/Ekipman Türü, Modeli
+(Laboratuvar, Araç, Makine-Teçhizat, vb.)	Projede Kullanım Amacı
+Bilgisayar Laboratuvarı (Kırklareli Üniversitesi – Yazılım Mühendisliği Bölümü)	Proje geliştirme, test ve sunum işlemlerinin yapılacağı çalışma ortamı olarak kullanılacaktır. Geliştiriciler, Unity ve Visual Studio ortamlarında çalışacaktır.
+Yazılım Geliştirme Araçları (Unity 2023 LTS, Visual Studio, GitHub, Figma)	Mini oyunların tasarımı, arayüz geliştirme ve versiyon kontrol süreçlerinde kullanılacaktır.
+
+
+Sunucu Altyapısı (Azure veya Üniversite Bilgi İşlem Sunucusu)	Uygulamanın backend servislerinin ve veritabanının barındırılması, test kullanıcı verilerinin güvenli şekilde saklanması için kullanılacaktır.
+Mobil Cihazlar (Android ve iOS test telefonları)
+
+	Uygulamanın farklı donanımlarda performans, FPS ve kullanıcı deneyimi testlerinin yapılması amacıyla kullanılacaktır.
+
+Kullanılan bilişsel testler (Stroop, N-Back, Go/No-Go), literatürde yer alan deneysel paradigmaların oyunlaştırılmış uyarlamalarıdır. Bu bilimsel temeller, mini oyunların bilişsel süreçleri güvenilir biçimde ölçmesini sağlamaktadır.
+
+3.4.	Kavram Haritası (Mind Map)
+Bu çalışmada kullanılan mini oyunların bilişsel alanlar, veri akışı, analiz modülleri ve teknolojik bileşenlerle ilişkisi aşağıdaki kavram haritası ile gösterilmiştir. Harita, araştırma yönteminin bütüncül yapısını görsel olarak ortaya koymaktadır.
+Şekil 3.4. Kavram Haritası
+ 
+
+ 
+4.	YAYGIN ETKİ
+
+      Önerilen çalışma başarıyla gerçekleştirildiği takdirde araştırmadan elde edilmesi öngörülen ve beklenen yaygın etkilerin neler olabileceği, diğer bir ifadeyle yapılan araştırmadan ne gibi çıktı, sonuç ve etkilerin elde edileceği aşağıdaki tabloda verilir.
+
+ARAŞTIRMA ÖNERİSİNDEN BEKLENEN YAYGIN ETKİ TABLOSU
+Yaygın Etki Türleri	Önerilen Araştırmadan Beklenen Çıktı, Sonuç ve Etkiler
+Bilimsel/Akademik 
+(Makale, Bildiri, Kitap Bölümü, Kitap)	Proje sonucunda mikro süreli bilişsel egzersizlerin dikkat, hafıza ve refleks gelişimine etkisi üzerine nicel veriler elde edilecektir. Bu veriler ışığında, “oyun tabanlı bilişsel antrenman” yaklaşımını konu alan bir bildiri veya akademik makale hazırlanacaktır. Ayrıca proje çıktıları, bilişsel bilim ve yazılım mühendisliği alanlarını birleştiren örnek bir çalışma olarak lisans öğrencileri için örnek vaka olarak kullanılabilecektir.
+
+Ekonomik/Ticari/Sosyal
+(Ürün, Prototip, Patent, Faydalı Model, Üretim İzni, Çeşit Tescili, Spin-off/Start- up Şirket, Görsel/İşitsel Arşiv, Envanter/Veri Tabanı/Belgeleme Üretimi, Telife Konu Olan Eser, Medyada Yer Alma, Fuar, Proje Pazarı, Çalıştay, Eğitim vb. Bilimsel Etkinlik, Proje Sonuçlarını Kullanacak Kurum/Kuruluş, vb. diğer yaygın etkiler)	“NöroDakika” uygulaması, yerli bir zihin egzersizi platformu prototipi ortaya çıkararak dijital sağlık ve kişisel gelişim alanlarında ticarileşme potansiyeline sahiptir. Mobil oyunlaştırma ve bilişsel gelişim birleşimiyle, bireylerin dikkat ve mental dayanıklılıklarını artırmayı hedeflemektedir. Uzun vadede, psikoloji ve eğitim alanında kullanılabilecek yerli bir spin-off girişim modeline dönüşme olasılığı taşır. Ayrıca toplumda zihinsel sağlık farkındalığını artırarak sosyal bir etki yaratacaktır.
+
+Araştırmacı Yetiştirilmesi ve Yeni Proje(ler) Oluşturma 
+(Yüksek Lisans/Doktora Tezi, Ulusal/Uluslararası Yeni Proje)	Projede yer alan öğrenciler, Unity, yapay zekâ, veri analizi ve deneysel tasarım konularında uygulamalı deneyim kazanacaklardır. Bu proje, ilerleyen dönemde TÜBİTAK 1512 BİGG veya 2247-C programlarına temel teşkil edebilecek bir araştırma-girişim altyapısı oluşturacaktır. Ayrıca, proje çıktıları yüksek lisans veya bitirme tezlerinde kullanılabilecek nitelikte bilimsel veri sağlayacaktır.
+
+
+
+5. BÜTÇE TALEP ÇİZELGESİ
+Bütçe Türü	 Talep Edilen Bütçe Miktarı (TL)	Talep Gerekçesi
+Sarf Malzeme	0 TL	Proje sürecinde kullanılacak bilgisayar vs donanımlar proje ekibinde bulunmaktar.
+
+
+Makina/Teçhizat (Demirbaş)	0 TL	Proje mevcut laboratuvar bilgisayarlarında ve kişisel cihazlarda yürütülecektir, yeni donanım alımı gerekmemektedir.
+
+
+Hizmet Alımı	    10.000 TL
+
+	Firebase(50.000+ kullanıcı için ödeme) Play Store geliştirici hesabı (25 USD), domain/hosting giderleri ve uygulama optimizasyonu için UI/UX danışmanlık desteği.
+Ulaşım	0 TL	Proje ekibinin proje için seyehat etmesi gereken herhangi bir yer yoktur.
+
+
+TOPLAM	10.000 TL	
+NOT: Bütçe talebiniz olması halinde hem bu tablonun hem de TÜBİTAK Yönetim Bilgi Sistemi (TYBS) başvuru ekranında karşınıza gelecek olan bütçe alanlarının doldurulması gerekmektedir. Yukardaki tabloda girilen bütçe kalemlerindeki rakamlar ile, TYBS başvuru ekranındaki rakamlar arasında farklılık olması halinde TYBS ekranındaki veriler dikkate alınır ve başvuru sonrasında değiştirilemez.
+
+6. BELİRTMEK İSTEDİĞİNİZ DİĞER KONULAR
+Sadece araştırma önerisinin değerlendirilmesine katkı sağlayabilecek bilgi/veri (grafik, tablo, vb.) eklenebilir. 
+Proje kapsamında geliştirilecek NöroDakika uygulaması, yalnızca bir oyun yazılımı değil; aynı zamanda bireylerin bilişsel performansını izlemeye ve kısa süreli egzersizlerin etkisini ölçmeye yarayan bir araştırma aracıdır. Proje sonunda toplanacak anonim kullanıcı verileri, istatistiksel olarak analiz edilerek dikkat ve refleks gelişimindeki değişim oranları değerlendirilecektir. Bu veriler, ilerleyen dönemde akademik yayın veya lisansüstü tez çalışmalarına temel teşkil edebilecektir.
+
+Uygulama, Unity oyun motoru, React Native ve Firebase veritabanı kullanılarak geliştirilecektir. Tüm kod ve tasarım süreçleri açık kaynak uyumlu olacak, böylece proje ilerleyen yıllarda genişletilmeye elverişli bir yapıda sürdürülebilecektir.
+
+Ayrıca proje çıktısı olarak oluşturulacak gelişim radar grafiği, kullanıcıların zihinsel becerilerindeki ilerlemeyi görsel olarak sunan yenilikçi bir bileşen olup, literatürde nadir görülen bir örnektir. Proje sonucunda elde edilecek sistemin, dijital sağlık, oyunlaştırma ve bilişsel bilim kesişiminde yeni araştırma alanlarına kapı aralaması beklenmektedir.
+
+ 
+
+7. EKLER
+
+7.1 OYUN EKRAN GÖRÜNTÜLERİ VE AÇIKLAMALARI
+
+Aşağıda NöroDakika uygulaması kapsamında geliştirilen yedi mini oyunun ekran görüntüleri, oyun ID kodları ve ilişkilendirildiği bilişsel alanlar sunulmuştur. Her oyunun en az bir bilimsel bilişsel alanla ilişkisi bulunmaktadır. Ekran görüntüleri, Unity ortamında oluşturulan prototiplerin arayüz çıktılarıdır
+
+•	7.1.1. Reflex Tap (REF01)
+Bilişsel Alan: Refleks
+Bilimsel Temel: Tepki Süresi Testi, Go/No-Go Mekanizması
+Ekran Etiketleri:
+•	REF01-1: Ana Oyun Ekranı
+•	REF01-2: Zamanlama / Tepki Süresi Arayüzü
+Ekran Görüntüleri: 
+
+            
+
+
+
+
+
+•	7.1.2. Stroop Tap (ATT01)
+Bilişsel Alan: Dikkat
+Bilimsel Temel: Stroop Etkisi (1935)
+Ekran Etiketleri:
+•	ATT01-1: Renk–Kelime Uyumsuzluğu Ekranı
+•	ATT01-2: Tepki Süresi Ölçümü
+Ekran Görüntüleri: 
+
+            
+	
+
+•	7.1.3. N-Back Mini (MEM01)
+Bilişsel Alan: Hafıza + Dikkat
+Bilimsel Temel: Çalışan Bellek (Jaeggi, 2008)
+Ekran Etiketleri:
+•	MEM01-1: 1-Back Oyun Ekranı
+•	MEM01-2: 2-Back Adaptif Zorluk Ekranı
+Ekran Görüntüleri: 
+
+           
+
+
+
+ 
+
+•	7.1.4. Logic Sequence Puzzle (LOG01)
+Bilişsel Alan: Mantık + Görsel Algı
+Bilimsel Temel: Dizisel Mantık Testleri
+Ekran Etiketleri:
+•	LOG01-1: Mantık Dizisi Arayüzü
+•	LOG01-2: Şekil/Görsel Algı Ekranı
+
+Ekran Görüntüleri: 
+
+           
+
+
+•	7.1.5. Quick Math (NUM01)
+Bilişsel Alan: Sayısal Zeka
+Bilimsel Temel: Mental Aritmetik Görevleri
+Ekran Etiketleri:
+•	NUM01-1: Hızlı İşlem Ekranı
+•	NUM01-2: Zorluk Artışı / Süreli İşlem
+
+Ekran Görüntüleri: 
+
+       
+
+ 
+
+•	7.1.6. Memory Board – Kart Eşleştirme (MEM02)
+Bilişsel Alan: Hafıza + Görsel Algı
+Bilimsel Temel: Memory Matching Tasks
+Ekran Etiketleri:
+•	MEM02-1: Kart Seçim Ekranı
+•	MEM02-2: Eşleşme Sonuç Arayüzü
+   
+Ekran Görüntüleri: 
+
+           
+
+
+•	7.1.7. Recall Phase (MEM03)
+Bilişsel Alan: Dil + Hafıza
+Bilimsel Temel: Sözcük Hatırlama Testleri
+Ekran Etiketleri:
+•	MEM03-1: Kelime Gösterim Ekranı
+•	MEM03-2: Hatırlama / Cevaplama Ekranı
+
+Ekran Görüntüleri: 
+
+                                                    
+ 
+7.2 Genel Oyun–Alan Tablosu
+
+Oyun ID	Oyun Adı	Bilişsel Alan(lar)	Bilimsel Temel
+REF01	Reflex Tap	Refleks	Tepki Süresi Ölçümü
+ATT01	Stroop Tap	Dikkat	Stroop Testi
+MEM01	N-Back Mini	Hafıza + Dikkat	Çalışan Bellek
+LOG01	Sequence Puzzle	Mantık + Görsel Algı	Mantık Dizisi Testleri
+NUM01	Quick Math	Sayısal Zeka	Mental Aritmetik
+MEM02	Memory Board	Hafıza + Görsel Algı	Memory Matching
+MEM03	Recall Phase	Dil + Hafıza	Sözcük Hatırlama Testi
+
+Bu bölümde verilen ekran görüntüleri uygulamanın Unity tabanlı mini oyun modüllerine aittir. Her oyun, ilgili bilişsel alanla ilişkilendirilmiş olup değerlendirmede kullanılan ID kodları ve etiketler kavram haritası ile uyumludur. Oyun ekranları araştırma kapsamında oluşturulan bilimsel modelin somut çıktılarıdır.
+
+
+
+
+
+
+
+
+
+
+ 
+EK-1:  KAYNAKLAR
+
+1  Baddeley, A. D. (2012). Working Memory: Theories, Models, and Controversies. Annual Review of Psychology, 63(1), 1–29.
+2  Jaeggi, S. M., Buschkuehl, M., Jonides, J., & Perrig, W. J. (2008). Improving fluid intelligence with training on working memory. Proceedings of the National Academy of Sciences, 105(19), 6829–6833.
+3  Green, C. S., & Bavelier, D. (2003). Action video game modifies visual selective attention. Nature, 423(6939), 534–537.
+4  Stroop, J. R. (1935). Studies of interference in serial verbal reactions. Journal of Experimental Psychology, 18(6), 643–662.
+5  Csikszentmihalyi, M. (1990). Flow: The Psychology of Optimal Experience. Harper & Row.
+6  Prensky, M. (2003). Digital game-based learning. Computers in Entertainment, 1(1), 21–29.
+7  Oei, A. C., & Patterson, M. D. (2014). Enhancing cognition with video games: A multiple game training study. PLoS ONE, 9(1), e84560.
+8  TUBİTAK (2024). 2209-A Üniversite Öğrencileri Araştırma Projeleri Destekleme Programı Uygulama Esasları. TÜBİTAK Bilim İnsanı Destek Programları Başkanlığı (BİDEB).
+9  Unity Technologies. (2024). Unity Manual – Scripting, Game Loop and Adaptive Difficulty Systems.
+
