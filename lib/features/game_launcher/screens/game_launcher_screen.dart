@@ -66,7 +66,10 @@ class GameLauncherScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => GamePlayScreen(game: game),
+            builder: (context) => GamePlayScreen(
+              game: game,
+              isDarkOverride: null,
+            ),
           ),
         );
       },

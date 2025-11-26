@@ -17,10 +17,12 @@ import '../widgets/recall_phase_game.dart';
 
 class GamePlayScreen extends ConsumerStatefulWidget {
   final GameModel game;
+  final bool? isDarkOverride;
 
   const GamePlayScreen({
     super.key,
     required this.game,
+    this.isDarkOverride,
   });
 
   @override
@@ -39,9 +41,6 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
   }
 
   Future<void> _startGame() async {
-    final userEmail = ref.read(currentUserProvider);
-    if (userEmail == null) return;
-
     setState(() {
       _isGameStarted = true;
     });
@@ -220,42 +219,22 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
       });
     }
 
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Oyun başlığı
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  Expanded(
-                    child: Text(
-                      widget.game.name,
-                      style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const SizedBox(width: 48), // Denge için
-                ],
-              ),
-            ),
-            
-            // Oyun alanı
-            Expanded(
-              child: _buildGameWidget(),
-            ),
-          ],
-        ),
+    final baseTheme = Theme.of(context);
+    final effectiveIsDark =
+        widget.isDarkOverride ?? baseTheme.brightness == Brightness.dark;
+    final bgColor =
+        effectiveIsDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+
+    final themedData = baseTheme.copyWith(
+      brightness: effectiveIsDark ? Brightness.dark : Brightness.light,
+      scaffoldBackgroundColor: bgColor,
+    );
+
+    return Theme(
+      data: themedData,
+      child: Scaffold(
+        backgroundColor: bgColor,
+        body: _buildGameWidget(),
       ),
     );
   }

@@ -77,7 +77,11 @@ class _ReflexTapGameState extends State<ReflexTapGame> {
 
     setState(() {
       _showTarget = false;
-      _feedbackText = reactionTime < 200 ? 'Great!' : reactionTime < 400 ? 'Good!' : 'OK';
+      _feedbackText = reactionTime < 200
+          ? 'Harika!'
+          : reactionTime < 400
+              ? 'İyi!'
+              : 'Fena değil';
     });
 
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -107,128 +111,200 @@ class _ReflexTapGameState extends State<ReflexTapGame> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment.center,
-          radius: 1.0,
-          colors: [
-            const Color(0xFFC6B4CE).withOpacity(0.15),
-            const Color(0xFF0A1931),
-          ],
-        ),
-      ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor =
+        isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+    final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final textPrimary =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textSecondary =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
+    return Container
+    (
+      color: backgroundColor,
       child: SafeArea(
-        child: Column(
-          children: [
-            // Top Bar
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFFF0F0F0)),
-                    onPressed: () => Navigator.pop(context),
+                  _buildInfoChip(
+                    label: 'Süre',
+                    value: '$_timeRemaining sn',
+                    isDark: isDark,
                   ),
-                  Expanded(
-                    child: Text(
-                      'Reflex Tap',
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFF0F0F0),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.pause, color: Color(0xFFF0F0F0)),
-                    onPressed: () {},
+                  _buildInfoChip(
+                    label: 'Skor',
+                    value: '$_score',
+                    isDark: isDark,
                   ),
                 ],
               ),
-            ),
-            
-            // Main Content
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Reaction Time Display
-                    if (_reactionTime > 0)
-                      Text(
-                        '$_reactionTime ms',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 56,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFFF0F0F0),
-                        ),
+              const SizedBox(height: 24),
+              Expanded(
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFF374151)
+                            : const Color(0xFFE5E7EB),
                       ),
-                    
-                    // Feedback Text
-                    if (_feedbackText.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 64),
-                        child: Text(
-                          _feedbackText,
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 18,
-                            color: const Color(0xFFA0D2DB),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33000000),
+                          blurRadius: 32,
+                          offset: Offset(0, 16),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_reactionTime > 0)
+                          Text(
+                            '$_reactionTime ms',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: textPrimary,
+                            ),
+                          ),
+                        if (_feedbackText.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, bottom: 24),
+                            child: Text(
+                              _feedbackText,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF10B981),
+                              ),
+                            ),
+                          ),
+                        GestureDetector(
+                          onTap: _onTap,
+                          child: Container(
+                            width: 220,
+                            height: 220,
+                            decoration: BoxDecoration(
+                              gradient: _showTarget
+                                  ? const LinearGradient(
+                                      colors: [
+                                        Color(0xFF4F46E5),
+                                        Color(0xFF10B981),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    )
+                                  : null,
+                              color: _showTarget
+                                  ? null
+                                  : (isDark
+                                      ? const Color(0xFF111827)
+                                      : const Color(0xFFE5E7EB)),
+                              shape: BoxShape.circle,
+                              boxShadow: _showTarget
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF4F46E5)
+                                            .withOpacity(0.5),
+                                        blurRadius: 24,
+                                        spreadRadius: 6,
+                                      ),
+                                      BoxShadow(
+                                        color: const Color(0xFF10B981)
+                                            .withOpacity(0.4),
+                                        blurRadius: 40,
+                                        spreadRadius: 10,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: Center(
+                              child: AnimatedOpacity(
+                                opacity: _showTarget ? 1 : 0.4,
+                                duration: const Duration(milliseconds: 200),
+                                child: Text(
+                                  _showTarget ? 'ŞİMDİ DOKUN' : 'BEKLE',
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? const Color(0xFFF9FAFB)
+                                        : const Color(0xFF111827),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    
-                    // Central Button
-                    GestureDetector(
-                      onTap: _onTap,
-                      child: Container(
-                        width: 256,
-                        height: 256,
-                        decoration: BoxDecoration(
-                          color: _showTarget ? _targetColor : Colors.transparent,
-                          shape: BoxShape.circle,
-                          boxShadow: _showTarget
-                              ? [
-                                  BoxShadow(
-                                    color: _targetColor.withOpacity(0.6),
-                                    blurRadius: 20,
-                                    spreadRadius: 5,
-                                  ),
-                                  BoxShadow(
-                                    color: _targetColor.withOpacity(0.4),
-                                    blurRadius: 40,
-                                    spreadRadius: 10,
-                                  ),
-                                  BoxShadow(
-                                    color: const Color(0xFFC6B4CE).withOpacity(0.3),
-                                    blurRadius: 60,
-                                    spreadRadius: 15,
-                                  ),
-                                ]
-                              : null,
+                        const SizedBox(height: 24),
+                        Text(
+                          'Düğmenin rengi değiştiğinde mümkün olan en hızlı şekilde dokun.',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 14,
+                            color: textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
+                      ],
                     ),
-                    
-                    // Instruction Text
-                    Padding(
-                      padding: const EdgeInsets.only(top: 64),
-                      child: Text(
-                        'Tap when the button changes color',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 16,
-                          color: const Color(0xFFF0F0F0).withOpacity(0.7),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip({
+    required String label,
+    required String value,
+    required bool isDark,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1F2937) : Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$label: ',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: isDark
+                  ? const Color(0xFF9CA3AF)
+                  : const Color(0xFF6B7280),
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? const Color(0xFFF9FAFB)
+                  : const Color(0xFF111827),
+            ),
+          ),
+        ],
       ),
     );
   }
