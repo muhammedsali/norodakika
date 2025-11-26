@@ -33,6 +33,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
   bool _isGameStarted = false;
   bool _isGameComplete = false;
   Map<String, dynamic>? _gameResult;
+  int _runId = 0; // oyun tekrarları için
 
   @override
   void initState() {
@@ -116,51 +117,189 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
 
     final score = (_gameResult!['score'] as num?)?.toDouble() ?? 0.0;
     final successRate = (_gameResult!['successRate'] as num?)?.toDouble() ?? 0.0;
+    final duration = (_gameResult!['duration'] as num?)?.toInt() ?? 0;
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
-        title: Text(
-          'Oyun Tamamlandı!',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF6E00FF),
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Skor: ${score.toStringAsFixed(1)}',
-              style: GoogleFonts.poppins(fontSize: 18),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Başarı Oranı: ${(successRate * 100).toStringAsFixed(1)}%',
-              style: GoogleFonts.poppins(fontSize: 16),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context); // Dialog'u kapat
-              Navigator.pop(context); // Oyun ekranından çık
-            },
-            child: Text(
-              'Tamam',
-              style: GoogleFonts.poppins(
-                color: const Color(0xFF6E00FF),
-                fontWeight: FontWeight.w600,
+      builder: (ctx) {
+        final theme = Theme.of(ctx);
+        final isDark = theme.brightness == Brightness.dark;
+        final bgColor =
+            isDark ? const Color(0xFF111827) : Colors.white;
+        final titleColor =
+            isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+        final textColor =
+            isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxWidth: 420,
+                  minHeight: 220,
+                ),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33000000),
+                      blurRadius: 32,
+                      offset: Offset(0, 16),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFE5E7EB),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Oyun tamamlandı',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Skor',
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 13,
+                                  color: textColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                score.toStringAsFixed(1),
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  color: titleColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Başarı oranı',
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 13,
+                                  color: textColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${(successRate * 100).toStringAsFixed(1)}%',
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  color: titleColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Süre: ${duration.toString()} sn',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 13,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.pop(ctx); // Dialog'u kapat
+                              setState(() {
+                                _isGameComplete = false;
+                                _gameResult = null;
+                                _isGameStarted = false;
+                                _runId++;
+                              });
+                              _startGame();
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                color: isDark
+                                    ? const Color(0xFF4B5563)
+                                    : const Color(0xFF4F46E5),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                            child: Text(
+                              'Tekrar oyna',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: titleColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: SizedBox(
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(ctx); // Dialog'u kapat
+                                Navigator.pop(ctx); // Oyun ekranından çık
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4F46E5),
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                              ),
+                              child: Text(
+                                'Ana ekrana dön',
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -171,19 +310,40 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
 
     switch (widget.game.id) {
       case 'REF01':
-        return ReflexTapGame(onComplete: _onGameComplete);
+        return ReflexTapGame(
+          key: ValueKey('reflex_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'NUM01':
-        return QuickMathGame(onComplete: _onGameComplete);
+        return QuickMathGame(
+          key: ValueKey('quickmath_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'MEM02':
-        return MemoryBoardGame(onComplete: _onGameComplete);
+        return MemoryBoardGame(
+          key: ValueKey('memoryboard_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'ATT01':
-        return StroopTapGame(onComplete: _onGameComplete);
+        return StroopTapGame(
+          key: ValueKey('stroop_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'MEM01':
-        return NBackMiniGame(onComplete: _onGameComplete);
+        return NBackMiniGame(
+          key: ValueKey('nback_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'LOG01':
-        return LogicPuzzleGame(onComplete: _onGameComplete);
+        return LogicPuzzleGame(
+          key: ValueKey('logic_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'MEM03':
-        return RecallPhaseGame(onComplete: _onGameComplete);
+        return RecallPhaseGame(
+          key: ValueKey('recall_$_runId'),
+          onComplete: _onGameComplete,
+        );
       default:
         return Center(
           child: Column(
