@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
@@ -27,6 +28,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userEmail = ref.watch(currentUserProvider);
     final userName = userEmail?.split('@').first ?? 'Kullanıcı';
     
+    // Sistem status bar ikonlarını tema ile uyumlu yap
+    final overlayStyle = _isDarkMode
+        ? const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.light,
+            statusBarBrightness: Brightness.dark,
+          )
+        : const SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: Brightness.dark,
+            statusBarBrightness: Brightness.light,
+          );
+    SystemChrome.setSystemUIOverlayStyle(overlayStyle);
+
     final games = MemoryBank.games
         .map((g) => GameModel.fromMap(g))
         .toList();
@@ -47,7 +62,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 } else if (_selectedTab == 1) {
                   return _buildGamesTabBody(context, games);
                 } else if (_selectedTab == 2) {
-                  return _buildProgressTabBody();
+                  // İlerleme sekmesi: İstatistik ekranı
+                  return const StatsScreen();
                 } else {
                   return _buildSettingsTabBody();
                 }
@@ -624,7 +640,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Cortex Kullanıcısı',
+                    'Zihin Antrenörü',
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -1002,13 +1018,283 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSettingsTabBody() {
-    return Center(
-      child: Text(
-        'Ayarlar ekranı yakında burada olacak.',
-        style: GoogleFonts.spaceGrotesk(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+    final bgColor = _isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+    final cardColor = _isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final titleColor = _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor = _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
+    return Container
+    (
+      color: bgColor,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Ayarlar',
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: titleColor,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Uygulamayı sana göre özelleştir.',
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 13,
+                color: subtitleColor,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Tema
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: _isDarkMode
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF818CF8).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.dark_mode_rounded,
+                      color: Color(0xFF4F46E5),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Karanlık Mod',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: titleColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Geceleri gözünü yormayan koyu tema.',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 12,
+                            color: subtitleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: _isDarkMode,
+                    activeColor: const Color(0xFF4F46E5),
+                    onChanged: (value) {
+                      setState(() {
+                        _isDarkMode = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Hesap ve İlerleme
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: _isDarkMode
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    leading: const Icon(Icons.person_rounded, color: Color(0xFF4F46E5)),
+                    title: Text(
+                      'Profil ve Hesap',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: titleColor,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Kullanıcı bilgilerini ve hedeflerini düzenle.',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        color: subtitleColor,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF)),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ProfileScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    leading: const Icon(Icons.today_rounded, color: Color(0xFF4F46E5)),
+                    title: Text(
+                      'Günün Planı',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: titleColor,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Bugünkü antrenman kartlarını gör.',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        color: subtitleColor,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF)),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DailyPlanScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                    leading: const Icon(Icons.bar_chart_rounded, color: Color(0xFF4F46E5)),
+                    title: Text(
+                      'İlerleme ve İstatistikler',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: titleColor,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Radar grafiği ve detaylı performansın.',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        color: subtitleColor,
+                      ),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF9CA3AF)),
+                    onTap: () {
+                      setState(() {
+                        _selectedTab = 2;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Hakkında
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: _isDarkMode
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.info_rounded,
+                      color: Color(0xFF059669),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'NöroDakika Hakkında',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: titleColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Zihinsel becerilerini kısa, bilimsel mini oyunlarla takip et ve geliştir. Bu sürüm MVP aşamasındadır.',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 12,
+                            height: 1.4,
+                            color: subtitleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

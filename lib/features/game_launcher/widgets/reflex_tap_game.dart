@@ -33,8 +33,13 @@ class ReflexGameApp extends StatelessWidget {
 
 class ReflexGameScreen extends StatefulWidget {
   final bool isPaused;
+  final void Function(Map<String, dynamic>)? onComplete;
 
-  const ReflexGameScreen({super.key, required this.isPaused});
+  const ReflexGameScreen({
+    super.key,
+    required this.isPaused,
+    this.onComplete,
+  });
 
   @override
   State<ReflexGameScreen> createState() => _ReflexGameScreenState();
@@ -183,6 +188,18 @@ class _ReflexGameScreenState extends State<ReflexGameScreen> with TickerProvider
       _gameState = GameState.finished;
       _isTargetVisible = false;
     });
+
+    // Oyun sonucunu üst seviyeye bildir
+    if (widget.onComplete != null) {
+      final durationSeconds = gameDuration; // şimdilik sabit oyun süresi
+      final successRate = _totalTaps == 0 ? 0.0 : _correctTaps / _totalTaps;
+
+      widget.onComplete!.call({
+        'score': _score.toDouble(),
+        'successRate': successRate,
+        'duration': durationSeconds,
+      });
+    }
   }
 
   void _scheduleNextTarget() {
@@ -658,6 +675,9 @@ class ReflexTapGame extends StatelessWidget {
   Widget build(BuildContext context) {
     // Şimdilik sadece ReflexGameScreen'i gösteriyoruz.
     // İleride istenirse onComplete entegrasyonu bu ekrana eklenebilir.
-    return ReflexGameScreen(isPaused: isPaused);
+    return ReflexGameScreen(
+      isPaused: isPaused,
+      onComplete: onComplete,
+    );
   }
 }

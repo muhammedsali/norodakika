@@ -11,53 +11,144 @@ class StatsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userEmail = ref.watch(currentUserProvider);
-    
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textColorPrimary = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColorSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+
     if (userEmail == null) {
-      return const Scaffold(
-        body: Center(child: Text('Kullanıcı bulunamadı')),
+      return Center(
+        child: Text(
+          'Henüz istatistik verisi bulunmuyor.',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: textColorSecondary,
+          ),
+          textAlign: TextAlign.center,
+        ),
       );
     }
 
     final userDataAsync = ref.watch(userDataProvider(userEmail));
 
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6E00FF)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Zihin Gelişim Grafiği',
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: userDataAsync.when(
-          data: (userData) {
-            if (userData == null) {
-              return const Center(child: Text('Veri yüklenemedi'));
-            }
+    return userDataAsync.when(
+      data: (userData) {
+        if (userData == null) {
+          return Center(
+            child: Text(
+              'Henüz istatistik verisi bulunmuyor.',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: textColorSecondary,
+              ),
+            ),
+          );
+        }
 
-            final radarStats = MemoryBank.calculateRadarStats(userData.history);
-            final categories = MemoryBank.categories;
+        final radarStats = MemoryBank.calculateRadarStats(userData.history);
+        final categories = MemoryBank.categories;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
+            // Bugün özeti için hesaplamalar
+            final now = DateTime.now();
+            final List history = userData.history ?? [];
+            final todayAttempts = history.where((h) {
+              if (h is Map && h['timestamp'] != null) {
+                try {
+                  final ts = DateTime.parse(h['timestamp'].toString());
+                  return ts.year == now.year && ts.month == now.month && ts.day == now.day;
+                } catch (_) {
+                  return false;
+                }
+              }
+              return false;
+            }).toList();
+
+            final gamesToday = todayAttempts.length;
+            final totalSecondsToday = todayAttempts.fold<int>(0, (prev, h) {
+              if (h is Map && h['duration'] != null) {
+                final d = int.tryParse(h['duration'].toString()) ?? 0;
+                return prev + d;
+              }
+              return prev;
+            });
+            final totalMinutesToday = (totalSecondsToday / 60).floor();
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+                  // Bugün Özeti Kartı
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1F2937) : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Bugün özeti',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: textColorPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              gamesToday > 0
+                                  ? '$gamesToday oyun, yaklaşık $totalMinutesToday dk'
+                                  : 'Bugün henüz oyun oynamadın',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: textColorSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4F46E5).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.today, size: 18, color: Color(0xFF4F46E5)),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${now.day}.${now.month}.${now.year}',
+                                style: GoogleFonts.robotoMono(
+                                  fontSize: 12,
+                                  color: const Color(0xFF4F46E5),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                   // Radar Chart
                   Container(
                     height: 300,
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: isDark ? const Color(0xFF020617) : Colors.white,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
@@ -71,8 +162,8 @@ class StatsScreen extends ConsumerWidget {
                       RadarChartData(
                         dataSets: [
                           RadarDataSet(
-                            fillColor: const Color(0xFF6E00FF).withOpacity(0.3),
-                            borderColor: const Color(0xFF6E00FF),
+                            fillColor: const Color(0xFF4F46E5).withOpacity(0.3),
+                            borderColor: const Color(0xFF4F46E5),
                             borderWidth: 2,
                             dataEntries: categories.map((category) {
                               final value = radarStats[category] ?? 0.0;
@@ -84,11 +175,12 @@ class StatsScreen extends ConsumerWidget {
                         tickCount: 5,
                         ticksTextStyle: GoogleFonts.poppins(
                           fontSize: 10,
-                          color: Colors.grey[600],
+                          color: textColorSecondary,
                         ),
                         tickBorderData: const BorderSide(color: Colors.grey, width: 1),
                         borderData: FlBorderData(show: true),
-                        radarBackgroundColor: Colors.grey[100],
+                        radarBackgroundColor:
+                            isDark ? const Color(0xFF020617) : Colors.grey[100],
                         gridBorderData: const BorderSide(color: Colors.grey, width: 1),
                         titlePositionPercentageOffset: 0.2,
                         getTitle: (index, angle) {
@@ -111,7 +203,7 @@ class StatsScreen extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDark ? const Color(0xFF1F2937) : Colors.white,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
@@ -129,11 +221,11 @@ class StatsScreen extends ConsumerWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                                color: textColorPrimary,
                               ),
                             ),
                             Text(
-                              value.toStringAsFixed(1),
+                              '${value.toStringAsFixed(1)} / 100',
                               style: GoogleFonts.poppins(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -145,13 +237,17 @@ class StatsScreen extends ConsumerWidget {
                       ),
                     );
                   }).toList(),
-                ],
-              ),
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(
-            child: Text('Hata: $error', style: GoogleFonts.poppins()),
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(
+        child: Text(
+          'Hata: $error',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            color: textColorSecondary,
           ),
         ),
       ),
