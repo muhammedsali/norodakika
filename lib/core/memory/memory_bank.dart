@@ -132,9 +132,15 @@ class MemoryBank {
 
     for (var h in history) {
       if (h is Map && h.containsKey("area") && h.containsKey("score")) {
-        String area = h["area"].toString();
-        if (grouped.containsKey(area)) {
-          grouped[area]!.add((h["score"] as num).toDouble());
+        final rawArea = h["area"].toString();
+        final score = (h["score"] as num).toDouble();
+
+        // "Hafıza + Dikkat" gibi çok alanlı etiketleri parçala
+        final parts = rawArea.split("+").map((s) => s.trim()).where((s) => s.isNotEmpty);
+        for (final part in parts) {
+          if (grouped.containsKey(part)) {
+            grouped[part]!.add(score);
+          }
         }
       }
     }
@@ -147,6 +153,16 @@ class MemoryBank {
         result[key] = value.reduce((a, b) => a + b) / value.length;
       }
     });
+
+    // 0–100 normalize et: en yüksek alan 100 olacak şekilde ölçekle
+    double maxVal = 0;
+    result.forEach((_, v) {
+      if (v > maxVal) maxVal = v;
+    });
+
+    if (maxVal > 0) {
+      result.updateAll((key, value) => double.parse(((value / maxVal) * 100).toStringAsFixed(1)));
+    }
 
     return result;
   }
