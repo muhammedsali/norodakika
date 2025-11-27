@@ -1,0 +1,76 @@
+1) MİMARİ GENEL FİKİR
+- Uygulama Flutter tarafında mümkün olduğunca "offline-first" kalsın; oyunlar ve temel akış internet gerektirmesin.
+- Tüm kalıcı veriler için 2 katman olsun: LocalStorageService (cihaz) + ApiService (sunucu).
+- Sunucu tarafında basit bir REST API yeterli: /auth, /games, /attempt, /daily-plan gibi uçlar.
+
+2) KULLANICI VE PROFİL VERİSİ
+- Kullanıcıyı e‑posta veya anonim ID ile tanımla (şu anki currentUserProvider yapısı kullanılabilir).
+- Local tarafta tutulan ana şeyler: son skorlar, zorluk değeri (difficulty), günlük plan, offline attempt kuyruğu.
+- Sunucuda ise sadece anonimleştirilmiş performans verileri ve özet istatistikler olsun (etik ve KVKK açısından daha temiz).
+
+3) OYUN MODELİ
+- Her oyun için tek bir GameModel kaydı olsun: id (REF01, MEM02...), name, area (Hafıza, Dikkat...), description, icon vb.
+- Zorluk (difficulty) numeric double (0.0–1.0 arasında) olarak tutulup MemoryBank.updateDifficulty ile güncellensin.
+- Her oyun kendi mini widget'ında oynansın ama hepsi GamePlayScreen üstünden yönetilsin (şu an yaptığımız gibi).
+
+4) "GÜNÜN OYUNU" MEKANİĞİ
+- Backend'de günlük planı hesaplayan bir uç olsun: GET /daily-plan?userId=...
+- Dönüş: o gün oynanması önerilen 1 ana oyun (+ belki 2 yedek oyun) ve hedefler (ör. 3 tur, min skor, odak alanı).
+- Bu uç, kullanıcının geçmiş attempt'lerine bakarak hangi alanı güçlendirmesi gerektiğine karar verebilir (örneğin hafıza düşükse MEM01/MEM02 ağırlıklı plan).
+- Frontend'de HomeScreen üzerindeki "Günün Oyunu" kartı bu API'den gelen GameModel'i gösterir.
+- Kullanıcı karta basınca doğrudan ilgili GamePlayScreen açılır; tamamlandığında o güne ait görev "tamamlandı" işaretlenir.
+
+5) İSTATİSTİK EKRANI
+- İstatistik ekranı 2 kaynaktan beslensin:
+  a) Yerel veriler: Son X attempt, son oynanan oyun, streak, günlük süre.
+  b) Sunucu verileri: Uzun vadeli ortalamalar, trendler, global percentile (istersek).
+- Radar grafiği için her alan (Hafıza, Dikkat, Refleks, Sayısal Zeka, Mantık, Görsel Algı, Dil) 0–100 skoruna normalize edilsin.
+- Günün oyunu oynandıktan sonra istatistik ekranında o güne ait küçük bir kart olsun: "Bugünkü görev: REF01, 3 tur, Başarı: %72" gibi.
+
+6) ATTEMPT KAYDI (ŞU ANKİ YAPI ÜZERİNDEN)
+- Frontend tarafı zaten AttemptModel ile skor, successRate, duration, area, difficulty gibi alanları üretiyor.
+- Her oyun bittiğinde:
+  1) LocalStorageService.saveAttempt(attempt)
+  2) ApiService.submitAttempt(attempt) (hata alırsa sessizce geç, sonra tekrar deneyebileceğin bir kuyruğa ekle)
+- Backend bu attempt'leri:
+  - Kullanıcı bazında tutar (userId + gameId + timestamp).
+  - Günlük/haftalık özetleri hesaplar (ör. son 7 gün ortalama refleks süresi).
+
+7) ADAPTİF ZORLUK
+- Zorluk hesabını tamamen backend'e de atabilirsin, ama şu anki MemoryBank.updateDifficulty mantığı iyi bir başlangıç.
+- Öneri: İlk versiyonda zorluğu sadece cihazda güncelle (quick feedback), belirli aralıklarla sunucuya senkronize et.
+- İleride: Backend kullanıcı başına daha karmaşık bir model (ör. ELO benzeri) tutabilir.
+
+8) GÜNÜN OYUNU İÇİN VERİ AKIŞI
+- HomeScreen açıldığında:
+  1) LocalStorageService'den son alınan daily-plan okunur.
+  2) Eğer plan eskiyse veya hiç yoksa ApiService.getDailyPlan() çağrılır.
+  3) Gelen plan local'e kaydedilir ve UI'da "Günün Oyunu" kartı güncellenir.
+- Kullanıcı oyunu oynayıp bitirdiğinde:
+  - Attempt kaydedilir.
+  - daily-plan içinde ilgili görev "done" işaretlenir (local + sunucu tarafında).
+
+9) İSTATİSTİKLERİN GÖRÜNÜMÜ
+- Uygulamada istatistik sekmesi/kartı şu bilgileri gösterebilir:
+  - Son 7 gün oyun sayısı (bar chart).
+  - Alan bazlı radar grafiği (Hafıza, Dikkat, Refleks...).
+  - "Bugün" özeti: Kaç oyun oynandı, toplam süre, tamamlanan görevler.
+- Ekstra olarak: Kullanıcıya basit yorumlar verilebilir ("Refleks skorun bu hafta arttı", "Hafıza egzersizlerine ağırlık verebilirsin" gibi).
+
+10) TEKNİK OLARAK DİKKAT EDİLECEKLER
+- Offline senaryoları baştan tasarla: API hatalarında uygulama bozulmasın, sadece senkronizasyon ertelensin.
+- Endpoint sayısını düşük ve anlamlı tut; hem mobil hem backend için bakım kolay olsun.
+- Versiyonlama düşün: API v1 altında tut ki ileride büyük değişikliklerde eski istemciler kırılmasın.
+- Veritabanı tarafında attempt tablosu iyi indekslenmiş olsun (userId + gameId + timestamp).
+
+11) MVP İÇİN ÖNCELİK SIRASI
+- 1) Mevcut oyunların (REF01, NUM01, MEM02, ATT01, MEM01, LOG01, MEM03) Flutter içinde stabil ve keyifli çalışması.
+- 2) Attempt kaydının local + API üzerinden problemsiz işlemesi.
+- 3) Basit bir istatistik ekranı (radar + son skorlar).
+- 4) En temel haliyle "Günün Oyunu" kartı (backend'ten sabit bir plan bile gelse yeterli).
+- 5) Adaptif zorluk ve gelişmiş daily-plan mantığı (v2 için).
+
+12) ÜRÜN GÖZÜYLE
+- Kullanıcıyı her gün uygulamaya sokan şey: basit bir görev akışı ve net geri bildirim.
+- Ekran karmaşık olmasın; "Bugünkü Görev", "Son Skorlar" ve "Oyunlar" kartları yeterli.
+- Backend ve istatistikler; kullanıcıya anlamlı, kısa yorumlar üretmek için kullanılsın, ham veriyi kullanıcıya yığmayalım.
