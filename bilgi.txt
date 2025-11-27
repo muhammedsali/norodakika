@@ -50,11 +50,11 @@ Araştırmanın Yürütüleceği Kurum/Kuruluş: KIRKLARELİ ÜNİVERSİTESİ �
 Özet
 Günümüzde bireylerin zihinsel performansını artırmak için dijital çözümler giderek yaygınlaşmaktadır. Ancak mevcut uygulamaların çoğu uzun süreli oyun seanslarına, karmaşık görev yapılarına veya bilimsel temelden yoksun ölçümlere dayanmaktadır. “NöroDakika” projesi, kullanıcıların yalnızca 1–3 dakikalık kısa seanslarla dikkat, hafıza, refleks, görsel algı, mantık, sayısal zeka ve dil gibi temel bilişsel alanlarda egzersiz yapmalarını sağlayan adaptif zorluk sistemine sahip bir mobil oyun platformudur.
 
-Uygulama, Flutter çatısı kullanılarak (Dart dili ile) tek bir kod tabanından Android ve iOS için geliştirilecektir. Mini oyunların tamamı Flutter içerisinde, ayrı widget tabanlı modüller olarak inşa edilmekte; kullanıcı performansı hem yerel depolama hem de REST tabanlı bir API servisi üzerinden kaydedilerek bireysel zorluk seviyeleri dinamik olarak belirlenmektedir.
+Uygulama, Flutter ile geliştirilecek ve oyunları Unity ile yapılıp kullanıcı verileri işlenerek bireysel zorluk seviyeleri dinamik olarak belirlenecektir. 
 
 Proje, oyunlaştırılmış bilişsel egzersizleri bilimsel temellerle birleştirerek hem eğlenceli hem de ölçülebilir bir zihinsel gelişim ortamı sunmayı hedeflemektedir. Çalışma sonucunda, kısa süreli ve tekrarlanabilir egzersizlerin bilişsel performans üzerindeki etkisi hakkında veri toplanarak literatüre katkı sağlanması planlanmaktadır.
 
-Anahtar Kelimeler: zihin egzersizi, bilişsel gelişim, Flutter, adaptif zorluk, yapay zekâ destekli oyun
+Anahtar Kelimeler: zihin egzersizi, bilişsel gelişim, Unity, adaptif zorluk, yapay zekâ destekli oyun
 
 
 1.	ÖZGÜN DEĞER 
@@ -113,7 +113,6 @@ Bu yöntem, hem yazılım mühendisliği hem de bilişsel bilim alanlarını bir
 3.	 PROJE YÖNETİMİ 
 Mobil uygulama arayüzü ve mini oyunlar tek bir teknoloji yığını üzerinde, Flutter ile geliştirilmiştir. Uygulama mimarisi; ana ekran, oyun başlatma katmanı ve her biri ayrı widget olarak tasarlanan mini oyun modüllerinden (Reflex Tap, Stroop Tap, N-Back, Quick Math, Memory Board, Recall Phase vb.) oluşmaktadır. Durum yönetiminde Riverpod tercih edilmekte, oyun sonuçları ise yerel depolama ve API servisi üzerinden kaydedilmektedir.
 
-
 3.1	İş- Zaman Çizelgesi
 
 Araştırma önerisinde yer alacak başlıca iş paketleri ve hedefleri, her bir iş paketinin hangi sürede gerçekleştirileceği, başarı ölçütü ve araştırmanın başarısına katkısı “İş-Zaman Çizelgesi” doldurularak verilir. Literatür taraması, gelişme ve sonuç raporu hazırlama aşamaları, araştırma sonuçlarının paylaşımı, makale yazımı ve malzeme alımı ayrı birer iş paketi olarak gösterilmemelidir.
@@ -124,7 +123,7 @@ Başarı ölçütü olarak her bir iş paketinin hangi kriterleri sağladığın
         
 İP No	İş Paketlerinin Adı ve Hedefleri	Kim(ler) Tarafından Gerçekleştirileceği	Zaman Aralığı
 (..-.. Ay)	Başarı Ölçütü ve Projenin Başarısına Katkısı 
-1	Flutter tabanlı mobil uygulama iskeleti kurulup, oyun başlatma ekranı ile mini oyun widget’ları entegre edilir.	Tüm ekip, danışman desteğiyle	3. Ay	Ana ekrandan ilgili oyun kartına tıklandığında seçilen mini oyun sorunsuz bir şekilde açılır. Uygulama 60 FPS hedefiyle akıcı çalışır.
+1	Flutter tabanlı mobil uygulama iskeleti kurulup, oyun başlatma ekranı ile mini oyun widget’ları entegre edilir.	Tüm ekip, danışman desteğiyle	3. Ay		Ana ekrandan ilgili oyun kartına tıklandığında seçilen mini oyun sorunsuz bir şekilde açılır. Uygulama 60 FPS hedefiyle akıcı çalışır.
 
 
 2	
@@ -235,7 +234,7 @@ NOT: Bütçe talebiniz olması halinde hem bu tablonun hem de TÜBİTAK Yönetim
 Sadece araştırma önerisinin değerlendirilmesine katkı sağlayabilecek bilgi/veri (grafik, tablo, vb.) eklenebilir. 
 Proje kapsamında geliştirilecek NöroDakika uygulaması, yalnızca bir oyun yazılımı değil; aynı zamanda bireylerin bilişsel performansını izlemeye ve kısa süreli egzersizlerin etkisini ölçmeye yarayan bir araştırma aracıdır. Proje sonunda toplanacak anonim kullanıcı verileri, istatistiksel olarak analiz edilerek dikkat ve refleks gelişimindeki değişim oranları değerlendirilecektir. Bu veriler, ilerleyen dönemde akademik yayın veya lisansüstü tez çalışmalarına temel teşkil edebilecektir.
 
-Uygulama, Flutter (Dart), yerel depolama ve REST tabanlı bir backend servisi kullanılarak geliştirilecektir. Tüm kod ve tasarım süreçleri versiyon kontrolü (GitHub) altında tutulacak, böylece proje ilerleyen yıllarda genişletilmeye elverişli bir yapıda sürdürülebilecektir.
+Uygulama, Unity oyun motoru, Flutter ve Firebase veritabanı kullanılarak geliştirilecektir. Tüm kod ve tasarım süreçleri açık kaynak uyumlu olacak, böylece proje ilerleyen yıllarda genişletilmeye elverişli bir yapıda sürdürülebilecektir.
 
 Ayrıca proje çıktısı olarak oluşturulacak gelişim radar grafiği, kullanıcıların zihinsel becerilerindeki ilerlemeyi görsel olarak sunan yenilikçi bir bileşen olup, literatürde nadir görülen bir örnektir. Proje sonucunda elde edilecek sistemin, dijital sağlık, oyunlaştırma ve bilişsel bilim kesişiminde yeni araştırma alanlarına kapı aralaması beklenmektedir.
 
@@ -355,17 +354,45 @@ Bu bölümde verilen ekran görüntüleri uygulamanın Flutter tabanlı mini oyu
 
 
 
-
  
 EK-1:  KAYNAKLAR
 
 1  Baddeley, A. D. (2012). Working Memory: Theories, Models, and Controversies. Annual Review of Psychology, 63(1), 1–29.
 2  Jaeggi, S. M., Buschkuehl, M., Jonides, J., & Perrig, W. J. (2008). Improving fluid intelligence with training on working memory. Proceedings of the National Academy of Sciences, 105(19), 6829–6833.
 3  Green, C. S., & Bavelier, D. (2003). Action video game modifies visual selective attention. Nature, 423(6939), 534–537.
-4  Stroop, J. R. (1935). Studies of interference in serial verbal reactions. Journal of Experimental Psychology, 18(6), 643–662.
+4   Flutter Team (2024). Flutter DevTools & Performance Profiling – Resmi Dokümantasyon.
+
 5  Csikszentmihalyi, M. (1990). Flow: The Psychology of Optimal Experience. Harper & Row.
 6  Prensky, M. (2003). Digital game-based learning. Computers in Entertainment, 1(1), 21–29.
 7  Oei, A. C., & Patterson, M. D. (2014). Enhancing cognition with video games: A multiple game training study. PLoS ONE, 9(1), e84560.
 8  TUBİTAK (2024). 2209-A Üniversite Öğrencileri Araştırma Projeleri Destekleme Programı Uygulama Esasları. TÜBİTAK Bilim İnsanı Destek Programları Başkanlığı (BİDEB).
-9  Flutter Team (2024). Flutter DevTools & Performance Profiling – Resmi Dokümantasyon.
 
+
+---
+İş Paketleri
+
+İş Paketleri
+
+İş Paketi 1 – Uygulama Mimarisi ve Ana İskeletin Kurulması
+Bu iş paketinde NöroDakika uygulamasının temel teknik altyapısı oluşturulacaktır. Flutter tabanlı projenin çok platformlu (Android/iOS) çalışacak şekilde yapılandırılması, proje klasör hiyerarşisinin (core, features, services vb.) belirlenmesi ve temel bağımlılıkların (Riverpod, HTTP, Firebase/REST istemcileri, Google Fonts vb.) eklenmesi sağlanacaktır. Ana ekran (HomeScreen), oyun başlatma katmanı (GameLauncher, GamePlayScreen) ve sayfa geçiş yapısı kurulacaktır. Bu iş paketi başarıyla tamamlandığında, ana ekrandan oyun kartlarına tıklanarak ilgili oyun akışlarının başlatılabildiği, 60 FPS hedefiyle akıcı çalışan temel bir uygulama iskeleti elde edilmiş olacaktır.
+
+İş Paketi 2 – Bilişsel Mini Oyun Tasarımı ve UI/UX Çalışmaları
+Bu iş paketinin amacı, NöroDakika’da kullanılacak mini oyunların bilişsel ve görsel tasarımını bütüncül bir şekilde oluşturmaktır. Hafıza, dikkat, refleks, sayısal zeka, mantık, görsel algı ve dil olmak üzere 7 ana bilişsel kategori için oyun konseptleri belirlenecek; her bir oyun için temel oyun döngüsü, hedeflenen tepki türü (tepki süresi, doğru/yanlış, hatırlama vb.) ve kullanıcı geri bildirimi (skor, seviye, geribildirim mesajları) tanımlanacaktır. Figma veya benzeri araçlarla düşük ve orta sadakatli arayüz prototipleri hazırlanacak; renk paleti, tipografi ve ikon seti belirlenerek koyu/açık tema uyumlu bir UI kiti oluşturulacaktır. Bu paketin çıktısı, kullanıcı akış diyagramları ve her mini oyun için onaylanmış UI/UX prototipleridir.
+
+İş Paketi 3 – Mini Oyun Çekirdeği ve Oyun Akışı Modüllerinin Geliştirilmesi
+Bu iş paketinde, tasarlanan oyunların yazılım tarafındaki çekirdek mantığı Flutter ve/veya Unity tabanlı modüller halinde hayata geçirilecektir. İlk aşamada en az bir temsilci oyun (örneğin Reflex Tap) Flutter içinde widget tabanlı olarak geliştirilecek; skor hesaplama, süre yönetimi, deneme sayısı, kombo/seri yakalama ve oyun bitiş koşulları uygulanacaktır. Ardından diğer mini oyunlar (Stroop Tap, N-Back, Quick Math, Memory Board, Recall Phase vb.) aynı oyun iskeletini (GamePlayScreen, sonuç ekranı, “deneme sonucu” modeli) kullanacak şekilde projeye eklenecektir. Bu paket tamamlandığında, birbirinden farklı bilişsel alanlara hitap eden, tekrar oynanabilir ve teknik olarak kararlı bir mini oyun seti elde edilecektir.
+
+İş Paketi 4 – Veri Toplama, Yerel Depolama ve Sunucu Entegrasyonu
+Bu iş paketinin hedefi, kullanıcı performans verilerinin toplanması, saklanması ve analiz için hazır hale getirilmesidir. Flutter tarafında LocalStorageService ile kullanıcının oynadığı her oyuna ait deneme verileri (oyun ID’si, skor, süre, tarih-zaman, cihaz bilgisi vb.) yapılandırılacak ve güvenli şekilde cihazda tutulacaktır. Paralel olarak, REST tabanlı API veya Firebase altyapısıyla, bu denemelerin sunucu tarafına güvenli aktarımı sağlanacaktır. /auth, /games, /attempt, /daily-plan, /stats gibi uç noktalarla kimlik doğrulama, oyun listesi, deneme kaydı ve istatistik sorguları gerçekleştirilecektir. Bu iş paketi sonunda, hem offline hem online senaryolarda çalışabilen, veri kaybını minimize eden ve araştırma için gerekli ölçümlerin tutulduğu bir veri katmanı tamamlanmış olacaktır.
+
+İş Paketi 5 – Adaptif Zorluk Sistemi ve Bilişsel Modelleme
+Bu iş paketinde, kullanıcıların performansına göre oyun zorluk seviyesini dinamik olarak ayarlayan adaptif yapı geliştirilecektir. Her oyun/alan için başlangıç zorluk parametreleri tanımlanacak; her oturum sonunda başarı oranı, tepki süresi ve hata sayısı gibi metrikler kullanılarak kullanıcının bilişsel seviye katsayısı (örneğin μ parametresi) güncellenecektir. ELO benzeri bir güncelleme formülüyle, hedef başarı oranı yaklaşık %60–70 bandında tutulacak; aşırı kolay veya aşırı zor deneyimler engellenecektir. Ayrıca, çok alanlı oyunlar (örneğin “Hafıza + Dikkat”) için her alana ağırlıklandırılmış katkı modellemesi yapılacaktır. Bu paketin çıktısı, hem oyun içi his olarak dengeli bir zorluk hissi hem de araştırma tarafında kullanılabilir istatistiksel zorluk parametreleridir.
+
+İş Paketi 6 – İlerleme Ekranları, Radar Grafiği ve Günün Planı Modülü
+Bu iş paketinin odağı, kullanıcının bilişsel ilerlemesini görünür kılan arayüzlerin geliştirilmesidir. StatsScreen üzerinde, kullanıcının geçmiş denemelerine göre 7 bilişsel alan için normalize edilmiş skorlar hesaplanarak radar grafiği ile görselleştirilecektir. Günlük özet kartları, “Bugünkü oyunlar”, “En iyi skorlar” ve “ortalama tepki süresi” gibi metrikleri kullanıcı dostu biçimde sunacaktır. Ayrıca MemoryBank veya benzeri bir planlama bileşeni ile “Günün Planı” modülü geliştirilecek; kullanıcının önceki performansına ve eksik alanlarına göre o gün önerilecek mini oyun setleri (örneğin 3–5 oyun) otomatik oluşturulacaktır. Böylece kullanıcıya sadece anlık skor değil, zaman içindeki ilerleme ve önerilen antrenman planı sunulmuş olacaktır.
+
+İş Paketi 7 – Kullanıcı Deneyimi İyileştirmeleri, Onboarding ve Çok Dilli Destek
+Bu iş paketinde, uygulamanın genel kullanıcı deneyimi katmanı güçlendirilecektir. İlk kez uygulamayı açan kullanıcılar için tam ekran onboarding kartları (ileri/atla akışı) tasarlanacak; bu kartlarda uygulamanın amacı, oyunların süresi ve radar grafiği kısaca anlatılacaktır. Uygulama için Türkçe/İngilizce dil desteği sağlanacak; ana ekran, alt menü, ayarlar ve istatistikler gibi temel ekranların metinleri seçilen dile göre dinamikleşecektir. Karanlık mod/aydınlık mod geçişleri, status bar ikonları ve kart renkleriyle uyumlu hale getirilecektir. Bu paketle birlikte NöroDakika, hem yeni kullanıcılar için anlaşılır hem de günlük kullanımda görsel olarak tatmin edici bir hale gelecektir.
+
+İş Paketi 8 – Test, Performans Optimizasyonu, Veri Analizi ve Nihai Raporlama
+Son iş paketinde, geliştirilen sistemin teknik ve bilimsel açıdan doğrulanması amaçlanmaktadır. Uygulama 20–30 gönüllü kullanıcı ile beta testine açılacak; hata raporları, geri bildirimler ve performans metrikleri (FPS, bellek kullanımı, çökme oranı vb.) toplanacaktır. Gerekli optimizasyonlar yapılarak özellikle düşük donanımlı cihazlarda akıcı çalışması sağlanacaktır. Elde edilen oyun verileri, istatistiksel yöntemlerle (ön test/son test karşılaştırmaları, anlamlılık analizleri vb.) incelenecek ve kısa süreli adaptif egzersizlerin dikkat, hafıza ve refleks üzerindeki etkisi sayısal olarak raporlanacaktır. Bu iş paketi sonunda, TÜBİTAK formatına uygun sonuç raporu, jüri sunumu ve gerektiğinde akademik yayın/tez çalışmalarına temel teşkil edebilecek veri setleri hazır hale getirilecektir.

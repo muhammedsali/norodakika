@@ -4,27 +4,40 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
-  const ProfileScreen({super.key});
+  final bool isDarkMode;
+
+  const ProfileScreen({
+    super.key,
+    required this.isDarkMode,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userEmail = ref.watch(currentUserProvider);
+    final bool isDark = isDarkMode;
+    final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+    final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
+    final displayEmail = userEmail ?? 'kullanici@ornek.com';
+    final initial = displayEmail.isNotEmpty ? displayEmail[0].toUpperCase() : 'U';
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: bgColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6E00FF)),
+          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF4F46E5)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Profil',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.spaceGrotesk(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: titleColor,
           ),
         ),
       ),
@@ -32,35 +45,166 @@ class ProfileScreen extends ConsumerWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Profil Avatar
               Container(
-                width: 100,
-                height: 100,
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6E00FF),
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(
-                    userEmail?.substring(0, 1).toUpperCase() ?? 'U',
-                    style: GoogleFonts.poppins(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color:
+                        isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x14000000),
+                      blurRadius: 16,
+                      offset: Offset(0, 6),
                     ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF4F46E5), Color(0xFF10B981)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          initial,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Muhammed Sali',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: titleColor,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            displayEmail,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 13,
+                              color: subtitleColor,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4F46E5).withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              'Seviye: Başlangıç',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF4F46E5),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color:
+                        isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                userEmail ?? 'Kullanıcı',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Genel Bilgiler',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Toplam oturum',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 13,
+                            color: subtitleColor,
+                          ),
+                        ),
+                        Text(
+                          '-',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 13,
+                            color: titleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Günlük hedef',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 13,
+                            color: subtitleColor,
+                          ),
+                        ),
+                        Text(
+                          '5 oyun',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 13,
+                            color: titleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
+
               const SizedBox(height: 32),
               
               // Çıkış Yap Butonu
@@ -75,16 +219,16 @@ class ProfileScreen extends ConsumerWidget {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[400],
+                    backgroundColor: const Color(0xFFDC2626),
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
                   child: Text(
                     'Çıkış Yap',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

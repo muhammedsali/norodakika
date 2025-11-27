@@ -10,6 +10,9 @@ import '../../game_launcher/screens/game_play_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../core/models/game_model.dart';
+import '../../../services/local_storage_service.dart';
+import '../../settings/providers/language_provider.dart';
+import '../widgets/home_bottom_nav.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,10 +25,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _selectedCategory = 'Tümü';
   bool _isDarkMode = false;
   int _selectedTab = 0; // 0: Ana Sayfa, 1: Oyunlar, 2: İlerleme, 3: Ayarlar
+  bool _showOnboarding = false;
+  int _onboardingStep = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOnboardingState();
+  }
+
+  Future<void> _loadOnboardingState() async {
+    final seen = await LocalStorageService.hasSeenOnboarding();
+    if (!seen && mounted) {
+      setState(() {
+        _showOnboarding = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final userEmail = ref.watch(currentUserProvider);
+    final appLanguage = ref.watch(languageProvider);
     final userName = userEmail?.split('@').first ?? 'Kullanıcı';
     
     // Sistem status bar ikonlarını tema ile uyumlu yap
@@ -49,32 +70,219 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor:
           _isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Üst Header
-            _buildHeader(userName),
-            
-            Expanded(
-              child: () {
-                if (_selectedTab == 0) {
-                  return _buildHomeTabBody(context, games);
-                } else if (_selectedTab == 1) {
-                  return _buildGamesTabBody(context, games);
-                } else if (_selectedTab == 2) {
-                  // İlerleme sekmesi: İstatistik ekranı
-                  return const StatsScreen();
-                } else {
-                  return _buildSettingsTabBody();
-                }
-              }(),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
+              children: [
+                // Üst Header
+                _buildHeader(userName),
+                
+                Expanded(
+                  child: () {
+                    if (_selectedTab == 0) {
+                      return _buildHomeTabBody(context, games);
+                    } else if (_selectedTab == 1) {
+                      return _buildGamesTabBody(context, games);
+                    } else if (_selectedTab == 2) {
+                      // İlerleme sekmesi: İstatistik ekranı
+                      return const StatsScreen();
+                    } else {
+                      return _buildSettingsTabBody();
+                    }
+                  }(),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (_showOnboarding) _buildOnboardingOverlay(context, appLanguage),
+        ],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: _buildBottomNav(),
+        child: HomeBottomNav(
+          selectedTab: _selectedTab,
+          isDarkMode: _isDarkMode,
+          language: appLanguage,
+          onTabSelected: (index) {
+            setState(() {
+              _selectedTab = index;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOnboardingOverlay(BuildContext context, AppLanguage lang) {
+    final isDark = _isDarkMode;
+    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+    final steps = lang == AppLanguage.en
+        ? const [
+            {
+              'title': 'Welcome!',
+              'text': 'Norodakika helps you train your mind with short, focused mini games.'
+            },
+            {
+              'title': 'Today’s Workout',
+              'text': 'Use the purple button on the home screen to start your daily plan.'
+            },
+            {
+              'title': 'Track Progress',
+              'text': 'See your radar chart and daily summary on the Progress tab.'
+            },
+          ]
+        : const [
+            {
+              'title': 'Hoş geldin!',
+              'text': 'NöroDakika, kısa mini oyunlarla zihnini antrenman yapman için tasarlandı.'
+            },
+            {
+              'title': 'Günün Antrenmanı',
+              'text': 'Ana ekrandaki mor butondan bugün için önerilen oyun planını başlatabilirsin.'
+            },
+            {
+              'title': 'İlerleme Takibi',
+              'text': 'Alt barda İlerleme sekmesinden radar grafiği ve günlük özetini görebilirsin.'
+            },
+          ];
+
+    final current = steps[_onboardingStep.clamp(0, steps.length - 1)];
+
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? const [Color(0xFF020617), Color(0xFF111827)]
+                : const [Color(0xFFEEF2FF), Color(0xFFFFFFFF)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Skip
+                Align(
+                  alignment: Alignment.topRight,
+                  child: TextButton(
+                    onPressed: () async {
+                      setState(() {
+                        _showOnboarding = false;
+                      });
+                      await LocalStorageService.setOnboardingSeen();
+                    },
+                    child: Text(
+                      lang == AppLanguage.en ? 'Skip' : 'Atla',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: textColor,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Content
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 16),
+                      Text(
+                        'Norodakika',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        current['title'] as String,
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: titleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        current['text'] as String,
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 15,
+                          height: 1.6,
+                          color: textColor,
+                        ),
+                      ),
+                      const Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(steps.length, (index) {
+                          final isActive = index == _onboardingStep;
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: isActive ? 18 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? const Color(0xFF4F46E5)
+                                  : textColor.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                          );
+                        }),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+
+                // Bottom primary button
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_onboardingStep < steps.length - 1) {
+                        setState(() {
+                          _onboardingStep++;
+                        });
+                      } else {
+                        setState(() {
+                          _showOnboarding = false;
+                        });
+                        await LocalStorageService.setOnboardingSeen();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF4F46E5),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    child: Text(
+                      _onboardingStep < steps.length - 1
+                          ? (lang == AppLanguage.en ? 'Next' : 'İleri')
+                          : (lang == AppLanguage.en ? 'Start' : 'Başla'),
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -640,7 +848,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Zihin Antrenörü',
+                    'Muhammed Sali',
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -672,19 +880,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            // Gece/Gündüz modu butonu
-            IconButton(
-              icon: Icon(
-                _isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                color:
-                    _isDarkMode ? Colors.white : const Color(0xFF4B5563),
-              ),
-              onPressed: () {
-                setState(() {
-                  _isDarkMode = !_isDarkMode;
-                });
-              },
-            ),
+            // Sağda boş alan (karanlık mod artık Ayarlar ekranından değişiyor)
+            const SizedBox(width: 40),
           ],
         ),
       ),
@@ -953,6 +1150,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildBottomNav() {
+    final appLanguage = ref.watch(languageProvider);
+    final homeLabel = appLanguage == AppLanguage.en ? 'Home' : 'Ana Sayfa';
+    final gamesLabel = appLanguage == AppLanguage.en ? 'Games' : 'Oyunlar';
+    final progressLabel = appLanguage == AppLanguage.en ? 'Progress' : 'İlerleme';
+    final settingsLabel = appLanguage == AppLanguage.en ? 'Settings' : 'Ayarlar';
+
     return Container(
       height: 80,
       decoration: const BoxDecoration(color: Colors.transparent),
@@ -978,22 +1181,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildNavItem(Icons.home_rounded, 'Ana Sayfa', _selectedTab == 0, () {
+            _buildNavItem(Icons.home_rounded, homeLabel, _selectedTab == 0, () {
               setState(() {
                 _selectedTab = 0;
               });
             }),
-            _buildNavItem(Icons.category_rounded, 'Oyunlar', _selectedTab == 1, () {
+            _buildNavItem(Icons.category_rounded, gamesLabel, _selectedTab == 1, () {
               setState(() {
                 _selectedTab = 1;
               });
             }),
-            _buildNavItem(Icons.bar_chart_rounded, 'İlerleme', _selectedTab == 2, () {
+            _buildNavItem(Icons.bar_chart_rounded, progressLabel, _selectedTab == 2, () {
               setState(() {
                 _selectedTab = 2;
               });
             }),
-            _buildNavItem(Icons.settings_rounded, 'Ayarlar', _selectedTab == 3, () {
+            _buildNavItem(Icons.settings_rounded, settingsLabel, _selectedTab == 3, () {
               setState(() {
                 _selectedTab = 3;
               });
@@ -1022,6 +1225,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final cardColor = _isDarkMode ? const Color(0xFF1F2937) : Colors.white;
     final titleColor = _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final subtitleColor = _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final appLanguage = ref.watch(languageProvider);
+    final languageLabel = appLanguage == AppLanguage.en ? 'English' : 'Türkçe';
 
     return Container
     (
@@ -1121,6 +1326,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
             const SizedBox(height: 24),
 
+            // Dil
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: _isDarkMode
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.language_rounded,
+                      color: Color(0xFF059669),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Dil',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: titleColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Uygulama dilini değiştir.',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 12,
+                            color: subtitleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  DropdownButton<AppLanguage>(
+                    value: appLanguage,
+                    onChanged: (AppLanguage? value) async {
+                      if (value != null) {
+                        await ref.read(languageProvider.notifier).setLanguage(value);
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        child: Text(
+                          'Türkçe',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 14,
+                            color: titleColor,
+                          ),
+                        ),
+                        value: AppLanguage.tr,
+                      ),
+                      DropdownMenuItem(
+                        child: Text(
+                          'English',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 14,
+                            color: titleColor,
+                          ),
+                        ),
+                        value: AppLanguage.en,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
             // Hesap ve İlerleme
             Container(
               width: double.infinity,
@@ -1166,7 +1464,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ProfileScreen(),
+                          builder: (context) => ProfileScreen(isDarkMode: _isDarkMode),
                         ),
                       );
                     },

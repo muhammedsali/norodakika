@@ -1,0 +1,234 @@
+NöroDakika – Genişletilmiş İş Paketleri
+=====================================
+
+Bu doküman, TÜBİTAK 2209-A başvurusunda yer alan iş paketlerinin daha ayrıntılı ve teknik olarak zenginleştirilmiş hâlidir. Buradaki metin, hem proje planına hem de ileride hazırlanacak rapor/sunumlara temel olarak kullanılabilir.
+
+--------------------------------------------------
+İş Paketi 1 – Uygulama Mimarisi ve Ana İskeletin Kurulması
+--------------------------------------------------
+
+Amaç:
+- Flutter tabanlı NöroDakika mobil uygulamasının çok platformlu (Android/iOS) çalışacak temel iskeletini kurmak.
+- Projenin klasör yapısını, bağımlılıklarını ve navigasyon yapısını standartlaştırmak.
+
+Kapsamlı Görevler:
+- Proje başlatma
+  - Flutter projesinin oluşturulması, paket adının ve minimum SDK sürümlerinin belirlenmesi.
+  - Android ve iOS yapılandırmalarının (app name, ikon, splash ekranı) ayarlanması.
+- Mimari organizasyon
+  - `core/`, `features/`, `services/`, `widgets/` gibi klasör hiyerarşisinin tanımlanması.
+  - Riverpod durum yönetimi, Google Fonts, HTTP/REST istemcileri, Firebase istemcileri gibi bağımlılıkların eklenmesi.
+- Ana ekran ve navigasyon
+  - `HomeScreen` inşa edilmesi: alt menü (Home/Games/Progress/Settings), header alanı, günlük plan kısayolu, oyun kartları.
+  - Oyun başlatma katmanı (`GameLauncherScreen`, `GamePlayScreen`) için temel rotaların ve parametre geçişlerinin tanımlanması.
+- Performans ve temel testler
+  - Debug/profil modunda FPS kontrolleri, temel cihaz testleri.
+
+Başarı Ölçütü:
+- Ana ekrandan herhangi bir oyun kartına tıklandığında oyun akışı hatasız başlar.
+- Uygulama, orta seviye cihazlarda 60 FPS hedefine yakın akıcı çalışır.
+
+--------------------------------------------------
+İş Paketi 2 – Bilişsel Mini Oyun Tasarımı ve UI/UX Çalışmaları
+--------------------------------------------------
+
+Amaç:
+- 7 bilişsel kategoriye (Hafıza, Dikkat, Refleks, Sayısal Zeka, Mantık, Görsel Algı, Dil) uygun mini oyunların konsept, arayüz ve kullanıcı deneyimi tasarımını hazırlamak.
+
+Kapsamlı Görevler:
+- Oyun konseptleri ve bilişsel alan eşleştirmesi
+  - Her kategori için 1–2 mini oyun fikri belirlenmesi (Reflex Tap, Stroop Tap, N-Back, Quick Math, Memory Board, Recall Phase vb.).
+  - Her oyun için ölçülecek temel metriklerin tanımlanması (doğruluk, tepki süresi, hata sayısı, skor formülü).
+- UI/UX prototipleri
+  - Figma vb. araçlarla düşük ve orta sadakatli ekran tasarımları hazırlanması.
+  - Renk paleti, tipografi, ikon seti ve kart tasarımlarının dark/light tema uyumlu olacak şekilde seçilmesi.
+- Kullanıcı akışları
+  - İlk giriş onboarding akışı (kartlar, atla/ileri), günlük plan akışı, oyun başlatma/bitiş akışının kullanıcı yolculuğu (user journey) olarak çıkarılması.
+
+Başarı Ölçütü:
+- Her mini oyun için en az bir onaylanmış UI prototipi ve kullanıcı akış diyagramı.
+- Ekip ve danışman tarafından onaylanmış, tutarlı bir tasarım sistemi (UI kit).
+
+--------------------------------------------------
+İş Paketi 3 – Mini Oyun Çekirdeği ve Oyun Akışı Modüllerinin Geliştirilmesi
+--------------------------------------------------
+
+Amaç:
+- Tasarlanan mini oyunların teknik çekirdeğini Flutter ve/veya Unity tabanlı modüller hâlinde geliştirmek.
+
+Kapsamlı Görevler:
+- Ortak oyun iskeleti
+  - `GamePlayScreen` yapısının oluşturulması (oyun içi HUD, skor, süre, pause/continue, bitiş diyaloğu).
+  - Oyun sonuç modeli (ör. `AttemptModel`) ile skor, süre, alan bilgisi vb. verilerin standart bir yapıda toplanması.
+- İlk temsilci oyun(lar)
+  - Reflex Tap oyununun Flutter içinde widget olarak geliştirilmesi (hedeflere tıklama, tepki süresi ölçümü, combo sistemi vb.).
+  - Memory Board gibi en az bir hafıza oyununun entegrasyonu.
+- Diğer mini oyunların eklenmesi
+  - Stroop Tap, N-Back, Quick Math, Recall Phase gibi oyunların aynı oyun iskeletine bağlanması.
+- Oyun içi hata yönetimi
+  - Oyun sırasında olası hatalarda (ör. veri gelmemesi, zamanlayıcı sorunları) kullanıcı dostu mesajlar gösterilmesi.
+
+Başarı Ölçütü:
+- En az 3 farklı bilişsel alanı temsil eden stabil mini oyunların tamamlanmış olması.
+- Her mini oyunun oyun sonu sonucunun standart modele dönmesi.
+
+--------------------------------------------------
+İş Paketi 4 – Veri Toplama, Yerel Depolama ve Sunucu Entegrasyonu
+--------------------------------------------------
+
+Amaç:
+- Kullanıcı performans verilerinin yerel ve uzak sunucu üzerinde güvenli ve tutarlı bir şekilde saklanmasını sağlamak.
+
+Kapsamlı Görevler:
+- Yerel veri katmanı
+  - `LocalStorageService` ile SharedPreferences veya benzeri mekanizma üzerinden kullanıcı, deneme ve ayar verilerinin tutulması.
+  - Onboarding görülme durumu, dil tercihi, dark mode tercihi gibi ayarların kaydedilmesi.
+- Sunucu/Backend entegrasyonu
+  - REST API veya Firebase üzerinden `/auth`, `/games`, `/attempt`, `/daily-plan`, `/stats` benzeri uç noktaların tasarımı.
+  - Kimlik doğrulama, token yönetimi, hata durumlarında geri dönüş stratejileri (retry, offline cache) belirlenmesi.
+- Veri bütünlüğü
+  - Offline iken oynanan oyunların daha sonra sunucuya senkronize edilmesi.
+  - Veri şemasının (JSON modelleri, DTO’lar) dokümante edilmesi.
+
+Başarı Ölçütü:
+- Oyun bitişinde oluşturulan her denemenin cihazda güvenle saklanması.
+- İnternet bağlantısı olduğunda deneme verilerinin sunucuya başarıyla gönderilebilmesi.
+
+--------------------------------------------------
+İş Paketi 5 – Adaptif Zorluk Sistemi ve Bilişsel Modelleme
+--------------------------------------------------
+
+Amaç:
+- Kullanıcıların performansına göre oyun zorluk seviyesini dinamik olarak ayarlayan, bilimsel temelli bir adaptif zorluk modeli geliştirmek.
+
+Kapsamlı Görevler:
+- Zorluk parametrelerinin tanımlanması
+  - Her oyun ve bilişsel alan için başlangıç zorluk katsayısı (ör. μ) aralıklarının belirlenmesi.
+- ELO-benzeri güncelleme fonksiyonu
+  - Başarı oranı, tepki süresi ve hata sayısına göre zorluk güncellemesi yapan fonksiyonun (`MemoryBank.updateDifficulty` vb.) tasarımı ve kodlanması.
+  - Hedef başarı oranının %60–70 bandında tutulması için katsayı ayarı.
+- Çok alanlı oyunlar için modelleme
+  - "Hafıza + Dikkat" gibi oyunların ilgili tüm alanlara katkı yapması için ağırlıklandırma stratejisi.
+- Doğrulama ve test
+  - Simüle edilmiş kullanıcı verileriyle adaptif sistemin dengesi ve kararlılığının test edilmesi.
+
+Başarı Ölçütü:
+- Farklı seviyedeki kullanıcılar için birkaç oturum sonunda zorluk seviyesinin dengelenmiş olması.
+- Ekstrem senaryolarda (çok başarısız/çok başarılı) sistemin kararlı kalması.
+
+--------------------------------------------------
+İş Paketi 6 – İlerleme Ekranları, Radar Grafiği ve Günün Planı Modülü
+--------------------------------------------------
+
+Amaç:
+- Kullanıcının bilişsel ilerlemesini görselleştiren ekranlar ve günlük oyun planı modülünü geliştirmek.
+
+Kapsamlı Görevler:
+- İlerleme/istatistik ekranı (StatsScreen)
+  - Günlük özet kartı (oynan oyun sayısı, ortalama skor, ortalama tepki süresi vb.).
+  - Tarihsel grafikler veya basit trend göstergeleri (opsiyonel).
+- Radar grafiği
+  - `MemoryBank.calculateRadarStats` fonksiyonu ile 7 bilişsel alanın normalize edilmiş skorlarının hesaplanması.
+  - Flutter üzerinde radar grafiği bileşeninin geliştirilmesi veya uygun bir paketle entegrasyonu.
+- Günün Planı modülü
+  - Kullanıcının eksik olduğu alanlara göre günlük öneri kartlarının oluşturulması.
+  - `DailyPlanScreen` ile bugünkü önerilen oyunların gösterilmesi ve başlatılması.
+
+Başarı Ölçütü:
+- Kullanıcı, geçmiş denemelerine göre her alan için ilerlemesini radar grafiğinde görebilir.
+- Günün planı ekranından önerilen oyunları oynayıp tekrar istatistiklere dönebilir.
+
+--------------------------------------------------
+İş Paketi 7 – Kullanıcı Deneyimi İyileştirmeleri, Onboarding ve Çok Dilli Destek
+--------------------------------------------------
+
+Amaç:
+- Uygulamayı ilk kez kullanan ve düzenli kullanan kullanıcılar için modern, anlaşılır ve esnek bir deneyim tasarlamak.
+
+Kapsamlı Görevler:
+- Onboarding akışı
+  - Uygulama ilk açıldığında görünen tam ekran bilgilendirme kartlarının tasarımı ve geliştirilmesi.
+  - Onboarding’in sadece ilk açılışta görünmesini sağlayan yerel bayrak (flag) yönetimi.
+- Çok dilli destek (TR/EN)
+  - Ana ekran, alt menü, ayarlar ve istatistikler gibi temel metinlerin dil sağlayıcı (language provider) ile yönetilmesi.
+  - Dil seçiminin LocalStorage ve/veya sunucu tarafında saklanması.
+- Tema (dark/light) deneyimi
+  - Ayarlar ekranından kontrol edilen koyu/açık tema geçişlerinin tüm ekranlara yayılması.
+  - Status bar ikonları, kart arka planları ve yazı renklerinin tema ile uyumlu hale getirilmesi.
+
+Başarı Ölçütü:
+- Yeni kullanıcılar onboarding’i tamamladıktan sonra uygulamanın amacını ve temel işleyişini anlayabilir.
+- Dil/tema ayarları kalıcıdır ve uygulama yeniden açıldığında korunur.
+
+--------------------------------------------------
+İş Paketi 8 – Test, Performans Optimizasyonu, Veri Analizi ve Nihai Raporlama
+--------------------------------------------------
+
+Amaç:
+- Uygulamanın teknik olarak kararlı, performans açısından verimli ve bilimsel olarak anlamlı sonuçlar ürettiğini doğrulamak.
+
+Kapsamlı Görevler:
+- Teknik testler ve optimizasyon
+  - 20–30 gönüllü kullanıcı ile beta testleri.
+  - FPS, bellek kullanımı, ağ gecikmesi ölçümleri, hata loglarının toplanması.
+  - Düşük donanımlı cihazlarda UI sadeleştirme ve optimizasyon.
+- Bilimsel veri analizi
+  - Ön test / son test karşılaştırmaları, anlamlılık analizleri (örn. basit t-testi veya uygun istatistiksel yöntemler).
+  - Dikkat, hafıza ve refleks alanlarında ölçülebilir değişim oranlarının raporlanması.
+- Raporlama ve sunum
+  - TÜBİTAK sonuç raporu, jüri sunumu slaytları, tanıtım videosu taslağı.
+
+Başarı Ölçütü:
+- Uygulama çökme oranlarının düşük, performans metriklerinin kabul edilebilir seviyede olması.
+- Elde edilen verilerle projenin araştırma sorusuna cevap verebilecek istatistiksel analizlerin yapılmış olması.
+
+--------------------------------------------------
+İş Paketi 9 – Unity Mini Oyun Entegrasyonu (Gelecek Faz / Opsiyonel)
+--------------------------------------------------
+
+Amaç:
+- Seçili 1–2 mini oyunu Unity oyun motoru ile geliştirip Flutter uygulamasına entegre ederek ileri seviye görsel/oyunsal deneyim prototipi oluşturmak.
+
+Kapsamlı Görevler:
+- Unity tarafı
+  - Reflex odaklı veya görsel zengin bir mini oyunun Unity ortamında geliştirilmesi.
+  - Android için `.aar` / `.unitylibrary` modülünün build edilmesi.
+- Flutter entegrasyonu
+  - Android tarafında Unity activity/fragment entegrasyonunun yapılması.
+  - Flutter’dan MethodChannel ile Unity oyununu başlatma ve skor/süre gibi sonuçları geri alma.
+- Veri akışı uyumu
+  - Unity’den dönen sonuçların `AttemptModel` veya benzeri yapıya map edilmesi.
+
+Başarı Ölçütü:
+- En az bir Unity mini oyun, Flutter içinden çalıştırılabilir ve sonuçları istatistik ekranına yansıtılabilir.
+
+Not:
+- Bu iş paketi, proje temel MVP’si tamamlandıktan sonra prototip amaçlı olarak ele alınabilir.
+
+--------------------------------------------------
+İş Paketi 10 – Etik, Veri Gizliliği ve Kullanıcı İzinleri
+--------------------------------------------------
+
+Amaç:
+- Kullanıcı verilerinin etik ilkelere ve gizlilik gereksinimlerine uygun olarak toplanmasını ve saklanmasını sağlamak.
+
+Kapsamlı Görevler:
+- Veri gizliliği politikası
+  - Toplanan verilerin (oyun sonuçları, cihaz bilgisi vb.) anonimleştirme stratejisinin belirlenmesi.
+  - Kullanıcıya gösterilecek “Veri Kullanım ve İzin” metinlerinin hazırlanması.
+- İzin ekranları
+  - Uygulama ilk çalıştığında gösterilecek izin/onay ekranlarının tasarımı.
+  - Onayı geri çekme (opt-out) mekanizmasının belirlenmesi.
+- Dokümantasyon
+  - Veri işleme süreçlerinin proje raporunda açıkça belirtilmesi.
+
+Başarı Ölçütü:
+- Proje kapsamında kişisel veri (PII) toplanmaması veya gerekli durumlarda uygun anonimleştirme tekniklerinin uygulanması.
+- Kullanıcıya şeffaf ve anlaşılır veri kullanımı bilgilendirmesi sunulması.
+
+--------------------------------------------------
+Kullanım Önerisi
+--------------------------------------------------
+
+- TÜBİTAK başvurusunda: Buradaki uzun metinlerden cümleleri seçerek daha kısa özetler oluşturabilirsiniz.
+- Bitirme projesi raporunda: Bu iş paketlerini bölüm başlığı altına koyup, her birinin altında yapılan işleri ekran görüntüleri ve kod özetleriyle destekleyebilirsiniz.

@@ -9,6 +9,8 @@ class LocalStorageService {
   static const String _userDataKey = 'user_data';
   static const String _attemptsKey = 'attempts';
   static const String _gameDifficultiesKey = 'game_difficulties';
+  static const String _onboardingSeenKey = 'onboarding_seen';
+  static const String _languageKey = 'language_code';
 
   // Kullanıcı işlemleri
   static Future<void> saveUser(String email, String password) async {
@@ -117,6 +119,29 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
     final key = '${_gameDifficultiesKey}_${userId}_$gameId';
     await prefs.setDouble(key, newDifficulty);
+  }
+
+  // İlk açılış onboarding durumunu getir
+  static Future<bool> hasSeenOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_onboardingSeenKey) ?? false;
+  }
+
+  // İlk açılış onboarding durumunu kaydet
+  static Future<void> setOnboardingSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_onboardingSeenKey, true);
+  }
+
+  // Uygulama dili
+  static Future<String> getLanguageCode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_languageKey) ?? 'tr';
+  }
+
+  static Future<void> setLanguageCode(String code) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_languageKey, code);
   }
 }
 
