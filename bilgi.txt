@@ -50,11 +50,11 @@ Araştırmanın Yürütüleceği Kurum/Kuruluş: KIRKLARELİ ÜNİVERSİTESİ �
 Özet
 Günümüzde bireylerin zihinsel performansını artırmak için dijital çözümler giderek yaygınlaşmaktadır. Ancak mevcut uygulamaların çoğu uzun süreli oyun seanslarına, karmaşık görev yapılarına veya bilimsel temelden yoksun ölçümlere dayanmaktadır. “NöroDakika” projesi, kullanıcıların yalnızca 1–3 dakikalık kısa seanslarla dikkat, hafıza, refleks, görsel algı, mantık, sayısal zeka ve dil gibi temel bilişsel alanlarda egzersiz yapmalarını sağlayan adaptif zorluk sistemine sahip bir mobil oyun platformudur.
 
-Uygulama, React Native ile geliştirilecek ve oyunları Unity ile yapılıp kullanıcı verileri işlenerek bireysel zorluk seviyeleri dinamik olarak belirlenecektir. 
+Uygulama, Flutter çatısı kullanılarak (Dart dili ile) tek bir kod tabanından Android ve iOS için geliştirilecektir. Mini oyunların tamamı Flutter içerisinde, ayrı widget tabanlı modüller olarak inşa edilmekte; kullanıcı performansı hem yerel depolama hem de REST tabanlı bir API servisi üzerinden kaydedilerek bireysel zorluk seviyeleri dinamik olarak belirlenmektedir.
 
 Proje, oyunlaştırılmış bilişsel egzersizleri bilimsel temellerle birleştirerek hem eğlenceli hem de ölçülebilir bir zihinsel gelişim ortamı sunmayı hedeflemektedir. Çalışma sonucunda, kısa süreli ve tekrarlanabilir egzersizlerin bilişsel performans üzerindeki etkisi hakkında veri toplanarak literatüre katkı sağlanması planlanmaktadır.
 
-Anahtar Kelimeler: zihin egzersizi, bilişsel gelişim, Unity, adaptif zorluk, yapay zekâ destekli oyun
+Anahtar Kelimeler: zihin egzersizi, bilişsel gelişim, Flutter, adaptif zorluk, yapay zekâ destekli oyun
 
 
 1.	ÖZGÜN DEĞER 
@@ -81,9 +81,9 @@ Kısa süreli ve adaptif zorluk temelli mikro oyun seansları, kullanıcıların
    
 Araştırma önerisinin amacı ve hedefleri açık, ölçülebilir, gerçekçi ve araştırma süresince ulaşılabilir nitelikte olacak şekilde yazılır.
 
-Bu projenin temel amacı, kısa süreli ve düzenli bilişsel egzersizlerin bireylerin dikkat, hafıza, refleks ve zihinsel işlem hızı üzerindeki etkisini ölçebilen, bilimsel temele dayalı bir mobil oyun uygulaması geliştirmektir. NöroDakika adlı bu sistem, kullanıcıların yalnızca 1–3 dakikalık günlük seanslarla farklı bilişsel alanlarda egzersiz yapmalarına olanak tanırken, her kullanıcının performansına göre zorluk seviyesini dinamik olarak belirleyen adaptif bir yapay zekâ algoritması içerecektir.
+Bu projenin temel amacı, kısa süreli ve düzenli bilişsel egzersizlerin bireylerin dikkat, hafıza, refleks ve zihinsel işlem hızı üzerindeki etkisini ölçebilen, bilimsel temele dayalı bir mobil oyun uygulaması geliştirmektir. NöroDakika adlı bu sistem, kullanıcıların yalnızca 1–3 dakikalık günlük seanslarla farklı bilişsel alanlarda egzersiz yapmalarına olanak tanırken, her kullanıcının performansına göre zorluk seviyesini dinamik olarak belirleyen adaptif bir zorluk algoritması içerecektir.
 
-Proje kapsamında geliştirilecek uygulama, Unity oyun motoru ile çok platformlu olarak tasarlanacak, Firebase veritabanında saklanacaktır. Bu sayede bireysel performans takibi yapılabilecek, radar grafikleriyle kullanıcıya gelişim verileri sunulacaktır.
+Proje kapsamında geliştirilecek uygulama, Flutter ile çok platformlu (Android/iOS) olarak tasarlanacak; kullanıcı denemeleri cihaz üzerinde yerel olarak saklanacak ve gerekirse sunucu tarafındaki REST API’lere iletilecektir. Bu sayede bireysel performans takibi yapılabilecek, radar grafikleriyle kullanıcıya gelişim verileri sunulacaktır.
 
 Projenin spesifik hedefleri şunlardır:
 
@@ -101,9 +101,9 @@ Araştırma önerisinde uygulanacak yöntem ve araştırma teknikleri (veri topl
 
 Yöntem bölümünün araştırmanın tasarımını, bağımlı ve bağımsız değişkenleri ve istatistiksel yöntemleri kapsaması gerekir. Araştırma önerisinde herhangi bir ön çalışma veya fizibilite yapıldıysa bunların sunulması beklenir. Araştırma önerisinde sunulan yöntemlerin iş paketleri ile ilişkilendirilmesi gerekir.
 
-Araştırma yöntemi, yazılım geliştirme ve deneysel veri toplama süreçlerini bütünleştiren karma bir tasarıma dayanmaktadır. Uygulama, Unity oyun motoru kullanılarak geliştirilecek, mini oyunlar bilişsel psikoloji literatüründe yer alan Stroop, N-Back, Go/No-Go gibi testlerin oyunlaştırılmış versiyonları temel alınarak oluşturulacaktır. Kullanıcı performansı (doğruluk oranı, tepki süresi, hata sayısı) her oyun sonunda kaydedilecek ve bu veriler firebase veritabanına aktarılacaktır.
+Araştırma yöntemi, yazılım geliştirme ve deneysel veri toplama süreçlerini bütünleştiren karma bir tasarıma dayanmaktadır. Uygulama, Flutter kullanılarak geliştirilecek; mini oyunlar bilişsel psikoloji literatüründe yer alan Stroop, N-Back, Go/No-Go gibi testlerin oyunlaştırılmış versiyonları temel alınarak oluşturulacaktır. Kullanıcı performansı (doğruluk oranı, tepki süresi, hata sayısı) her oyun sonunda kaydedilecek ve bu veriler yerel depolama ile birlikte sunucu tarafındaki API servisine aktarılacaktır.
 
-Elde edilen veriler, analiz edilerek her kullanıcının bireysel beceri katsayısı (μ) güncellenecektir. Böylece kullanıcı, bir sonraki oturumda kendi performansına göre optimize edilmiş zorluk seviyesine sahip oyunlar oynayacaktır.
+Elde edilen veriler, analiz edilerek her kullanıcının bireysel beceri katsayısı (μ) LocalStorageService ve sunucu tarafı API’leri üzerinden güncellenecektir. Böylece kullanıcı, bir sonraki oturumda kendi performansına göre optimize edilmiş zorluk seviyesine sahip oyunlar oynayacaktır.
 
 Uygulamanın etkinliği, 4 haftalık gönüllü kullanıcı grubu testleriyle değerlendirilecektir. Her haftanın sonunda dikkat, hafıza ve refleks skorlarındaki değişim istatistiksel olarak analiz edilerek, mikro süreli egzersizlerin bilişsel gelişime etkisi nicel olarak belirlenecektir.
 
@@ -111,7 +111,7 @@ Bu yöntem, hem yazılım mühendisliği hem de bilişsel bilim alanlarını bir
 
  
 3.	 PROJE YÖNETİMİ 
-Mobil uygulama arayüzü React Native ile tasarlanmış, mini oyunlar Unity ile geliştirilmiştir. Bu iki ortam, köprü (bridge) yöntemi ile entegre edilmiştir.
+Mobil uygulama arayüzü ve mini oyunlar tek bir teknoloji yığını üzerinde, Flutter ile geliştirilmiştir. Uygulama mimarisi; ana ekran, oyun başlatma katmanı ve her biri ayrı widget olarak tasarlanan mini oyun modüllerinden (Reflex Tap, Stroop Tap, N-Back, Quick Math, Memory Board, Recall Phase vb.) oluşmaktadır. Durum yönetiminde Riverpod tercih edilmekte, oyun sonuçları ise yerel depolama ve API servisi üzerinden kaydedilmektedir.
 
 
 3.1	İş- Zaman Çizelgesi
@@ -124,16 +124,16 @@ Başarı ölçütü olarak her bir iş paketinin hangi kriterleri sağladığın
         
 İP No	İş Paketlerinin Adı ve Hedefleri	Kim(ler) Tarafından Gerçekleştirileceği	Zaman Aralığı
 (..-.. Ay)	Başarı Ölçütü ve Projenin Başarısına Katkısı 
-1	React Native ile Unity Bağlantısı kurularak, React native ile geliştirilen uygulamada Unity ile yapılan oyunların optimize bir şekilde çalışması sağlanır.	Tüm ekip, danışman desteğiyle	3. Ay	React uygulaması içindeki oyunlara tıkladığımızda oyunlar sorunsuz bir şekilde açılır. Uygulama daha optimize çalışmış olur.
+1	Flutter tabanlı mobil uygulama iskeleti kurulup, oyun başlatma ekranı ile mini oyun widget’ları entegre edilir.	Tüm ekip, danışman desteğiyle	3. Ay	Ana ekrandan ilgili oyun kartına tıklandığında seçilen mini oyun sorunsuz bir şekilde açılır. Uygulama 60 FPS hedefiyle akıcı çalışır.
 
 
 2	
 Oyun Tasarımı ve UI/UX Çalışması: 7 bilişsel kategoriye uygun mini oyunların tasarım ilkeleri ve kullanıcı arayüz prototipleri hazırlanır.
 	Muhammed, Enes	1. Ay	Figma prototipleri, kullanıcı akışı ve renk paleti tamamlanır.
-3	Unity Proje Kurulumu ve Oyun İskeletinin Geliştirilmesi: Unity projesi oluşturulur, ilk mini oyun (Refleks Tap) tamamlanır.	Ahmet, Serhat	2.–3. Ay	İlk oynanabilir prototip (60 FPS) ve oyun motoru yapısı hazır hale gelir.
+3	Mini Oyun Çekirdeğinin Geliştirilmesi: Flutter projesinde ilk mini oyun (Reflex Tap) ve ortak oyun iskeleti (GamePlayScreen, skor/sonuç diyaloğu vb.) tamamlanır.	Ahmet, Serhat	2.–3. Ay	İlk oynanabilir prototip (60 FPS) ve oyun yönetim yapısı hazır hale gelir.
 
 
-4	Veritabanı Entegrasyonu: Kullanıcı kayıt, veri toplama, adaptif zorluk hesaplaması ve API bağlantıları kurulur.	Ahmet, Muhammed	3.–4. Ay	Veritabanı bağlantısı, /attempt ve /daily-plan API uçları sorunsuz çalışır.
+4	Veri Katmanı ve Servis Entegrasyonu: Kullanıcı kayıt, veri toplama, adaptif zorluk hesaplaması ve REST API bağlantıları kurulur (LocalStorageService, ApiService).	Ahmet, Muhammed	3.–4. Ay	Yerel depolama ve API uçları (/attempt, /daily-plan vb.) sorunsuz çalışır; denemeler cihazda ve sunucuda güvenli şekilde tutulur.
 
 
 5	Adaptif Zorluk Sistemi ve Veri Analizi: Kullanıcı performansına göre zorluk seviyeleri dinamikleştirilir.	Enes , Serhat	4.–5. Ay	Adaptif sistem doğru çalışır; başarı oranı %60–70 bandında kalır.
@@ -164,7 +164,7 @@ Oyun Tasarımı ve UI/UX Çalışması: 7 bilişsel kategoriye uygun mini oyunla
 
                                                        RİSK YÖNETİMİ TABLOSU*
 İP No	En Önemli Riskler	Risk Yönetimi (B Planı)
-1	Unity oyunlarının React arayüzüne entegre edilirken performans düşüşü yaşanması	Gerekirse oyunlar standalone (bağımsız) şekilde iframe olarak çağrılır; Unity URP ve Addressables optimizasyonu uygulanır. FPS testleriyle düşük cihazlara özel mod hazırlanır.
+1	Flutter mini oyunlarının animasyon yoğunluğu nedeniyle düşük cihazlarda performans düşüşü yaşanması	Gerekirse animasyon yoğunluğu azaltılır, görsel efektler optimize edilir ve FPS profilleme araçlarıyla (Flutter DevTools) performans izlenir. Düşük seviye cihazlar için hafif arayüz teması ve azaltılmış efekt modu eklenir.
 2	7 oyundan bazılarının planlanan zamanda tamamlanamaması	Öncelik temel 3 oyun (Reflex, Stroop, N-Back) üzerinde olur. Diğerleri varyasyon olarak eklenir. Oyun sayısı azaltılıp zorluk çeşitliliği artırılarak denge korunur.
 3	Firebase bağlantısında gecikme veya veri senkronizasyon hataları	Geçici olarak localStorage tabanlı yedek veri kaydı tutulur. İnternet bağlantısı geldiğinde otomatik senkronizasyon yapılır. Firestore offline mode aktif edilir.
 4	Adaptif zorluk sistemi hatalı sonuçlar verirse oyun dengesizleşir	%60 hedef başarı oranı ELO tabanlı denge sistemiyle test edilir. Gerektiğinde zorluk katsayısı (K değeri) 16–24–32 aralığında yeniden ayarlanır.
@@ -180,8 +180,8 @@ ARAŞTIRMA OLANAKLARI TABLOSU (*)
 
 Kuruluşta Bulunan Altyapı/Ekipman Türü, Modeli
 (Laboratuvar, Araç, Makine-Teçhizat, vb.)	Projede Kullanım Amacı
-Bilgisayar Laboratuvarı (Kırklareli Üniversitesi – Yazılım Mühendisliği Bölümü)	Proje geliştirme, test ve sunum işlemlerinin yapılacağı çalışma ortamı olarak kullanılacaktır. Geliştiriciler, Unity ve Visual Studio ortamlarında çalışacaktır.
-Yazılım Geliştirme Araçları (Unity 2023 LTS, Visual Studio, GitHub, Figma)	Mini oyunların tasarımı, arayüz geliştirme ve versiyon kontrol süreçlerinde kullanılacaktır.
+Bilgisayar Laboratuvarı (Kırklareli Üniversitesi – Yazılım Mühendisliği Bölümü)	Proje geliştirme, test ve sunum işlemlerinin yapılacağı çalışma ortamı olarak kullanılacaktır. Geliştiriciler, Flutter SDK, Android Studio/VS Code ve ilgili araçlar üzerinde çalışacaktır.
+Yazılım Geliştirme Araçları (Flutter SDK, Android Studio/VS Code, GitHub, Figma)	Mini oyunların tasarımı, arayüz geliştirme ve versiyon kontrol süreçlerinde kullanılacaktır.
 
 
 Sunucu Altyapısı (Azure veya Üniversite Bilgi İşlem Sunucusu)	Uygulamanın backend servislerinin ve veritabanının barındırılması, test kullanıcı verilerinin güvenli şekilde saklanması için kullanılacaktır.
@@ -235,7 +235,7 @@ NOT: Bütçe talebiniz olması halinde hem bu tablonun hem de TÜBİTAK Yönetim
 Sadece araştırma önerisinin değerlendirilmesine katkı sağlayabilecek bilgi/veri (grafik, tablo, vb.) eklenebilir. 
 Proje kapsamında geliştirilecek NöroDakika uygulaması, yalnızca bir oyun yazılımı değil; aynı zamanda bireylerin bilişsel performansını izlemeye ve kısa süreli egzersizlerin etkisini ölçmeye yarayan bir araştırma aracıdır. Proje sonunda toplanacak anonim kullanıcı verileri, istatistiksel olarak analiz edilerek dikkat ve refleks gelişimindeki değişim oranları değerlendirilecektir. Bu veriler, ilerleyen dönemde akademik yayın veya lisansüstü tez çalışmalarına temel teşkil edebilecektir.
 
-Uygulama, Unity oyun motoru, React Native ve Firebase veritabanı kullanılarak geliştirilecektir. Tüm kod ve tasarım süreçleri açık kaynak uyumlu olacak, böylece proje ilerleyen yıllarda genişletilmeye elverişli bir yapıda sürdürülebilecektir.
+Uygulama, Flutter (Dart), yerel depolama ve REST tabanlı bir backend servisi kullanılarak geliştirilecektir. Tüm kod ve tasarım süreçleri versiyon kontrolü (GitHub) altında tutulacak, böylece proje ilerleyen yıllarda genişletilmeye elverişli bir yapıda sürdürülebilecektir.
 
 Ayrıca proje çıktısı olarak oluşturulacak gelişim radar grafiği, kullanıcıların zihinsel becerilerindeki ilerlemeyi görsel olarak sunan yenilikçi bir bileşen olup, literatürde nadir görülen bir örnektir. Proje sonucunda elde edilecek sistemin, dijital sağlık, oyunlaştırma ve bilişsel bilim kesişiminde yeni araştırma alanlarına kapı aralaması beklenmektedir.
 
@@ -245,7 +245,7 @@ Ayrıca proje çıktısı olarak oluşturulacak gelişim radar grafiği, kullan�
 
 7.1 OYUN EKRAN GÖRÜNTÜLERİ VE AÇIKLAMALARI
 
-Aşağıda NöroDakika uygulaması kapsamında geliştirilen yedi mini oyunun ekran görüntüleri, oyun ID kodları ve ilişkilendirildiği bilişsel alanlar sunulmuştur. Her oyunun en az bir bilimsel bilişsel alanla ilişkisi bulunmaktadır. Ekran görüntüleri, Unity ortamında oluşturulan prototiplerin arayüz çıktılarıdır
+Aşağıda NöroDakika uygulaması kapsamında geliştirilen yedi mini oyunun ekran görüntüleri, oyun ID kodları ve ilişkilendirildiği bilişsel alanlar sunulmuştur. Her oyunun en az bir bilimsel bilişsel alanla ilişkisi bulunmaktadır. Ekran görüntüleri, Flutter tabanlı uygulama içerisinde oluşturulan mini oyun ekranlarına aittir.
 
 •	7.1.1. Reflex Tap (REF01)
 Bilişsel Alan: Refleks
@@ -345,7 +345,7 @@ NUM01	Quick Math	Sayısal Zeka	Mental Aritmetik
 MEM02	Memory Board	Hafıza + Görsel Algı	Memory Matching
 MEM03	Recall Phase	Dil + Hafıza	Sözcük Hatırlama Testi
 
-Bu bölümde verilen ekran görüntüleri uygulamanın Unity tabanlı mini oyun modüllerine aittir. Her oyun, ilgili bilişsel alanla ilişkilendirilmiş olup değerlendirmede kullanılan ID kodları ve etiketler kavram haritası ile uyumludur. Oyun ekranları araştırma kapsamında oluşturulan bilimsel modelin somut çıktılarıdır.
+Bu bölümde verilen ekran görüntüleri uygulamanın Flutter tabanlı mini oyun modüllerine aittir. Her oyun, ilgili bilişsel alanla ilişkilendirilmiş olup değerlendirmede kullanılan ID kodları ve etiketler kavram haritası ile uyumludur. Oyun ekranları araştırma kapsamında oluşturulan bilimsel modelin somut çıktılarıdır.
 
 
 
@@ -367,5 +367,5 @@ EK-1:  KAYNAKLAR
 6  Prensky, M. (2003). Digital game-based learning. Computers in Entertainment, 1(1), 21–29.
 7  Oei, A. C., & Patterson, M. D. (2014). Enhancing cognition with video games: A multiple game training study. PLoS ONE, 9(1), e84560.
 8  TUBİTAK (2024). 2209-A Üniversite Öğrencileri Araştırma Projeleri Destekleme Programı Uygulama Esasları. TÜBİTAK Bilim İnsanı Destek Programları Başkanlığı (BİDEB).
-9  Unity Technologies. (2024). Unity Manual – Scripting, Game Loop and Adaptive Difficulty Systems.
+9  Flutter Team (2024). Flutter DevTools & Performance Profiling – Resmi Dokümantasyon.
 
