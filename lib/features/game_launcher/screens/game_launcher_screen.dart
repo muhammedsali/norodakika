@@ -61,6 +61,44 @@ class GameLauncherScreen extends StatelessWidget {
   }
 
   Widget _buildGameCard(BuildContext context, GameModel game) {
+    // Basit görsel stil: her oyun için farklı ikon ve renk paleti
+    IconData leadingIcon;
+    List<Color> gradientColors;
+
+    switch (game.id) {
+      case 'REF01':
+      case 'REF02':
+        leadingIcon = Icons.bolt_rounded;
+        gradientColors = const [Color(0xFF6366F1), Color(0xFF22C55E)];
+        break;
+      case 'ATT01':
+      case 'ATT02':
+        leadingIcon = Icons.visibility_rounded;
+        gradientColors = const [Color(0xFFF97316), Color(0xFFEC4899)];
+        break;
+      case 'MEM01':
+      case 'MEM02':
+      case 'MEM03':
+        leadingIcon = Icons.grid_view_rounded;
+        gradientColors = const [Color(0xFF0EA5E9), Color(0xFF6366F1)];
+        break;
+      case 'NUM01':
+        leadingIcon = Icons.calculate_rounded;
+        gradientColors = const [Color(0xFFFACC15), Color(0xFFF97316)];
+        break;
+      case 'LOG01':
+        leadingIcon = Icons.extension_rounded;
+        gradientColors = const [Color(0xFF22C55E), Color(0xFF0EA5E9)];
+        break;
+      case 'LANG02':
+        leadingIcon = Icons.text_fields_rounded;
+        gradientColors = const [Color(0xFFEC4899), Color(0xFF6366F1)];
+        break;
+      default:
+        leadingIcon = Icons.games_rounded;
+        gradientColors = const [Color(0xFF6E00FF), Color(0xFF6366F1)];
+    }
+
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -95,13 +133,19 @@ class GameLauncherScreen extends StatelessWidget {
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6E00FF).withOpacity(0.1),
+                  gradient: LinearGradient(
+                    colors: gradientColors,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
-                  Icons.games,
-                  color: Color(0xFF6E00FF),
-                  size: 32,
+                child: Center(
+                  child: Icon(
+                    leadingIcon,
+                    color: Colors.white,
+                    size: 32,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

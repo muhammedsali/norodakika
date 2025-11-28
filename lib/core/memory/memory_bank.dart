@@ -21,10 +21,22 @@ class MemoryBank {
       "description": "Tepki süresi ölçümü + Go/No-Go mekanizması."
     },
     {
+      "id": "REF02",
+      "name": "Reflex Dash",
+      "area": "Refleks",
+      "description": "Şeritler üzerinde kayan hedeflere hızlı tepki."
+    },
+    {
       "id": "ATT01",
       "name": "Stroop Tap",
       "area": "Dikkat",
       "description": "Renk-kelime uyumsuzluğu ile dikkat testi."
+    },
+    {
+      "id": "ATT02",
+      "name": "Focus Line",
+      "area": "Dikkat + Görsel Algı",
+      "description": "Yatay çizgi üzerindeki hedef renk noktalara odaklanma."
     },
     {
       "id": "MEM01",
@@ -55,6 +67,12 @@ class MemoryBank {
       "name": "Recall Phase",
       "area": "Dil + Hafıza",
       "description": "Kelime gösterim ve hatırlama testi."
+    },
+    {
+      "id": "LANG02",
+      "name": "Word Sprint",
+      "area": "Dil",
+      "description": "Gerçek ve uydurma kelimeleri ayırt etme oyunu."
     }
   ];
 

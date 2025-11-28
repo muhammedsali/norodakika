@@ -8,12 +8,15 @@ import '../../../services/local_storage_service.dart';
 import '../../../core/api/api_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../widgets/reflex_tap_game.dart';
+import '../widgets/reflex_dash_game.dart';
 import '../widgets/quick_math_game.dart';
 import '../widgets/memory_board_game.dart';
 import '../widgets/stroop_tap_game.dart';
+import '../widgets/focus_line_game.dart';
 import '../widgets/n_back_mini_game.dart';
 import '../widgets/logic_puzzle_game.dart';
 import '../widgets/recall_phase_game.dart';
+import '../widgets/word_sprint_game.dart';
 
 class GamePlayScreen extends ConsumerStatefulWidget {
   final GameModel game;
@@ -460,6 +463,12 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
           onComplete: _onGameComplete,
           isPaused: _isPaused,
         );
+      case 'REF02':
+        return ReflexDashGame(
+          key: ValueKey('reflexdash_$_runId'),
+          onComplete: _onGameComplete,
+          isPaused: _isPaused,
+        );
       case 'NUM01':
         return QuickMathGame(
           key: ValueKey('quickmath_$_runId'),
@@ -475,6 +484,11 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
           key: ValueKey('stroop_$_runId'),
           onComplete: _onGameComplete,
         );
+      case 'ATT02':
+        return FocusLineGame(
+          key: ValueKey('focusline_$_runId'),
+          onComplete: _onGameComplete,
+        );
       case 'MEM01':
         return NBackMiniGame(
           key: ValueKey('nback_$_runId'),
@@ -488,6 +502,11 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
       case 'MEM03':
         return RecallPhaseGame(
           key: ValueKey('recall_$_runId'),
+          onComplete: _onGameComplete,
+        );
+      case 'LANG02':
+        return WordSprintGame(
+          key: ValueKey('wordsprint_$_runId'),
           onComplete: _onGameComplete,
         );
       default:
