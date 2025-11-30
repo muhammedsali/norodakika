@@ -22,13 +22,13 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   
   // Mantıksal Kontroller
   int? _firstCardIndex;
-  bool _isProcessing = false; // Tıklamaları engellemek için kilit
+  bool _isProcessing = false; 
 
   final List<IconData> _icons = [
-    Icons.extension, // yapboz parçası
+    Icons.extension, 
     Icons.star_rounded,
-    Icons.casino, // zar
-    Icons.visibility, // göz
+    Icons.casino, 
+    Icons.visibility, 
     Icons.favorite_rounded,
     Icons.flash_on,
     Icons.lightbulb_outline,
@@ -49,7 +49,6 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   }
 
   void _initializeGame() {
-    // Kartları oluştur ve karıştır
     List<ItemModel> cards = [];
     for (int i = 0; i < 8; i++) {
       cards.add(ItemModel(icon: _icons[i], value: i));
@@ -80,7 +79,6 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   }
 
   void _handleCardTap(int index) {
-    // 1. Kilit kontrolü: İşlem sürüyorsa veya kart zaten açıksa tıklamayı yoksay
     if (_isProcessing || _gameCards[index].isFlipped || _gameCards[index].isMatched) {
       return;
     }
@@ -89,33 +87,26 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
       _gameCards[index].isFlipped = true;
     });
 
-    // İlk kart açılıyor
     if (_firstCardIndex == null) {
       _firstCardIndex = index;
-    } 
-    // İkinci kart açılıyor
-    else {
+    } else {
       _moves++;
-      _isProcessing = true; // Diğer tıklamaları kilitle
+      _isProcessing = true; 
 
-      // Eşleşme Kontrolü
       if (_gameCards[_firstCardIndex!].value == _gameCards[index].value) {
-        // EŞLEŞME VAR
         setState(() {
           _gameCards[_firstCardIndex!].isMatched = true;
           _gameCards[index].isMatched = true;
           _matches++;
           _score += 20;
           _firstCardIndex = null;
-          _isProcessing = false; // Kilidi aç
+          _isProcessing = false; 
         });
 
-        // Oyun Bitti mi?
         if (_matches == 8) {
           _endGame();
         }
       } else {
-        // EŞLEŞME YOK (Hata cezası)
         Future.delayed(const Duration(milliseconds: 800), () {
           if (mounted) {
             setState(() {
@@ -123,7 +114,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
               _gameCards[index].isFlipped = false;
               _firstCardIndex = null;
               _score = (_score - 2).clamp(0, 9999);
-              _isProcessing = false; // Kilidi aç
+              _isProcessing = false; 
             });
           }
         });
@@ -135,7 +126,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
     _timer?.cancel();
     widget.onComplete({
       'score': _score.toDouble(),
-      'successRate': _matches / 8.0, // Basitleştirilmiş oran
+      'successRate': _matches / 8.0, 
       'duration': _elapsedSeconds,
       'moves': _moves,
     });
@@ -149,154 +140,207 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
-    final Color cardBack = isDark ? const Color(0xFF1F2937) : Colors.white;
-    final Color accentColor = const Color(0xFF6366F1);
-    final Color matchedColor = const Color(0xFF10B981);
-    final Color gridBorder = isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
-
+    // Tasarım Renk Paleti (Modern & Cognitive Style)
+    const Color bgColor = Color(0xFFF0F4F8); // Çok açık gri-mavi
+    const Color primaryColor = Color(0xFF2D3436); // Koyu gri (Text)
+    const Color cardBackInfo = Color(0xFF6C5CE7); // Morumsu Mavi (Aktif olmayan kart)
+    const Color accentColor = Color(0xFF00B894); // Yeşil (Eşleşme)
+    
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-          child: Column(
-            children: [
-              // --- HEADER (Skor ve Süre) ---
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                decoration: BoxDecoration(
-                  color: cardBack,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: gridBorder),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x14000000),
-                      blurRadius: 18,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildStatItem('HAMLE', '$_moves', accentColor),
-                    _buildStatItem('SKOR', '$_score', isDark ? Colors.white : const Color(0xFF111827)),
-                    _buildStatItem('SÜRE', _formatTime(_elapsedSeconds), accentColor),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // --- GRID BOARD ---
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF020617) : Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: gridBorder),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x14000000),
-                        blurRadius: 24,
-                        offset: Offset(0, 10),
+        child: Column(
+          children: [
+            // --- HEADER ---
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Hafıza Testi",
+                        style: GoogleFonts.outfit(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                      Text(
+                        "Kartları eşleştir",
+                        style: GoogleFonts.outfit(
+                          fontSize: 14,
+                          color: primaryColor.withOpacity(0.6),
+                        ),
                       ),
                     ],
                   ),
-                  child: GridView.builder(
-                    physics: const BouncingScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      // Kartları biraz daha kare yaparak alanı daha iyi doldur
-                      childAspectRatio: 0.95,
-
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    itemCount: 16,
-                    itemBuilder: (context, index) {
-                      final item = _gameCards[index];
-                      return GestureDetector(
-                        onTap: () => _handleCardTap(index),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOut,
-                          decoration: BoxDecoration(
-                            color: item.isMatched
-                                ? matchedColor.withOpacity(isDark ? 0.18 : 0.12)
-                                : item.isFlipped
-                                    ? cardBack.withOpacity(isDark ? 0.9 : 1.0)
-                                    : cardBack,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: item.isMatched
-                                  ? matchedColor
-                                  : item.isFlipped
-                                      ? accentColor
-                                      : gridBorder.withOpacity(0.7),
-                              width: item.isFlipped || item.isMatched ? 2 : 1,
-                            ),
-                            boxShadow: item.isFlipped
-                                ? [
-                                    BoxShadow(
-                                      color: accentColor.withOpacity(0.18),
-                                      blurRadius: 14,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ]
-                                : [],
-                          ),
-                          child: Center(
-                            child: item.isFlipped || item.isMatched
-                                ? Icon(
-                                    item.icon,
-                                    color: item.isMatched ? matchedColor : accentColor,
-                                    size: 30,
-                                  )
-                                : Icon(
-                                    Icons.grid_3x3,
-                                    color: isDark ? Colors.white10 : const Color(0xFFE5E7EB),
-                                    size: 22,
-                                  ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.timer_outlined, size: 18, color: cardBackInfo),
+                        const SizedBox(width: 6),
+                        Text(
+                          _formatTime(_elapsedSeconds),
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // --- SPACER (Üst boşluk dengeleme) ---
+            const Spacer(),
+
+            // --- OYUN ALANI (Ortalanmış) ---
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                // AspectRatio grid'in kare kalmasını sağlar
+                child: AspectRatio(
+                  aspectRatio: 0.9, 
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(), // Kaydırmayı kapat
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.85, // Kart oranı
+                        ),
+                        itemCount: 16,
+                        itemBuilder: (context, index) {
+                          return _buildCard(_gameCards[index], index);
+                        },
                       );
-                    },
+                    }
                   ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 4),
-            ],
-          ),
+            // --- SPACER (Alt boşluk dengeleme) ---
+            const Spacer(),
+
+            // --- FOOTER STATS ---
+            Container(
+              margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildFooterStat('HAMLE', '$_moves', Icons.touch_app_rounded, Colors.orange),
+                  Container(width: 1, height: 40, color: Colors.grey.shade200),
+                  _buildFooterStat('SKOR', '$_score', Icons.emoji_events_rounded, cardBackInfo),
+                  Container(width: 1, height: 40, color: Colors.grey.shade200),
+                  _buildFooterStat('DURUM', '${(_matches/8*100).toInt()}%', Icons.pie_chart_rounded, accentColor),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          label,
-          // HATA DÜZELTİLDİ: jetbrainsMono yerine robotoMono kullanıldı
-          style: GoogleFonts.robotoMono(
-            fontSize: 12,
-            color: Colors.white54,
-            fontWeight: FontWeight.w500,
-          ),
+  // Kart Widget'ı
+  Widget _buildCard(ItemModel item, int index) {
+    return GestureDetector(
+      onTap: () => _handleCardTap(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutBack,
+        decoration: BoxDecoration(
+          color: item.isMatched
+              ? const Color(0xFF00B894) // Matched Green
+              : item.isFlipped
+                  ? Colors.white
+                  : const Color(0xFF6C5CE7), // Card Back Purple/Blue
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: item.isFlipped 
+                ? Colors.black.withOpacity(0.05) 
+                : const Color(0xFF6C5CE7).withOpacity(0.4),
+              blurRadius: item.isFlipped ? 5 : 10,
+              offset: item.isFlipped ? const Offset(0, 2) : const Offset(0, 6),
+            ),
+          ],
         ),
+        child: Center(
+          child: item.isFlipped || item.isMatched
+              ? Icon(
+                  item.icon,
+                  color: item.isMatched ? Colors.white : const Color(0xFF2D3436),
+                  size: 32,
+                )
+              : Text(
+                  "?",
+                  style: GoogleFonts.fredoka(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  // Alt İstatistik Kutucukları
+  Widget _buildFooterStat(String label, String value, IconData icon, Color color) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 20, color: color.withOpacity(0.8)),
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.spaceGrotesk(
+          style: GoogleFonts.outfit(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: color,
+            color: const Color(0xFF2D3436),
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.outfit(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey.shade500,
+            letterSpacing: 1.0,
           ),
         ),
       ],
@@ -304,7 +348,6 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   }
 }
 
-// Basit Veri Modeli
 class ItemModel {
   final IconData icon;
   final int value;

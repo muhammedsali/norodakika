@@ -61,7 +61,7 @@ class GameLauncherScreen extends StatelessWidget {
   }
 
   Widget _buildGameCard(BuildContext context, GameModel game) {
-    // Basit görsel stil: her oyun için farklı ikon ve renk paleti
+    // Her oyun için ikon + iki renkli gradient belirle
     IconData leadingIcon;
     List<Color> gradientColors;
 
@@ -99,7 +99,8 @@ class GameLauncherScreen extends StatelessWidget {
         gradientColors = const [Color(0xFF6E00FF), Color(0xFF6366F1)];
     }
 
-    return InkWell(
+    return InkWell
+        (
       onTap: () {
         Navigator.push(
           context,
@@ -111,65 +112,91 @@ class GameLauncherScreen extends StatelessWidget {
           ),
         );
       },
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(28),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: gradientColors.last.withOpacity(0.4),
+              blurRadius: 22,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Sol üstte ikonlu küçük kart
               Container(
-                width: 60,
-                height: 60,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: gradientColors,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Colors.white.withOpacity(0.18),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Center(
                   child: Icon(
                     leadingIcon,
                     color: Colors.white,
-                    size: 32,
+                    size: 26,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              const Spacer(),
+              // Oyun ismi
               Text(
                 game.name,
                 style: GoogleFonts.poppins(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
-                textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 4),
+              // Alt açıklama satırı (bölge bilgisi)
               Text(
                 game.area,
                 style: GoogleFonts.poppins(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Colors.white.withOpacity(0.85),
                 ),
-                textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 12),
+              // Sol altta play butonu
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.22),
+                ),
+                child: Center(
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      size: 18,
+                      color: gradientColors.first,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

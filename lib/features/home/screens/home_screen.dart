@@ -461,6 +461,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildAllGamesCard(BuildContext context, GameModel game) {
+    // Oyun türüne göre basit görsel kimlik
+    IconData leadingIcon;
+    List<Color> gradientColors;
+    bool useImage = false; // Şimdilik hiçbir oyunda resim kullanmıyoruz
+
+    switch (game.id) {
+      case 'REF01':
+        leadingIcon = Icons.bolt_rounded;
+        gradientColors = const [Color(0xFF6366F1), Color(0xFF22C55E)];
+        break;
+      case 'REF02':
+        leadingIcon = Icons.bolt_rounded;
+        gradientColors = const [Color(0xFF6366F1), Color(0xFF22C55E)];
+        break;
+      case 'ATT01':
+      case 'ATT02':
+        leadingIcon = Icons.visibility_rounded;
+        gradientColors = const [Color(0xFFF97316), Color(0xFFEC4899)];
+        break;
+      case 'MEM01':
+      case 'MEM02':
+      case 'MEM03':
+        leadingIcon = Icons.grid_view_rounded;
+        gradientColors = const [Color(0xFF0EA5E9), Color(0xFF6366F1)];
+        break;
+      case 'NUM01':
+        leadingIcon = Icons.calculate_rounded;
+        gradientColors = const [Color(0xFFFACC15), Color(0xFFF97316)];
+        break;
+      case 'LOG01':
+        leadingIcon = Icons.extension_rounded;
+        gradientColors = const [Color(0xFF22C55E), Color(0xFF0EA5E9)];
+        break;
+      case 'LANG02':
+        leadingIcon = Icons.text_fields_rounded;
+        gradientColors = const [Color(0xFFEC4899), Color(0xFF6366F1)];
+        break;
+      default:
+        leadingIcon = Icons.games_rounded;
+        gradientColors = const [Color(0xFF6E00FF), Color(0xFF6366F1)];
+    }
+
     return InkWell(
       onTap: () {
         _showGameStartSheet(
@@ -493,29 +535,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Başlık ve alan üstte
             Text(
               game.name,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color:
-                    _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
+                color: _isDarkMode
+                    ? const Color(0xFFF9FAFB)
+                    : const Color(0xFF111827),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               game.area,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 12,
-                color:
-                    _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                color: _isDarkMode
+                    ? const Color(0xFF9CA3AF)
+                    : const Color(0xFF6B7280),
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const Spacer(),
+            const SizedBox(height: 8),
+
+            // Ortada büyük ikon / görsel
+            Expanded(
+              child: Center(
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: useImage ? Colors.transparent : null,
+                    gradient: useImage
+                        ? null
+                        : LinearGradient(
+                            colors: gradientColors,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: useImage
+                        ? Image.asset(
+                            'assets/games/ref01.png',
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(
+                            leadingIcon,
+                            size: 32,
+                            color: _isDarkMode
+                                ? const Color(0xFFF9FAFB)
+                                : const Color(0xFF4F46E5),
+                          ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Altta play ikonu
             Align(
               alignment: Alignment.bottomRight,
               child: Icon(
