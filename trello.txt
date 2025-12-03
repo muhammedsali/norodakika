@@ -1,0 +1,40 @@
+=== BUGÜN ===
+
+Kart: GameLauncher – Kart Tasarımı İnce Ayarı
+- Yeni gradient kart yapısının (radius, padding, gölge) görsel olarak son kez kontrolü
+- Play butonu, başlık ve açıklama hizalarının referans tasarımla karşılaştırılması
+
+Kart: HomeScreen – Oyun Kartlarıyla Uyum
+- HomeScreen "Tüm Oyunlar" bölümündeki kartların GameLauncher kart stiliyle hizalanması
+- İkon ve gradient renk paletlerinin iki ekranda da aynı mantıkla kullanılması
+
+Kart: Mini Oyunlar – Görsel Dokunuş
+- Reflex Dash, Focus Line ve Word Sprint için kart renklerinin ve ikonlarının oyun temasına göre güncellenmesi
+
+=== SON GÜNLERDE YAPILANLAR ===
+
+Kart: 3 Yeni Mini Oyun Entegrasyonu
+- Reflex Dash (REF02) – lane bazlı refleks oyunu geliştirildi
+- Focus Line (ATT02) – dikkat/görsel algı oyunu geliştirildi
+- Word Sprint (LANG02) – dil + karar verme oyunu geliştirildi
+- Hepsi GamePlayScreen, MemoryBank ve istatistik sistemiyle entegre edildi
+
+Kart: GameLauncher Kart Tasarımı
+- `_buildGameCard` modern gradient tasarıma göre yeniden tasarlandı
+- Tam ekran renk geçişli arka plan, sol üstte cam efekti ikon kutusu
+- Altta oyun adı, açıklama ve sol altta dairesel play butonu eklendi
+
+Kart: HomeScreen – Tüm Oyunlar Bölümü
+- Kartlarda ikonlar ortalandı ve büyütüldü
+- Tek renk yerine iki renkli gradient arka plan yapısı kuruldu
+- `ref01.png` görseli kaldırıldı, yerine ikon + gradient kullanıldı
+
+Kart: Dil Sistemi (TR / EN)
+- `AppLanguage` enum ve `LanguageNotifier` ile Riverpod tabanlı dil yönetimi kuruldu
+- Seçilen dil LocalStorage’a kaydediliyor (kalıcı tercih)
+- Alt menü etiketleri ve onboarding metinleri TR/EN dinamik hale getirildi
+
+Kart: Profil & Ayarlar Ekranları
+- Dark/light moda uyumlu modern arayüz tasarımı yapıldı
+- Profil ekranı HomeScreen’deki tema durumunu `isDarkMode` parametresi ile takip ediyor
+- Ayarlar ekranında dil kartı tema kartının hemen altına taşındı
