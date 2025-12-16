@@ -33,14 +33,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       if (mounted) {
         final authState = ref.read(authNotifierProvider);
+        
+        // Önceki snackbar'ları temizle
+        ScaffoldMessenger.of(context).clearSnackBars();
+        
         authState.when(
           data: (_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Kayıt başarılı! Giriş yapılıyor...'),
+                backgroundColor: Colors.green,
+              ),
+            );
             Navigator.pop(context);
           },
           loading: () {},
           error: (error, _) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Kayıt hatası: $error')),
+              SnackBar(
+                content: Text(error.toString().replaceAll('Exception: ', '')),
+                backgroundColor: Colors.red,
+              ),
             );
           },
         );

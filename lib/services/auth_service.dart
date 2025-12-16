@@ -28,15 +28,30 @@ class AuthService {
       final user = userCredential.user;
       if (user != null) {
         // 2. Firestore'da kullanıcı dokümanı oluştur
-        final userModel = UserModel.fromJson(MemoryBank.createUserModel(user.uid));
-        // Email'i de modele ekleyelim (UserModel'de email alanı varsa)
-        // Şimdilik sadece UID ile oluşturuyoruz, gerekirse UserModel güncellenmeli
-        
-        await _firestore.collection('users').doc(user.uid).set(userModel.toJson());
+        // Not: Firestore yazma işlemi başarısız olsa bile kayıt (Auth) başarılı sayılmalı.
+        // Bu yüzden burayı ayrı bir try-catch bloğuna alıyoruz.
+        try {
+          final userModel = UserModel.fromJson(MemoryBank.createUserModel(user.uid));
+          await _firestore.collection('users').doc(user.uid).set(userModel.toJson());
+        } catch (e) {
+          // Firestore hatası kritik değil, kullanıcı giriş yapabilir.
+          // Sadece logluyoruz.
+          print('Uyarı: Profil veritabanına yazılamadı: $e');
+        }
       }
     } on FirebaseAuthException catch (e) {
+      // Eğer hata "email-already-in-use" ise ve kullanıcı aslında giriş yapmış durumdaysa
+      // hatayı görmezden gelebiliriz ama bu durumda giriş yapmış olması beklenmez.
+      // Sadece genel hata durumunda kullanıcı kontrolü yapmak daha güvenli.
       throw _handleAuthException(e);
     } catch (e) {
+      // Kritik Hata Kontrolü:
+      // Eğer bir hata oluştuysa (örn: network timeout) ama kullanıcı aslında oluşturulduysa,
+      // işlemi başarısız saymak yerine başarılı kabul et.
+      if (_auth.currentUser != null) {
+        print('Register sırasında hata fırlatıldı ancak kullanıcı başarıyla oluşturulmuş: $e');
+        return;
+      }
       throw 'Bir hata oluştu: $e';
     }
   }
