@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/models/game_model.dart';
 import '../../../core/models/attempt_model.dart';
 import '../../../core/memory/memory_bank.dart';
-import '../../../services/local_storage_service.dart';
+// import '../../../services/local_storage_service.dart'; // Artık kullanılmıyor
 import '../../../core/api/api_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../widgets/reflex_tap_game.dart';
@@ -52,11 +52,13 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
   }
 
   Future<void> _onGameComplete(Map<String, dynamic> result) async {
-    final userEmail = ref.read(currentUserProvider);
-    if (userEmail == null) return;
+    final userAsync = ref.read(currentUserProvider);
+    final user = userAsync.value;
+    
+    if (user == null) return;
 
-    final difficulty = await LocalStorageService.getGameDifficulty(
-      userId: userEmail,
+    final difficulty = await ref.read(firestoreServiceProvider).getGameDifficulty(
+      userId: user.uid,
       gameId: widget.game.id,
     );
 
@@ -66,7 +68,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
     });
 
     // Attempt kaydet
-    await _saveAttempt(result, difficulty, userEmail);
+    await _saveAttempt(result, difficulty, user.uid);
   }
 
   Future<void> _saveAttempt(
@@ -90,8 +92,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
         area: widget.game.area,
       );
 
-      // Local storage'a kaydet
-      await LocalStorageService.saveAttempt(attempt);
+      // Firestore'a kaydet
+      await ref.read(firestoreServiceProvider).saveAttempt(attempt);
 
       // API'ye gönder (opsiyonel)
       try {
@@ -106,7 +108,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen> {
         difficulty,
         successRate,
       );
-      await LocalStorageService.updateGameDifficulty(
+      
+      await ref.read(firestoreServiceProvider).updateGameDifficulty(
         userId: userId,
         gameId: widget.game.id,
         newDifficulty: newDifficulty,

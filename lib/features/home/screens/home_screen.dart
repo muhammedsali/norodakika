@@ -45,9 +45,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userEmail = ref.watch(currentUserProvider);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
     final appLanguage = ref.watch(languageProvider);
-    final userName = userEmail?.split('@').first ?? 'Kullanıcı';
+    final userName = user?.displayName ?? user?.email?.split('@').first ?? 'Kullanıcı';
     
     // Sistem status bar ikonlarını tema ile uyumlu yap
     final overlayStyle = _isDarkMode

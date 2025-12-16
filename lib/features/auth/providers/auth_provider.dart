@@ -1,29 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../services/local_storage_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../../services/auth_service.dart';
+import '../../../services/firestore_service.dart';
 import '../../../core/models/user_model.dart';
-import '../../../core/memory/memory_bank.dart';
 
-final currentUserProvider = StateNotifierProvider<CurrentUserNotifier, String?>((ref) {
-  return CurrentUserNotifier();
+// Firebase Auth servis sağlayıcısı
+final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+
+// Firestore servis sağlayıcısı
+final firestoreServiceProvider = Provider<FirestoreService>((ref) => FirestoreService());
+
+// Mevcut kullanıcı ID'si (Firebase Auth'dan gelir)
+final currentUserProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authServiceProvider).authStateChanges;
 });
 
-class CurrentUserNotifier extends StateNotifier<String?> {
-  CurrentUserNotifier() : super(null) {
-    _loadUser();
+// Kullanıcı verileri (Firestore'dan gelir)
+final userDataProvider = FutureProvider<UserModel?>((ref) async {
+  final user = ref.watch(currentUserProvider).value;
+  if (user != null) {
+    return ref.watch(firestoreServiceProvider).getUserData(user.uid);
   }
-
-  Future<void> _loadUser() async {
-    final user = await LocalStorageService.getCurrentUser();
-    state = user;
-  }
-
-  void setUser(String? email) {
-    state = email;
-  }
-}
-
-final userDataProvider = FutureProvider.family<UserModel?, String>((ref, email) async {
-  return await LocalStorageService.getUserData(email);
+  return null;
 });
 
 class AuthNotifier extends StateNotifier<AsyncValue<void>> {
@@ -36,13 +34,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      await LocalStorageService.saveUser(email, password);
-      
-      // Kullanıcı modelini oluştur
-      final userModel = UserModel.fromJson(MemoryBank.createUserModel(email));
-      await LocalStorageService.saveUserData(userModel);
-      
-      ref.read(currentUserProvider.notifier).setUser(email);
+      await ref.read(authServiceProvider).register(email: email, password: password);
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -55,21 +47,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      final success = await LocalStorageService.login(email, password);
-      if (success) {
-        ref.read(currentUserProvider.notifier).setUser(email);
-        state = const AsyncValue.data(null);
-      } else {
-        state = AsyncValue.error('Geçersiz e-posta veya şifre', StackTrace.current);
-      }
+      await ref.read(authServiceProvider).login(email: email, password: password);
+      state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
   }
 
   Future<void> logout() async {
-    await LocalStorageService.logout();
-    ref.read(currentUserProvider.notifier).setUser(null);
+    await ref.read(authServiceProvider).logout();
   }
 }
 

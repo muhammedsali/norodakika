@@ -13,15 +13,17 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userEmail = ref.watch(currentUserProvider);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
     final bool isDark = isDarkMode;
     final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
     final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
     final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
-    final displayEmail = userEmail ?? 'kullanici@ornek.com';
-    final initial = displayEmail.isNotEmpty ? displayEmail[0].toUpperCase() : 'U';
+    final displayEmail = user?.email ?? 'kullanici@ornek.com';
+    final displayName = user?.displayName ?? 'Kullanıcı';
+    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : (displayEmail.isNotEmpty ? displayEmail[0].toUpperCase() : 'U');
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -95,7 +97,7 @@ class ProfileScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Muhammed Sali',
+                            displayName,
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

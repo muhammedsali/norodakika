@@ -10,13 +10,14 @@ class StatsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userEmail = ref.watch(currentUserProvider);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final textColorPrimary = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final textColorSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
 
-    if (userEmail == null) {
+    if (user == null) {
       return Center(
         child: Text(
           'Henüz istatistik verisi bulunmuyor.',
@@ -29,7 +30,10 @@ class StatsScreen extends ConsumerWidget {
       );
     }
 
-    final userDataAsync = ref.watch(userDataProvider(userEmail));
+    // userDataProvider artık user objesine ihtiyaç duymuyor, internal olarak currentUserProvider kullanıyor
+    // Ancak mevcut provider yapısı (eğer parametreliyse) güncellenmeli veya parametresiz kullanılmalı.
+    // auth_provider.dart'ta userDataProvider parametresiz yapılmıştı.
+    final userDataAsync = ref.watch(userDataProvider);
 
     return userDataAsync.when(
       data: (userData) {

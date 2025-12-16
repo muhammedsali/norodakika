@@ -16,6 +16,11 @@ dependencies:
   # HTTP & API
   http: ^1.2.0
   dio: ^5.4.0
+
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  cloud_firestore: ^4.14.0
   
   # UI & Design
   fl_chart: ^0.66.0
