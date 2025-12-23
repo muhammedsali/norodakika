@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../core/models/game_model.dart';
+import '../../settings/providers/theme_provider.dart';
 import '../../game_launcher/screens/game_launcher_screen.dart';
 
 class DailyPlanScreen extends ConsumerWidget {
@@ -11,14 +12,18 @@ class DailyPlanScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dailyPlan = MemoryBank.generateDailyPlan();
+    final isDarkMode = ref.watch(themeProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: isDarkMode ? const Color(0xFF111827) : Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF6E00FF)),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDarkMode ? Colors.white : const Color(0xFF6E00FF),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -26,7 +31,7 @@ class DailyPlanScreen extends ConsumerWidget {
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            color: isDarkMode ? Colors.white : Colors.black87,
           ),
         ),
       ),
@@ -35,7 +40,9 @@ class DailyPlanScreen extends ConsumerWidget {
             ? Center(
                 child: Text(
                   'Bugün için plan yok',
-                  style: GoogleFonts.poppins(color: Colors.grey[600]),
+                  style: GoogleFonts.poppins(
+                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
                 ),
               )
             : ListView.builder(
@@ -73,11 +80,11 @@ class DailyPlanScreen extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withOpacity(isDarkMode ? 0.2 : 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -108,7 +115,7 @@ class DailyPlanScreen extends ConsumerWidget {
                                     style: GoogleFonts.poppins(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
+                                      color: isDarkMode ? Colors.white : Colors.black87,
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -116,7 +123,7 @@ class DailyPlanScreen extends ConsumerWidget {
                                     '${duration} saniye • ${game.area}',
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
-                                      color: Colors.grey[600],
+                                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                                     ),
                                   ),
                                 ],
@@ -124,7 +131,7 @@ class DailyPlanScreen extends ConsumerWidget {
                             ),
                             Icon(
                               Icons.arrow_forward_ios,
-                              color: Colors.grey[400],
+                              color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
                               size: 20,
                             ),
                           ],

@@ -54,7 +54,7 @@ class StatsScreen extends ConsumerWidget {
 
             // Bugün özeti için hesaplamalar
             final now = DateTime.now();
-            final List history = userData.history ?? [];
+            final List history = userData.history;
             final todayAttempts = history.where((h) {
               if (h is Map && h['timestamp'] != null) {
                 try {
@@ -91,7 +91,7 @@ class StatsScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -126,7 +126,7 @@ class StatsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF4F46E5).withOpacity(0.08),
+                            color: const Color(0xFF4F46E5).withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Row(
@@ -156,7 +156,7 @@ class StatsScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -166,7 +166,7 @@ class StatsScreen extends ConsumerWidget {
                       RadarChartData(
                         dataSets: [
                           RadarDataSet(
-                            fillColor: const Color(0xFF4F46E5).withOpacity(0.3),
+                            fillColor: const Color(0xFF4F46E5).withValues(alpha: 0.3),
                             borderColor: const Color(0xFF4F46E5),
                             borderWidth: 2,
                             dataEntries: categories.map((category) {
@@ -211,7 +211,7 @@ class StatsScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 5,
                               offset: const Offset(0, 2),
                             ),

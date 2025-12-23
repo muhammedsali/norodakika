@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../daily_plan/screens/daily_plan_screen.dart';
 import '../../stats/screens/stats_screen.dart';
+import '../../stats/providers/user_stats_provider.dart';
+import '../../stats/widgets/radar_chart_widget.dart';
 import '../../game_launcher/screens/game_launcher_screen.dart';
 import '../../game_launcher/screens/game_play_screen.dart';
 import '../../profile/screens/profile_screen.dart';
@@ -12,7 +14,9 @@ import '../../../core/memory/memory_bank.dart';
 import '../../../core/models/game_model.dart';
 import '../../../services/local_storage_service.dart';
 import '../../settings/providers/language_provider.dart';
+import '../../settings/providers/theme_provider.dart';
 import '../widgets/home_bottom_nav.dart';
+import '../../shared/widgets/game_card_widgets.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +27,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _selectedCategory = 'Tümü';
-  bool _isDarkMode = false;
   int _selectedTab = 0; // 0: Ana Sayfa, 1: Oyunlar, 2: İlerleme, 3: Ayarlar
   bool _showOnboarding = false;
   int _onboardingStep = 0;
@@ -48,10 +51,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.value;
     final appLanguage = ref.watch(languageProvider);
+    final isDarkMode = ref.watch(themeProvider);
     final userName = user?.displayName ?? user?.email?.split('@').first ?? 'Kullanıcı';
     
     // Sistem status bar ikonlarını tema ile uyumlu yap
-    final overlayStyle = _isDarkMode
+    final overlayStyle = isDarkMode
         ? const SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
             statusBarIconBrightness: Brightness.light,
@@ -70,7 +74,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       backgroundColor:
-          _isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6),
+          isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6),
       body: Stack(
         children: [
           SafeArea(
@@ -103,7 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: HomeBottomNav(
           selectedTab: _selectedTab,
-          isDarkMode: _isDarkMode,
+          isDarkMode: isDarkMode,
           language: appLanguage,
           onTabSelected: (index) {
             setState(() {
@@ -116,7 +120,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildOnboardingOverlay(BuildContext context, AppLanguage lang) {
-    final isDark = _isDarkMode;
+    final isDarkMode = ref.watch(themeProvider);
+    final isDark = isDarkMode;
     final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
     final steps = lang == AppLanguage.en
@@ -265,8 +270,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF4F46E5),
                       foregroundColor: Colors.white,
+                      elevation: 8,
+                      shadowColor:
+                          (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
+                              .withValues(alpha: 0.35),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(999),
+                        side: isDarkMode
+                            ? const BorderSide(
+                                color: Color(0xFF818CF8),
+                                width: 1.2,
+                              )
+                            : BorderSide.none,
                       ),
                     ),
                     child: Text(
@@ -293,17 +308,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required String gameId,
     required String title,
     required String description,
+    required bool isDarkMode,
   }) {
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (ctx) {
         final themeBg =
-            _isDarkMode ? const Color(0xFF111827) : Colors.white;
+            isDarkMode ? const Color(0xFF111827) : Colors.white;
         final titleColor =
-            _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
         final textColor =
-            _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
 
         return Center(
           child: Padding(
@@ -327,7 +343,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ],
                   border: Border.all(
-                    color: _isDarkMode
+                    color: isDarkMode
                         ? const Color(0xFF374151)
                         : const Color(0xFFE5E7EB),
                   ),
@@ -358,10 +374,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: (_isDarkMode
+                                  color: (isDarkMode
                                           ? const Color(0xFF818CF8)
                                           : const Color(0xFF4F46E5))
-                                      .withOpacity(0.12),
+                                      .withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
@@ -369,7 +385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   style: GoogleFonts.spaceGrotesk(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w500,
-                                    color: _isDarkMode
+                                    color: isDarkMode
                                         ? const Color(0xFF818CF8)
                                         : const Color(0xFF4F46E5),
                                   ),
@@ -428,7 +444,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             MaterialPageRoute(
                               builder: (_) => GamePlayScreen(
                                 game: selectedGame,
-                                isDarkOverride: _isDarkMode,
+                                isDarkOverride: isDarkMode,
                               ),
                             ),
                           );
@@ -461,159 +477,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildAllGamesCard(BuildContext context, GameModel game) {
-    // Oyun türüne göre basit görsel kimlik
-    IconData leadingIcon;
-    List<Color> gradientColors;
-    bool useImage = false; // Şimdilik hiçbir oyunda resim kullanmıyoruz
-
-    switch (game.id) {
-      case 'REF01':
-        leadingIcon = Icons.bolt_rounded;
-        gradientColors = const [Color(0xFF6366F1), Color(0xFF22C55E)];
-        break;
-      case 'REF02':
-        leadingIcon = Icons.bolt_rounded;
-        gradientColors = const [Color(0xFF6366F1), Color(0xFF22C55E)];
-        break;
-      case 'ATT01':
-      case 'ATT02':
-        leadingIcon = Icons.visibility_rounded;
-        gradientColors = const [Color(0xFFF97316), Color(0xFFEC4899)];
-        break;
-      case 'MEM01':
-      case 'MEM02':
-      case 'MEM03':
-        leadingIcon = Icons.grid_view_rounded;
-        gradientColors = const [Color(0xFF0EA5E9), Color(0xFF6366F1)];
-        break;
-      case 'NUM01':
-        leadingIcon = Icons.calculate_rounded;
-        gradientColors = const [Color(0xFFFACC15), Color(0xFFF97316)];
-        break;
-      case 'LOG01':
-        leadingIcon = Icons.extension_rounded;
-        gradientColors = const [Color(0xFF22C55E), Color(0xFF0EA5E9)];
-        break;
-      case 'LANG02':
-        leadingIcon = Icons.text_fields_rounded;
-        gradientColors = const [Color(0xFFEC4899), Color(0xFF6366F1)];
-        break;
-      default:
-        leadingIcon = Icons.games_rounded;
-        gradientColors = const [Color(0xFF6E00FF), Color(0xFF6366F1)];
-    }
-
-    return InkWell(
-      onTap: () {
-        _showGameStartSheet(
-          context: context,
-          gameId: game.id,
-          title: game.name,
-          description: game.description.isNotEmpty
-              ? game.description
-              : game.area,
-        );
-      },
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: _isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color:
-                _isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-          ),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x14000000),
-              blurRadius: 12,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Başlık ve alan üstte
-            Text(
-              game.name,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: _isDarkMode
-                    ? const Color(0xFFF9FAFB)
-                    : const Color(0xFF111827),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              game.area,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 12,
-                color: _isDarkMode
-                    ? const Color(0xFF9CA3AF)
-                    : const Color(0xFF6B7280),
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 8),
-
-            // Ortada büyük ikon / görsel
-            Expanded(
-              child: Center(
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    color: useImage ? Colors.transparent : null,
-                    gradient: useImage
-                        ? null
-                        : LinearGradient(
-                            colors: gradientColors,
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: useImage
-                        ? Image.asset(
-                            'assets/games/ref01.png',
-                            fit: BoxFit.cover,
-                          )
-                        : Icon(
-                            leadingIcon,
-                            size: 32,
-                            color: _isDarkMode
-                                ? const Color(0xFFF9FAFB)
-                                : const Color(0xFF4F46E5),
-                          ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Altta play ikonu
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Icon(
-                Icons.play_arrow_rounded,
-                color: const Color(0xFF818CF8),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildHomeTabBody(BuildContext context, List<GameModel> games) {
+    final isDarkMode = ref.watch(themeProvider);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
@@ -621,30 +487,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           _buildPrimaryCtaButton(context),
           const SizedBox(height: 24),
-          _buildProgressSection(),
-          const SizedBox(height: 32),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'Mini Oyunlar',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color:
-                      _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          _buildMiniGamesGrid(context, games),
+          _buildExpandedProgressSection(),
         ],
       ),
     );
   }
 
   Widget _buildGamesTabBody(BuildContext context, List<GameModel> games) {
+    final isDarkMode = ref.watch(themeProvider);
     // Tüm oyunların tam grid görünümü
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -656,7 +506,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             style: GoogleFonts.spaceGrotesk(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
+              color: isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
             ),
           ),
           const SizedBox(height: 16),
@@ -672,15 +522,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             itemCount: games.length,
             itemBuilder: (context, index) {
               final game = games[index];
-              return _buildAllGamesCard(context, game);
+              return GridGameCard(
+                gameId: game.id,
+                title: game.name,
+                area: game.area,
+                isDarkMode: isDarkMode,
+                onTap: () {
+                  _showGameStartSheet(
+                    context: context,
+                    gameId: game.id,
+                    title: game.name,
+                    description: game.description.isNotEmpty
+                        ? game.description
+                        : game.area,
+                    isDarkMode: isDarkMode,
+                  );
+                },
+              );
             },
           ),
         ],
       ),
     );
   }
-  
+
   Widget _buildPrimaryCtaButton(BuildContext context) {
+    final isDarkMode = ref.watch(themeProvider);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -693,21 +560,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const DailyPlanScreen(),
+                    builder: (context) => const GameLauncherScreen(),
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    _isDarkMode ? const Color(0xFF1F2937) : const Color(0xFF4F46E5),
+                    isDarkMode ? const Color(0xFF1F2937) : const Color(0xFF4F46E5),
                 foregroundColor: Colors.white,
                 elevation: 8,
                 shadowColor:
-                    (_isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
-                        .withOpacity(0.35),
+                    (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
+                        .withValues(alpha: 0.35),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
-                  side: _isDarkMode
+                  side: isDarkMode
                       ? const BorderSide(
                           color: Color(0xFF818CF8),
                           width: 1.2,
@@ -731,167 +598,121 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildProgressSection() {
-    // Şimdilik sabit %40; ileride gerçek verilere bağlanabilir
-    const progress = 0.4;
+  Widget _buildExpandedProgressSection() {
+    final isDarkMode = ref.watch(themeProvider);
+    final statsAsync = ref.watch(userStatsProvider);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 8,
-          decoration: BoxDecoration(
-            color:
-                _isDarkMode ? const Color(0xFF1F2937) : Colors.grey[300],
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: progress,
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFF818CF8),
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
+        Text(
+          'İlerleme',
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          'Bugünkü hedefinin %40ını tamamladın!',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 14,
-            color:
-                _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+        const SizedBox(height: 16),
+        statsAsync.when(
+          data: (stats) {
+            final hasData = stats.values.any((value) => value > 0);
+            if (!hasData) {
+              return Container(
+                padding: const EdgeInsets.all(40),
+                decoration: BoxDecoration(
+                  color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isDarkMode
+                        ? const Color(0xFF374151)
+                        : const Color(0xFFE5E7EB),
+                    width: 1,
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.show_chart_rounded,
+                        size: 48,
+                        color: isDarkMode
+                            ? Colors.grey[600]
+                            : Colors.grey[400],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Henüz oyun oynamadın',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Oyun oynamaya başlayınca ilerleme grafin burada görünecek',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: isDarkMode ? Colors.grey[500] : Colors.grey[500],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            return RadarChartWidget(
+              stats: stats,
+              isDarkMode: isDarkMode,
+            );
+          },
+          loading: () => Container(
+            height: 300,
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDarkMode
+                    ? const Color(0xFF374151)
+                    : const Color(0xFFE5E7EB),
+                width: 1,
+              ),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+          error: (error, stack) => Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDarkMode
+                    ? const Color(0xFF374151)
+                    : const Color(0xFFE5E7EB),
+                width: 1,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                'Veriler yüklenemedi',
+                style: GoogleFonts.poppins(
+                  color: Colors.red,
+                ),
+              ),
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildMiniGamesGrid(BuildContext context, List<GameModel> games) {
-    // HTML tasarımdaki gibi 4 statik mini oyun kartı göster
-    final miniGames = [
-      {
-        'id': 'MEM02',
-        'title': 'Hafıza Matrisi',
-        'subtitle': 'Kısa süreli hafızanı zorla ve güçlendir.',
-        'icon': Icons.grid_view_rounded,
-      },
-      {
-        'id': 'LOG01',
-        'title': 'Mantık Işıkları',
-        'subtitle': 'Işık desenleriyle mantık bulmacalarını çöz.',
-        'icon': Icons.lightbulb_outline,
-      },
-      {
-        'id': 'ATT01',
-        'title': 'Odak Akışı',
-        'subtitle': 'Dikkat ve konsantrasyon süreni artır.',
-        'icon': Icons.center_focus_strong,
-      },
-      {
-        'id': 'MEM01',
-        'title': 'Desen Yolu',
-        'subtitle': 'Karmaşık görsel desenleri tanı ve tamamla.',
-        'icon': Icons.timeline,
-      },
-    ];
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.9,
-      ),
-      itemCount: miniGames.length,
-      itemBuilder: (context, index) {
-        final item = miniGames[index];
-
-        return InkWell(
-          onTap: () {
-            _showGameStartSheet(
-              context: context,
-              gameId: item['id'] as String,
-              title: item['title'] as String,
-              description: item['subtitle'] as String,
-            );
-          },
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: _isDarkMode
-                  ? const Color(0xFF1F2937)
-                  : Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: _isDarkMode
-                    ? const Color(0xFF374151)
-                    : const Color(0xFFE5E7EB),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x14000000),
-                  blurRadius: 12,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF818CF8).withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    item['icon'] as IconData,
-                    color: const Color(0xFF4F46E5),
-                    size: 28,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  item['title'] as String,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color:
-                        _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item['subtitle'] as String,
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 11,
-                    color:
-                        _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-                  ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildHeader(String userName) {
+    final isDarkMode = ref.watch(themeProvider);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Container(
@@ -937,17 +758,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color:
-                          _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
+                          isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
                     ),
                   ),
                   const SizedBox(height: 6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: (_isDarkMode
-                              ? const Color(0xFF818CF8)
-                              : const Color(0xFF4F46E5))
-                          .withOpacity(0.2),
+                      color: (isDarkMode
+                          ? const Color(0xFF818CF8)
+                          : const Color(0xFF4F46E5))
+                      .withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
@@ -956,7 +777,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color:
-                            _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF4F46E5),
+                            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF4F46E5),
                       ),
                     ),
                   ),
@@ -972,348 +793,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildCategoriesSection() {
-    final categories = ['Tümü', 'Reflex Tap', 'N-Back Mini', 'Stroop Tap', 'Hızlı Matematik'];
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            'Kategoriler',
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        SizedBox(
-          height: 40,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              final category = categories[index];
-              final isSelected = _selectedCategory == category;
-              
-              return Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = category;
-                    });
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? const Color(0xFF7F0DF2)
-                          : const Color(0xFF1F1630),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected
-                            ? const Color(0xFFB47CFF)
-                            : const Color(0xFF7F0DF2).withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        category,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.white : Colors.white70,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGamesGrid(List<Map<String, dynamic>> games) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.75, // Daha küçük değer = daha yüksek kartlar
-      ),
-      itemCount: games.length,
-      itemBuilder: (context, index) {
-        final game = GameModel.fromMap(games[index]);
-        return _buildGameCard(game);
-      },
-    );
-  }
-
-  Widget _buildGameCard(GameModel game) {
-    IconData iconData;
-    String subtitle;
-    String displayName;
-    
-    switch (game.id) {
-      case 'REF01':
-        iconData = Icons.touch_app;
-        subtitle = 'Reflekslerini test et';
-        displayName = 'Reflex Tap';
-        break;
-      case 'MEM01':
-        iconData = Icons.memory;
-        subtitle = 'Hafızanı güçlendir';
-        displayName = 'N-Back Mini';
-        break;
-      case 'ATT01':
-        iconData = Icons.palette;
-        subtitle = 'Odaklanma becerisi';
-        displayName = 'Stroop Tap';
-        break;
-      case 'NUM01':
-        iconData = Icons.calculate;
-        subtitle = 'Sayısal zeka';
-        displayName = 'Hızlı Matematik';
-        break;
-      default:
-        iconData = Icons.games;
-        subtitle = game.description;
-        displayName = game.name;
-    }
-
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GameLauncherScreen(gameId: game.id),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1F1630),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFF7F0DF2).withOpacity(0.3),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF7F0DF2).withOpacity(0.2),
-              blurRadius: 14,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // İkon
-            Expanded(
-              flex: 3,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF7F0DF2), Color(0xFF00E0FF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  iconData,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            
-            // Başlık ve Alt Başlık
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    displayName,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Flexible(
-                    child: Text(
-                      subtitle,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 12,
-                        color: Colors.white60,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDailyWorkoutButton() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        width: double.infinity,
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF7F0DF2), Color(0xFF00E0FF)],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF7F0DF2).withOpacity(0.5),
-              blurRadius: 20,
-              spreadRadius: 2,
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DailyPlanScreen(),
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(8),
-            child: Center(
-              child: Text(
-                'Başla: Günün Antrenmanı',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav() {
+  Widget _buildSettingsTabBody() {
+    final isDarkMode = ref.watch(themeProvider);
+    final bgColor = isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+    final cardColor = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
     final appLanguage = ref.watch(languageProvider);
-    final homeLabel = appLanguage == AppLanguage.en ? 'Home' : 'Ana Sayfa';
-    final gamesLabel = appLanguage == AppLanguage.en ? 'Games' : 'Oyunlar';
-    final progressLabel = appLanguage == AppLanguage.en ? 'Progress' : 'İlerleme';
-    final settingsLabel = appLanguage == AppLanguage.en ? 'Settings' : 'Ayarlar';
 
     return Container(
-      height: 80,
-      decoration: const BoxDecoration(color: Colors.transparent),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: _isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: _isDarkMode
-              ? Border.all(
-                  color: const Color(0xFF4B5563),
-                  width: 1,
-                )
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(Icons.home_rounded, homeLabel, _selectedTab == 0, () {
-              setState(() {
-                _selectedTab = 0;
-              });
-            }),
-            _buildNavItem(Icons.category_rounded, gamesLabel, _selectedTab == 1, () {
-              setState(() {
-                _selectedTab = 1;
-              });
-            }),
-            _buildNavItem(Icons.bar_chart_rounded, progressLabel, _selectedTab == 2, () {
-              setState(() {
-                _selectedTab = 2;
-              });
-            }),
-            _buildNavItem(Icons.settings_rounded, settingsLabel, _selectedTab == 3, () {
-              setState(() {
-                _selectedTab = 3;
-              });
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProgressTabBody() {
-    return Center(
-      child: Text(
-        'İlerleme ekranı yakında burada olacak.',
-        style: GoogleFonts.spaceGrotesk(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettingsTabBody() {
-    final bgColor = _isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
-    final cardColor = _isDarkMode ? const Color(0xFF1F2937) : Colors.white;
-    final titleColor = _isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor = _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final appLanguage = ref.watch(languageProvider);
-    final languageLabel = appLanguage == AppLanguage.en ? 'English' : 'Türkçe';
-
-    return Container
-    (
       color: bgColor,
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
@@ -1346,7 +834,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: cardColor,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: _isDarkMode
+                  color: isDarkMode
                       ? const Color(0xFF374151)
                       : const Color(0xFFE5E7EB),
                 ),
@@ -1363,7 +851,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF818CF8).withOpacity(0.15),
+                      color: const Color(0xFF7F0DF2).withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -1396,12 +884,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   Switch(
-                    value: _isDarkMode,
-                    activeColor: const Color(0xFF4F46E5),
+                    value: isDarkMode,
+                    activeThumbColor: const Color(0xFF4F46E5),
                     onChanged: (value) {
-                      setState(() {
-                        _isDarkMode = value;
-                      });
+                      ref.read(themeProvider.notifier).setDarkMode(value);
                     },
                   ),
                 ],
@@ -1418,7 +904,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: cardColor,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: _isDarkMode
+                  color: isDarkMode
                       ? const Color(0xFF374151)
                       : const Color(0xFFE5E7EB),
                 ),
@@ -1511,7 +997,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: cardColor,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: _isDarkMode
+                  color: isDarkMode
                       ? const Color(0xFF374151)
                       : const Color(0xFFE5E7EB),
                 ),
@@ -1548,7 +1034,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ProfileScreen(isDarkMode: _isDarkMode),
+                          builder: (context) => ProfileScreen(isDarkMode: isDarkMode),
                         ),
                       );
                     },
@@ -1577,7 +1063,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const DailyPlanScreen(),
+                          builder: (context) => const GameLauncherScreen(),
                         ),
                       );
                     },
@@ -1622,7 +1108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: cardColor,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: _isDarkMode
+                  color: isDarkMode
                       ? const Color(0xFF374151)
                       : const Color(0xFFE5E7EB),
                 ),
@@ -1682,35 +1168,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, bool isSelected, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? const Color(0xFF4F46E5)
-                  : (_isDarkMode ? Colors.white70 : const Color(0xFF4B5563)),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? const Color(0xFF4F46E5)
-                    : (_isDarkMode ? Colors.white70 : const Color(0xFF4B5563)),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
