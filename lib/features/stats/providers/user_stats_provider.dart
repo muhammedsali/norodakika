@@ -9,15 +9,17 @@ final firestoreServiceProvider = Provider<FirestoreService>((ref) {
 final userStatsProvider = StreamProvider<Map<String, double>>((ref) async* {
   final user = ref.watch(currentUserProvider).value;
   
+  // Sahte veri - Demo amaçlı
+  yield {
+    'Refleks': 75.0,
+    'Dikkat': 62.0,
+    'Hafıza': 88.0,
+    'Sayısal': 54.0,
+    'Mantık': 70.0,
+    'Dil': 45.0,
+  };
+  
   if (user == null) {
-    yield {
-      'Refleks': 0.0,
-      'Dikkat': 0.0,
-      'Hafıza': 0.0,
-      'Sayısal': 0.0,
-      'Mantık': 0.0,
-      'Dil': 0.0,
-    };
     return;
   }
 
@@ -26,22 +28,26 @@ final userStatsProvider = StreamProvider<Map<String, double>>((ref) async* {
   yield* Stream.periodic(const Duration(seconds: 2), (_) async {
     final userData = await firestoreService.getUserData(user.uid);
     if (userData != null && userData.stats.isNotEmpty) {
-      return {
-        'Refleks': userData.stats['Refleks'] ?? 0.0,
-        'Dikkat': userData.stats['Dikkat'] ?? 0.0,
-        'Hafıza': userData.stats['Hafıza'] ?? 0.0,
-        'Sayısal': userData.stats['Sayısal'] ?? 0.0,
-        'Mantık': userData.stats['Mantık'] ?? 0.0,
-        'Dil': userData.stats['Dil'] ?? 0.0,
-      };
+      final hasRealData = userData.stats.values.any((value) => value > 0);
+      if (hasRealData) {
+        return {
+          'Refleks': userData.stats['Refleks'] ?? 0.0,
+          'Dikkat': userData.stats['Dikkat'] ?? 0.0,
+          'Hafıza': userData.stats['Hafıza'] ?? 0.0,
+          'Sayısal': userData.stats['Sayısal'] ?? 0.0,
+          'Mantık': userData.stats['Mantık'] ?? 0.0,
+          'Dil': userData.stats['Dil'] ?? 0.0,
+        };
+      }
     }
+    // Gerçek veri yoksa sahte veriyi göster
     return {
-      'Refleks': 0.0,
-      'Dikkat': 0.0,
-      'Hafıza': 0.0,
-      'Sayısal': 0.0,
-      'Mantık': 0.0,
-      'Dil': 0.0,
+      'Refleks': 75.0,
+      'Dikkat': 62.0,
+      'Hafıza': 88.0,
+      'Sayısal': 54.0,
+      'Mantık': 70.0,
+      'Dil': 45.0,
     };
   }).asyncMap((future) => future);
 });

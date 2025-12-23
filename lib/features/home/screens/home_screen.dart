@@ -17,6 +17,7 @@ import '../../settings/providers/language_provider.dart';
 import '../../settings/providers/theme_provider.dart';
 import '../widgets/home_bottom_nav.dart';
 import '../../shared/widgets/game_card_widgets.dart';
+import '../../profile/providers/avatar_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -298,6 +299,108 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showAvatarPicker(BuildContext context) {
+    final isDarkMode = ref.read(themeProvider);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: isDarkMode ? Colors.white24 : Colors.black12,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Profil Resmi Seç',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : const Color(0xFF1F2937),
+              ),
+            ),
+            const SizedBox(height: 24),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1,
+              ),
+              itemCount: AvatarData.avatars.length,
+              itemBuilder: (context, index) {
+                final avatar = AvatarData.avatars[index];
+                final isSelected = ref.watch(avatarProvider) == index;
+                return GestureDetector(
+                  onTap: () {
+                    ref.read(avatarProvider.notifier).setAvatar(index);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: avatar['colors'] as List<Color>,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      border: isSelected
+                          ? Border.all(
+                              color: Colors.white,
+                              width: 3,
+                            )
+                          : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: (avatar['colors'] as List<Color>)[0].withOpacity(0.3),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          avatar['icon'] as IconData,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          avatar['name'] as String,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );
@@ -723,26 +826,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Row(
           children: [
             // Profil Avatar
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF4F46E5), Color(0xFF10B981)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  userName.isNotEmpty ? userName[0].toUpperCase() : 'U',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+            GestureDetector(
+              onTap: () => _showAvatarPicker(context),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final selectedAvatar = ref.watch(avatarProvider);
+                  final avatarData = AvatarData.getAvatar(selectedAvatar);
+                  return Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: avatarData['colors'] as List<Color>,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: (avatarData['colors'] as List<Color>)[0].withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      avatarData['icon'] as IconData,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 12),
@@ -921,12 +1035,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.15),
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFEC4899).withOpacity(isDarkMode ? 0.2 : 0.15),
+                          const Color(0xFFF472B6).withOpacity(isDarkMode ? 0.15 : 0.1),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.language_rounded,
-                      color: Color(0xFF059669),
+                      color: isDarkMode ? const Color(0xFFF472B6) : const Color(0xFFEC4899),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -953,35 +1074,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ],
                     ),
                   ),
-                  DropdownButton<AppLanguage>(
-                    value: appLanguage,
-                    onChanged: (AppLanguage? value) async {
-                      if (value != null) {
-                        await ref.read(languageProvider.notifier).setLanguage(value);
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(
-                        child: Text(
-                          'Türkçe',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 14,
-                            color: titleColor,
-                          ),
-                        ),
-                        value: AppLanguage.tr,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFEC4899).withOpacity(isDarkMode ? 0.2 : 0.1),
+                          const Color(0xFFF472B6).withOpacity(isDarkMode ? 0.15 : 0.08),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      DropdownMenuItem(
-                        child: Text(
-                          'English',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 14,
-                            color: titleColor,
-                          ),
-                        ),
-                        value: AppLanguage.en,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFEC4899).withOpacity(isDarkMode ? 0.3 : 0.2),
+                        width: 1,
                       ),
-                    ],
+                    ),
+                    child: DropdownButton<AppLanguage>(
+                      value: appLanguage,
+                      onChanged: (AppLanguage? value) async {
+                        if (value != null) {
+                          await ref.read(languageProvider.notifier).setLanguage(value);
+                        }
+                      },
+                      underline: const SizedBox(),
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: isDarkMode ? const Color(0xFFF472B6) : const Color(0xFFEC4899),
+                      ),
+                      dropdownColor: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text(
+                            'Türkçe',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isDarkMode ? const Color(0xFFF472B6) : const Color(0xFFEC4899),
+                            ),
+                          ),
+                          value: AppLanguage.tr,
+                        ),
+                        DropdownMenuItem(
+                          child: Text(
+                            'English',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isDarkMode ? const Color(0xFFF472B6) : const Color(0xFFEC4899),
+                            ),
+                          ),
+                          value: AppLanguage.en,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

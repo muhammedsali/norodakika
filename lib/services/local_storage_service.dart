@@ -38,5 +38,18 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_themeKey, isDark);
   }
+
+  // Avatar seçimi
+  static const String _avatarKey = 'selected_avatar';
+
+  Future<int> getSelectedAvatar() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_avatarKey) ?? 0;
+  }
+
+  Future<void> saveSelectedAvatar(int avatarIndex) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_avatarKey, avatarIndex);
+  }
 }
 

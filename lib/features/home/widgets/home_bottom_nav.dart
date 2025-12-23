@@ -51,7 +51,7 @@ class HomeBottomNav extends StatelessWidget {
             _buildNavItem(Icons.home_rounded, homeLabel, selectedTab == 0, () {
               onTabSelected(0);
             }),
-            _buildNavItem(Icons.category_rounded, gamesLabel, selectedTab == 1, () {
+            _buildNavItem(Icons.sports_esports_rounded, gamesLabel, selectedTab == 1, () {
               onTabSelected(1);
             }),
             _buildNavItem(Icons.bar_chart_rounded, progressLabel, selectedTab == 2, () {
