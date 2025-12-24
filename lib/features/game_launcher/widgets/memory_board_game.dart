@@ -12,7 +12,6 @@ class MemoryBoardGame extends StatefulWidget {
 }
 
 class _MemoryBoardGameState extends State<MemoryBoardGame> {
-  // Oyun Durumu Değişkenleri
   late List<ItemModel> _gameCards;
   int _score = 0;
   int _moves = 0;
@@ -20,7 +19,6 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   Timer? _timer;
   int _elapsedSeconds = 0;
   
-  // Mantıksal Kontroller
   int? _firstCardIndex;
   bool _isProcessing = false; 
 
@@ -98,7 +96,9 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
           _gameCards[_firstCardIndex!].isMatched = true;
           _gameCards[index].isMatched = true;
           _matches++;
-          _score += 20;
+          // Hız bonusu: daha az hamlede eşleştirme = daha çok puan
+          final speedBonus = (30 - _moves).clamp(0, 20);
+          _score += 20 + speedBonus;
           _firstCardIndex = null;
           _isProcessing = false; 
         });
@@ -124,9 +124,10 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
 
   void _endGame() {
     _timer?.cancel();
+    final successRate = _matches / 8.0;
     widget.onComplete({
       'score': _score.toDouble(),
-      'successRate': _matches / 8.0, 
+      'successRate': successRate, 
       'duration': _elapsedSeconds,
       'moves': _moves,
     });
@@ -140,98 +141,108 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
 
   @override
   Widget build(BuildContext context) {
-    // Tasarım Renk Paleti (Modern & Cognitive Style)
-    const Color bgColor = Color(0xFFF0F4F8); // Çok açık gri-mavi
-    const Color primaryColor = Color(0xFF2D3436); // Koyu gri (Text)
-    const Color cardBackInfo = Color(0xFF6C5CE7); // Morumsu Mavi (Aktif olmayan kart)
-    const Color accentColor = Color(0xFF00B894); // Yeşil (Eşleşme)
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+    final panelColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final accentColor = isDark ? const Color(0xFF6C5CE7) : const Color(0xFF6366F1);
+    final successColor = isDark ? const Color(0xFF10B981) : const Color(0xFF059669);
     
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
-            // --- HEADER ---
+            // Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Hafıza Testi",
-                        style: GoogleFonts.outfit(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
-                        ),
-                      ),
-                      Text(
-                        "Kartları eşleştir",
-                        style: GoogleFonts.outfit(
-                          fontSize: 14,
-                          color: primaryColor.withOpacity(0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: panelColor,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    child: Row(
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.timer_outlined, size: 18, color: cardBackInfo),
-                        const SizedBox(width: 6),
                         Text(
-                          _formatTime(_elapsedSeconds),
-                          style: GoogleFonts.robotoMono(
-                            fontSize: 16,
+                          "Hafıza Testi",
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: primaryColor,
+                            color: titleColor,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Kartları eşleştir",
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 14,
+                            color: subtitleColor,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: accentColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: accentColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.timer_outlined, size: 18, color: accentColor),
+                          const SizedBox(width: 6),
+                          Text(
+                            _formatTime(_elapsedSeconds),
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: accentColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
-            // --- SPACER (Üst boşluk dengeleme) ---
-            const Spacer(),
-
-            // --- OYUN ALANI (Ortalanmış) ---
-            Center(
+            // Game Grid
+            Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                // AspectRatio grid'in kare kalmasını sağlar
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: AspectRatio(
                   aspectRatio: 0.9, 
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(), // Kaydırmayı kapat
+                        physics: const NeverScrollableScrollPhysics(),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
-                          childAspectRatio: 0.85, // Kart oranı
+                          childAspectRatio: 0.85,
                         ),
                         itemCount: 16,
                         itemBuilder: (context, index) {
-                          return _buildCard(_gameCards[index], index);
+                          return _buildCard(_gameCards[index], index, isDark, panelColor, titleColor, successColor, accentColor);
                         },
                       );
                     }
@@ -240,19 +251,16 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
               ),
             ),
 
-            // --- SPACER (Alt boşluk dengeleme) ---
-            const Spacer(),
-
-            // --- FOOTER STATS ---
+            // Footer Stats
             Container(
-              margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: panelColor,
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF6C5CE7).withOpacity(0.1),
+                    color: accentColor.withOpacity(isDark ? 0.2 : 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -261,11 +269,11 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildFooterStat('HAMLE', '$_moves', Icons.touch_app_rounded, Colors.orange),
-                  Container(width: 1, height: 40, color: Colors.grey.shade200),
-                  _buildFooterStat('SKOR', '$_score', Icons.emoji_events_rounded, cardBackInfo),
-                  Container(width: 1, height: 40, color: Colors.grey.shade200),
-                  _buildFooterStat('DURUM', '${(_matches/8*100).toInt()}%', Icons.pie_chart_rounded, accentColor),
+                  _buildFooterStat('HAMLE', '$_moves', Icons.touch_app_rounded, Colors.orange, titleColor, subtitleColor),
+                  Container(width: 1, height: 40, color: isDark ? const Color(0xFF374151) : Colors.grey.shade200),
+                  _buildFooterStat('SKOR', '$_score', Icons.emoji_events_rounded, accentColor, titleColor, subtitleColor),
+                  Container(width: 1, height: 40, color: isDark ? const Color(0xFF374151) : Colors.grey.shade200),
+                  _buildFooterStat('DURUM', '${(_matches/8*100).toInt()}%', Icons.pie_chart_rounded, successColor, titleColor, subtitleColor),
                 ],
               ),
             ),
@@ -275,8 +283,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
     );
   }
 
-  // Kart Widget'ı
-  Widget _buildCard(ItemModel item, int index) {
+  Widget _buildCard(ItemModel item, int index, bool isDark, Color panelColor, Color titleColor, Color successColor, Color accentColor) {
     return GestureDetector(
       onTap: () => _handleCardTap(index),
       child: AnimatedContainer(
@@ -284,16 +291,16 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
         curve: Curves.easeOutBack,
         decoration: BoxDecoration(
           color: item.isMatched
-              ? const Color(0xFF00B894) // Matched Green
+              ? successColor
               : item.isFlipped
-                  ? Colors.white
-                  : const Color(0xFF6C5CE7), // Card Back Purple/Blue
+                  ? panelColor
+                  : accentColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: item.isFlipped 
-                ? Colors.black.withOpacity(0.05) 
-                : const Color(0xFF6C5CE7).withOpacity(0.4),
+                ? Colors.black.withOpacity(isDark ? 0.2 : 0.05) 
+                : accentColor.withOpacity(0.4),
               blurRadius: item.isFlipped ? 5 : 10,
               offset: item.isFlipped ? const Offset(0, 2) : const Offset(0, 6),
             ),
@@ -303,15 +310,15 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
           child: item.isFlipped || item.isMatched
               ? Icon(
                   item.icon,
-                  color: item.isMatched ? Colors.white : const Color(0xFF2D3436),
+                  color: item.isMatched ? Colors.white : titleColor,
                   size: 32,
                 )
               : Text(
                   "?",
-                  style: GoogleFonts.fredoka(
+                  style: GoogleFonts.spaceGrotesk(
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withOpacity(0.7),
                   ),
                 ),
         ),
@@ -319,8 +326,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
     );
   }
 
-  // Alt İstatistik Kutucukları
-  Widget _buildFooterStat(String label, String value, IconData icon, Color color) {
+  Widget _buildFooterStat(String label, String value, IconData icon, Color color, Color titleColor, Color subtitleColor) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -328,18 +334,18 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
         const SizedBox(height: 4),
         Text(
           value,
-          style: GoogleFonts.outfit(
+          style: GoogleFonts.spaceGrotesk(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: const Color(0xFF2D3436),
+            color: titleColor,
           ),
         ),
         Text(
           label,
-          style: GoogleFonts.outfit(
+          style: GoogleFonts.spaceGrotesk(
             fontSize: 10,
             fontWeight: FontWeight.w500,
-            color: Colors.grey.shade500,
+            color: subtitleColor,
             letterSpacing: 1.0,
           ),
         ),
