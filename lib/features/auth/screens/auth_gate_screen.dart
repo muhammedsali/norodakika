@@ -4,11 +4,16 @@ import '../providers/auth_provider.dart';
 import '../../home/screens/home_screen.dart';
 import 'login_screen.dart';
 
-class AuthGateScreen extends ConsumerWidget {
+class AuthGateScreen extends ConsumerStatefulWidget {
   const AuthGateScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AuthGateScreen> createState() => _AuthGateScreenState();
+}
+
+class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(currentUserProvider);
 
     return authState.when(
@@ -16,7 +21,21 @@ class AuthGateScreen extends ConsumerWidget {
         if (user == null) {
           return const LoginScreen();
         } else {
-          return const HomeScreen();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                ),
+              );
+            }
+          });
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
       },
       loading: () => const Scaffold(

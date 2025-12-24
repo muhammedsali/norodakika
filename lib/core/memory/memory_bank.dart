@@ -69,6 +69,18 @@ class MemoryBank {
       "description": "Kelime gösterim ve hatırlama testi."
     },
     {
+      "id": "MEM04",
+      "name": "Sequence Echo",
+      "area": "Hafıza + Dikkat",
+      "description": "Gösterilen hücre sırasını aynen tekrar et."
+    },
+    {
+      "id": "VIS02",
+      "name": "Odd One Out",
+      "area": "Görsel Algı + Dikkat",
+      "description": "Farklı kartı hızlıca bulma oyunu."
+    },
+    {
       "id": "LANG02",
       "name": "Word Sprint",
       "area": "Dil",

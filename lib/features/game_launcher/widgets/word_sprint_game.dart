@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Kelime akışı: gerçek kelimelere dokun, uydurmalara dokunma.
+/// 60 sn, 3 can, seri/bonus, kaçan kelime cezası, hızlanan spawn.
 class WordSprintGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
 
@@ -19,29 +21,39 @@ class WordSprintGame extends StatefulWidget {
 
 class _WordSprintGameState extends State<WordSprintGame> {
   static const int gameDuration = 60; // saniye
-  static const int spawnIntervalMs = 900;
+  static const int maxHearts = 3;
+  static const double initialSpawnMs = 1100;
+  static const double minSpawnMs = 520;
+  static const double spawnStep = 16;
 
   final Random _rng = Random();
 
-  late Timer _timer;
-  late Timer _spawnTimer;
+  Timer? _timer;
+  Timer? _spawnTimer;
 
   int _timeRemaining = gameDuration;
-
-  final List<_WordItem> _items = [];
-
+  int _hearts = maxHearts;
   int _score = 0;
+  int _streak = 0;
+  int _bestStreak = 0;
   int _correctHits = 0;
   int _wrongHits = 0;
+  int _missed = 0;
+
+  double _spawnMs = initialSpawnMs;
+
+  final List<_WordItem> _items = [];
 
   static const _realWords = [
     'memory', 'focus', 'speed', 'brain', 'logic', 'number',
     'zihin', 'hafiza', 'dikkat', 'refleks', 'kelime', 'sayi',
+    'derin', 'ritim', 'denge', 'tempo', 'enerji', 'uzay',
   ];
 
   static const _fakeWords = [
     'memroy', 'foduc', 'spaed', 'brein', 'lagic', 'numbar',
     'zhin', 'hafzia', 'dikakt', 'refkles', 'kelmie', 'sayii',
+    'derni', 'ritmi', 'dnege', 'tepm0', 'enerjj', 'uzaay',
   ];
 
   @override
@@ -51,13 +63,9 @@ class _WordSprintGameState extends State<WordSprintGame> {
   }
 
   void _startGame() {
-    _timeRemaining = gameDuration;
-    _score = 0;
-    _correctHits = 0;
-    _wrongHits = 0;
-    _items.clear();
-
+    _resetState();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted || _isFinished) return;
       setState(() {
         _timeRemaining--;
       });
@@ -65,16 +73,36 @@ class _WordSprintGameState extends State<WordSprintGame> {
         _finishGame();
       }
     });
+    _startSpawnTimer();
+  }
 
-    _spawnTimer = Timer.periodic(
-      const Duration(milliseconds: spawnIntervalMs),
-      (t) => _spawnWord(),
-    );
+  bool _isFinished = false;
+
+  void _resetState() {
+    _timeRemaining = gameDuration;
+    _hearts = maxHearts;
+    _score = 0;
+    _streak = 0;
+    _bestStreak = 0;
+    _correctHits = 0;
+    _wrongHits = 0;
+    _missed = 0;
+    _spawnMs = initialSpawnMs;
+    _items.clear();
+    _isFinished = false;
+  }
+
+  void _startSpawnTimer() {
+    _spawnTimer?.cancel();
+    _spawnTimer = Timer.periodic(Duration(milliseconds: _spawnMs.toInt()), (_) {
+      if (!mounted || _isFinished) return;
+      _spawnWord();
+      _spawnMs = max(minSpawnMs, _spawnMs - spawnStep);
+      _startSpawnTimer();
+    });
   }
 
   void _spawnWord() {
-    if (_timeRemaining <= 0) return;
-
     final isReal = _rng.nextBool();
     final text = isReal
         ? _realWords[_rng.nextInt(_realWords.length)]
@@ -88,46 +116,76 @@ class _WordSprintGameState extends State<WordSprintGame> {
       ),
     );
 
-    if (_items.length > 8) {
-      _items.removeAt(0);
+    // çok birikmesin
+    if (_items.length > 10) {
+      final lost = _items.removeAt(0);
+      if (lost.isReal) {
+        _registerMiss();
+      }
     }
 
     setState(() {});
   }
 
   void _onWordTap(_WordItem item) {
+    if (_isFinished) return;
     HapticFeedback.lightImpact();
 
     setState(() {
       if (item.isReal) {
         _correctHits++;
-        _score += 120;
+        _streak++;
+        _bestStreak = max(_bestStreak, _streak);
+        _score += 140 + (_streak * 12);
       } else {
         _wrongHits++;
-        _score = (_score - 100).clamp(0, 999999);
+        _streak = 0;
+        _hearts = max(0, _hearts - 1);
+        _score = max(0, _score - 120);
+        if (_hearts == 0) {
+          _finishGame();
+        }
       }
       _items.remove(item);
     });
   }
 
-  void _finishGame() {
-    _timer.cancel();
-    _spawnTimer.cancel();
+  void _registerMiss() {
+    _missed++;
+    _streak = 0;
+    _hearts = max(0, _hearts - 1);
+    _score = max(0, _score - 80);
+    if (_hearts == 0) {
+      _finishGame();
+    }
+  }
 
-    final totalHits = _correctHits + _wrongHits;
+  void _finishGame() {
+    if (_isFinished) return;
+    _isFinished = true;
+    _timer?.cancel();
+    _spawnTimer?.cancel();
+
+    final totalHits = _correctHits + _wrongHits + _missed;
     final successRate = totalHits == 0 ? 0.0 : _correctHits / totalHits;
 
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
       'duration': gameDuration,
+      'correct': _correctHits,
+      'wrong': _wrongHits,
+      'missed': _missed,
+      'bestStreak': _bestStreak,
     });
+
+    setState(() {});
   }
 
   @override
   void dispose() {
-    _timer.cancel();
-    _spawnTimer.cancel();
+    _timer?.cancel();
+    _spawnTimer?.cancel();
     super.dispose();
   }
 
@@ -135,7 +193,8 @@ class _WordSprintGameState extends State<WordSprintGame> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
+    final bgColor = isDark ? const Color(0xFF0B1220) : const Color(0xFFF6F8FB);
+    final panel = isDark ? const Color(0xFF111827) : Colors.white;
     final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
@@ -146,121 +205,356 @@ class _WordSprintGameState extends State<WordSprintGame> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Word Sprint',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: titleColor,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Gerçek kelimelere dokun, uydurmalara dokunma.',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 12,
-                          color: subtitleColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '$_timeRemaining s',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: titleColor,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Skor: $_score',
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 13,
-                          color: subtitleColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF020617) : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-                    ),
-                  ),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final width = constraints.maxWidth;
-                      final height = constraints.maxHeight;
+              _buildHeader(titleColor, subtitleColor, panel),
+              const SizedBox(height: 12),
+              _buildTimerBar(isDark),
+              const SizedBox(height: 12),
+              Expanded(child: _buildStream(panel, isDark, titleColor, subtitleColor)),
+              const SizedBox(height: 12),
+              _buildStats(panel, isDark),
+              if (_isFinished) _ResultOverlay(onRestart: _startGame),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                      return Stack(
-                        children: [
-                          for (int i = 0; i < _items.length; i++)
-                            Positioned(
-                              top: (height / 8) * (i + 0.5) - 16,
-                              left: 16,
-                              right: 16,
-                              child: GestureDetector(
-                                onTapDown: (_) => _onWordTap(_items[i]),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? const Color(0xFF111827)
-                                        : const Color(0xFFF9FAFB),
-                                    borderRadius: BorderRadius.circular(999),
-                                    border: Border.all(
-                                      color: isDark
-                                          ? const Color(0xFF374151)
-                                          : const Color(0xFFE5E7EB),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        _items[i].text,
-                                        style: GoogleFonts.spaceGrotesk(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: titleColor,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.touch_app,
-                                        size: 18,
-                                        color: subtitleColor,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+  Widget _buildHeader(Color titleColor, Color subtitleColor, Color panel) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: panel,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Word Sprint',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Gerçek kelimeyi kap, uydurma gelirse kaç.',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 12,
+                  color: subtitleColor,
                 ),
               ),
             ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '$_timeRemaining s',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Skor: $_score',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 13,
+                  color: subtitleColor,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimerBar(bool isDark) {
+    final progress = _timeRemaining / gameDuration;
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: LinearProgressIndicator(
+        value: progress.clamp(0, 1),
+        minHeight: 12,
+        backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+        valueColor: AlwaysStoppedAnimation<Color>(
+          Color.lerp(const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStream(Color panel, bool isDark, Color titleColor, Color subtitleColor) {
+    return Container(
+      decoration: BoxDecoration(
+        color: panel,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final height = constraints.maxHeight;
+
+          return Stack(
+            children: [
+              Positioned(
+                left: 12,
+                right: 12,
+                top: 8,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _ChipTag(label: 'Can', value: '$_hearts/$maxHearts', color: const Color(0xFFEF4444)),
+                    _ChipTag(label: 'Seri', value: '$_streak', color: const Color(0xFFFFA000)),
+                    _ChipTag(label: 'En iyi seri', value: '$_bestStreak', color: titleColor),
+                  ],
+                ),
+              ),
+              for (int i = 0; i < _items.length; i++)
+                Positioned(
+                  top: 44.0 + (height - 80) / 8 * i,
+                  left: 12,
+                  right: 12,
+                  child: GestureDetector(
+                    onTapDown: (_) => _onWordTap(_items[i]),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            _items[i].text,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: titleColor,
+                            ),
+                          ),
+                          Icon(
+                            Icons.touch_app,
+                            size: 18,
+                            color: subtitleColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildStats(Color panel, bool isDark) {
+    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final accuracy =
+        (_correctHits + _wrongHits + _missed) == 0 ? 0.0 : _correctHits / (_correctHits + _wrongHits + _missed);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: panel,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withOpacity(0.02)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _StatChip(
+            icon: Icons.check_circle,
+            label: 'Doğru',
+            value: '$_correctHits',
+            color: const Color(0xFF22C55E),
+          ),
+          _StatChip(
+            icon: Icons.close,
+            label: 'Hatalı',
+            value: '$_wrongHits',
+            color: const Color(0xFFEF4444),
+          ),
+          _StatChip(
+            icon: Icons.visibility_off,
+            label: 'Kaçan',
+            value: '$_missed',
+            color: subtitleColor,
+          ),
+          _StatChip(
+            icon: Icons.psychology,
+            label: 'Doğruluk',
+            value: '${(accuracy * 100).toStringAsFixed(0)}%',
+            color: const Color(0xFF3B82F6),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChipTag extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _ChipTag({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.bolt_rounded, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            '$label: $value',
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatChip({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 6),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withOpacity(0.8)),
+            ),
+            Text(
+              value,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _ResultOverlay extends StatelessWidget {
+  final VoidCallback onRestart;
+
+  const _ResultOverlay({required this.onRestart});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Oyun Bitti',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: onRestart,
+                  icon: const Icon(Icons.replay_rounded),
+                  label: const Text('Tekrar Oyna'),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
