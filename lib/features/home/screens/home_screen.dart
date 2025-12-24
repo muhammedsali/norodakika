@@ -406,6 +406,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Map<String, dynamic> _getGameIconData(String gameId) {
+    switch (gameId) {
+      case 'REF01':
+        return {'icon': Icons.touch_app, 'color': Color(0xFFEF4444), 'emoji': '⚡'};
+      case 'REF02':
+        return {'icon': Icons.directions_run, 'color': Color(0xFF10B981), 'emoji': '🏃'};
+      case 'ATT01':
+        return {'icon': Icons.palette, 'color': Color(0xFF8B5CF6), 'emoji': '🎨'};
+      case 'ATT02':
+        return {'icon': Icons.remove, 'color': Color(0xFF06B6D4), 'emoji': '➖'};
+      case 'MEM01':
+        return {'icon': Icons.psychology, 'color': Color(0xFFEC4899), 'emoji': '🧠'};
+      case 'LOG01':
+        return {'icon': Icons.extension, 'color': Color(0xFFF59E0B), 'emoji': '🧩'};
+      case 'NUM01':
+        return {'icon': Icons.calculate, 'color': Color(0xFF3B82F6), 'emoji': '🔢'};
+      case 'MEM02':
+        return {'icon': Icons.grid_view, 'color': Color(0xFF14B8A6), 'emoji': '🎴'};
+      case 'MEM03':
+        return {'icon': Icons.text_fields, 'color': Color(0xFF6366F1), 'emoji': '📝'};
+      case 'MEM04':
+        return {'icon': Icons.repeat, 'color': Color(0xFFA855F7), 'emoji': '🔁'};
+      case 'VIS02':
+        return {'icon': Icons.find_in_page, 'color': Color(0xFFF97316), 'emoji': '🔍'};
+      case 'LANG02':
+        return {'icon': Icons.speed, 'color': Color(0xFF06B6D4), 'emoji': '💨'};
+      default:
+        return {'icon': Icons.sports_esports, 'color': Color(0xFF4F46E5), 'emoji': '🎮'};
+    }
+  }
+
   void _showGameStartSheet({
     required BuildContext context,
     required String gameId,
@@ -413,51 +444,120 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required String description,
     required bool isDarkMode,
   }) {
+    final iconData = _getGameIconData(gameId);
+    final gameColor = iconData['color'] as Color;
+    final emoji = iconData['emoji'] as String;
+
     showDialog(
       context: context,
       barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(isDarkMode ? 0.75 : 0.5),
       builder: (ctx) {
-        final themeBg =
-            isDarkMode ? const Color(0xFF111827) : Colors.white;
+        final themeBg = isDarkMode
+            ? const Color(0xFF1F2937)
+            : Colors.white;
         final titleColor =
             isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
         final textColor =
-            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final cardBg = isDarkMode
+            ? const Color(0xFF111827)
+            : const Color(0xFFF9FAFB);
+        final borderColor = isDarkMode
+            ? const Color(0xFF374151)
+            : const Color(0xFFE5E7EB);
 
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                constraints: const BoxConstraints(
-                  maxWidth: 420,
-                  minHeight: 220,
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              constraints: const BoxConstraints(
+                maxWidth: 420,
+              ),
+              decoration: BoxDecoration(
+                color: themeBg,
+                borderRadius: BorderRadius.circular(32),
+                border: Border.all(
+                  color: borderColor,
+                  width: 1.5,
                 ),
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: themeBg,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 32,
-                      offset: Offset(0, 16),
-                    ),
-                  ],
-                  border: Border.all(
+                boxShadow: [
+                  BoxShadow(
                     color: isDarkMode
-                        ? const Color(0xFF374151)
-                        : const Color(0xFFE5E7EB),
+                        ? Colors.black.withOpacity(0.6)
+                        : Colors.black.withOpacity(0.1),
+                    blurRadius: 50,
+                    spreadRadius: -10,
+                    offset: const Offset(0, 25),
                   ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  BoxShadow(
+                    color: gameColor.withOpacity(isDarkMode ? 0.1 : 0.05),
+                    blurRadius: 30,
+                    spreadRadius: 0,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header with gradient
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(24, 24, 16, 20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: isDarkMode
+                            ? [
+                                gameColor.withOpacity(0.2),
+                                gameColor.withOpacity(0.08),
+                              ]
+                            : [
+                                gameColor.withOpacity(0.15),
+                                gameColor.withOpacity(0.05),
+                              ],
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(32),
+                        topRight: Radius.circular(32),
+                      ),
+                    ),
+                    child: Row(
                       children: [
+                        // Game icon
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                gameColor,
+                                gameColor.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: gameColor.withOpacity(0.4),
+                                blurRadius: 15,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              emoji,
+                              style: const TextStyle(fontSize: 32),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Title and badge
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,113 +565,253 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Text(
                                 title,
                                 style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
                                   color: titleColor,
+                                  letterSpacing: -0.5,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
+                                  horizontal: 12,
+                                  vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: (isDarkMode
-                                          ? const Color(0xFF818CF8)
-                                          : const Color(0xFF4F46E5))
-                                      .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  'Hızlı antrenman oyunu',
-                                  style: GoogleFonts.spaceGrotesk(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDarkMode
-                                        ? const Color(0xFF818CF8)
-                                        : const Color(0xFF4F46E5),
+                                  color: gameColor.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: gameColor.withOpacity(0.3),
+                                    width: 1,
                                   ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.timer_outlined,
+                                      size: 14,
+                                      color: gameColor,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '~2-3 dakika',
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: gameColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        IconButton(
-                          splashRadius: 20,
-                          onPressed: () {
-                            Navigator.of(ctx).pop();
-                          },
-                          icon: Icon(
-                            Icons.close_rounded,
-                            size: 22,
-                            color: textColor,
+                        // Close button
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => Navigator.of(ctx).pop(),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: isDarkMode
+                                    ? const Color(0xFF374151)
+                                    : const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 20,
+                                color: textColor,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Nasıl oynanır?',
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: titleColor,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      description,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 13,
-                        height: 1.4,
-                        color: textColor,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                          final allGames = MemoryBank.games
-                              .map((g) => GameModel.fromMap(g))
-                              .toList();
-                          final selectedGame = allGames.firstWhere(
-                            (g) => g.id == gameId,
-                            orElse: () => allGames.first,
-                          );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => GamePlayScreen(
-                                game: selectedGame,
-                                isDarkOverride: isDarkMode,
+                  ),
+
+                  // Content
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Description card
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: borderColor,
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: isDarkMode
+                                    ? Colors.black.withOpacity(0.3)
+                                    : Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                spreadRadius: 0,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: gameColor.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.info_outline_rounded,
+                                      size: 16,
+                                      color: gameColor,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Nasıl Oynanır?',
+                                    style: GoogleFonts.spaceGrotesk(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: titleColor,
+                                      letterSpacing: -0.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              Text(
+                                description,
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 14,
+                                  height: 1.65,
+                                  color: textColor,
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 0.1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Start button
+                        Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(ctx).pop();
+                              final allGames = MemoryBank.games
+                                  .map((g) => GameModel.fromMap(g))
+                                  .toList();
+                              final selectedGame = allGames.firstWhere(
+                                (g) => g.id == gameId,
+                                orElse: () => allGames.first,
+                              );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => GamePlayScreen(
+                                    game: selectedGame,
+                                    isDarkOverride: isDarkMode,
+                                  ),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(20),
+                            child: Container(
+                              width: double.infinity,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    gameColor,
+                                    gameColor.withOpacity(0.85),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: gameColor.withOpacity(isDarkMode ? 0.5 : 0.4),
+                                    blurRadius: 25,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                  BoxShadow(
+                                    color: gameColor.withOpacity(0.2),
+                                    blurRadius: 15,
+                                    spreadRadius: -5,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.25),
+                                        borderRadius: BorderRadius.circular(12),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.1),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Icon(
+                                        Icons.play_arrow_rounded,
+                                        color: Colors.white,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 14),
+                                    Text(
+                                      'Oyunu Başlat',
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 0.3,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black.withOpacity(0.2),
+                                            blurRadius: 4,
+                                            offset: const Offset(0, 1),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        icon: const Icon(Icons.play_arrow_rounded, size: 22),
-                        label: Text(
-                          'Oyunu Başlat',
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4F46E5),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          elevation: 2,
-                        ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

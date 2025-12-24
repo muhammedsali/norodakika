@@ -195,7 +195,6 @@ class _StroopTapGameState extends State<StroopTapGame> {
               _buildOptionsGrid(isDark),
               const SizedBox(height: 12),
               _buildStatsBar(isDark),
-              if (_isFinished) _ResultOverlay(onRestart: _startGame),
             ],
           ),
         ),
@@ -548,55 +547,4 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-class _ResultOverlay extends StatelessWidget {
-  final VoidCallback onRestart;
-
-  const _ResultOverlay({required this.onRestart});
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.4),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Oyun Bitti',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: onRestart,
-                  icon: const Icon(Icons.replay_rounded),
-                  label: const Text('Tekrar Oyna'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 

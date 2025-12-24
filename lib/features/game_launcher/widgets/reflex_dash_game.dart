@@ -463,14 +463,6 @@ class _ReflexDashGameState extends State<ReflexDashGame>
                   top: (constraints.maxHeight - 40) * target.progress,
                   child: _DashChip(target: target),
                 ),
-              if (_isFinished)
-                _ResultOverlay(
-                  score: _score,
-                  accuracy: _goodHits + _badHits + _missed == 0
-                      ? 0
-                      : _goodHits / (_goodHits + _badHits + _missed),
-                  bestCombo: _bestCombo,
-                ),
               if (!_isFinished && !_isRunning)
                 _PauseOverlay(onResume: () {
                   setState(() {
@@ -579,76 +571,6 @@ class _DashChip extends StatelessWidget {
   }
 }
 
-class _ResultOverlay extends StatelessWidget {
-  final int score;
-  final double accuracy;
-  final int bestCombo;
-
-  const _ResultOverlay({
-    required this.score,
-    required this.accuracy,
-    required this.bestCombo,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.45),
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Oyun Bitti',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF111827),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Skor: $score',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF4F46E5),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'İsabet: ${(accuracy * 100).toStringAsFixed(1)}%',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 13,
-                    color: const Color(0xFF6B7280),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'En iyi kombo: $bestCombo',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 13,
-                    color: const Color(0xFF6B7280),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _PauseOverlay extends StatelessWidget {
   final VoidCallback onResume;

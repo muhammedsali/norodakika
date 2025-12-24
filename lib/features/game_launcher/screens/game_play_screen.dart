@@ -170,18 +170,27 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     final successRate = (_gameResult!['successRate'] as num?)?.toDouble() ?? 0.0;
     final duration = (_gameResult!['duration'] as num?)?.toInt() ?? 0;
 
+    final baseTheme = Theme.of(context);
+    final effectiveIsDark =
+        widget.isDarkOverride ?? baseTheme.brightness == Brightness.dark;
+
     showDialog(
       context: context,
       barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(effectiveIsDark ? 0.75 : 0.5),
       builder: (ctx) {
-        final theme = Theme.of(ctx);
-        final isDark = theme.brightness == Brightness.dark;
-        final bgColor =
-            isDark ? const Color(0xFF111827) : Colors.white;
-        final titleColor =
-            isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-        final textColor =
-            isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+        final bgColor = effectiveIsDark
+            ? const Color(0xFF1F2937)
+            : Colors.white;
+        final titleColor = effectiveIsDark
+            ? const Color(0xFFF9FAFB)
+            : const Color(0xFF111827);
+        final textColor = effectiveIsDark
+            ? const Color(0xFF9CA3AF)
+            : const Color(0xFF6B7280);
+        final borderColor = effectiveIsDark
+            ? const Color(0xFF374151)
+            : const Color(0xFFE5E7EB);
 
         return Center(
           child: Padding(
@@ -196,18 +205,20 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: bgColor,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: const [
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 32,
-                      offset: Offset(0, 16),
+                      color: effectiveIsDark
+                          ? Colors.black.withOpacity(0.6)
+                          : Colors.black.withOpacity(0.15),
+                      blurRadius: 40,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 20),
                     ),
                   ],
                   border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF374151)
-                        : const Color(0xFFE5E7EB),
+                    color: borderColor,
+                    width: 1.5,
                   ),
                 ),
                 child: Column(
@@ -299,13 +310,15 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             },
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
-                                color: isDark
+                                color: effectiveIsDark
                                     ? const Color(0xFF4B5563)
                                     : const Color(0xFF4F46E5),
+                                width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(999),
                               ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
                               'Tekrar oyna',
@@ -361,11 +374,21 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
       return true;
     }
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF111827) : Colors.white;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+    final baseTheme = Theme.of(context);
+    final effectiveIsDark =
+        widget.isDarkOverride ?? baseTheme.brightness == Brightness.dark;
+    final bgColor = effectiveIsDark
+        ? const Color(0xFF1F2937)
+        : Colors.white;
+    final titleColor = effectiveIsDark
+        ? const Color(0xFFF9FAFB)
+        : const Color(0xFF111827);
+    final textColor = effectiveIsDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
+    final borderColor = effectiveIsDark
+        ? const Color(0xFF374151)
+        : const Color(0xFFE5E7EB);
 
     setState(() {
       _isPaused = true;
@@ -374,6 +397,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(effectiveIsDark ? 0.75 : 0.5),
       builder: (ctx) {
         return Center(
           child: Padding(
@@ -388,18 +412,20 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
                   color: bgColor,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: const [
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
                     BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 32,
-                      offset: Offset(0, 16),
+                      color: effectiveIsDark
+                          ? Colors.black.withOpacity(0.6)
+                          : Colors.black.withOpacity(0.15),
+                      blurRadius: 40,
+                      spreadRadius: 0,
+                      offset: const Offset(0, 20),
                     ),
                   ],
                   border: Border.all(
-                    color: isDark
-                        ? const Color(0xFF374151)
-                        : const Color(0xFFE5E7EB),
+                    color: borderColor,
+                    width: 1.5,
                   ),
                 ),
                 child: Column(
@@ -432,13 +458,15 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             },
                             style: OutlinedButton.styleFrom(
                               side: BorderSide(
-                                color: isDark
+                                color: effectiveIsDark
                                     ? const Color(0xFF4B5563)
                                     : const Color(0xFF4F46E5),
+                                width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(999),
                               ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
                               'Devam et',
