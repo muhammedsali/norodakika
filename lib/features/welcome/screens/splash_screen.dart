@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
-import '../../auth/screens/auth_gate_screen.dart';
+// import '../../auth/screens/auth_gate_screen.dart'; // GEÇİCİ OLARAK DEVRE DIŞI
+import '../../home/screens/home_screen.dart'; // Direkt HomeScreen'e geç
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,12 +41,12 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // 3 saniye sonra AuthGateScreen'e geç
+    // 3 saniye sonra HomeScreen'e geç (Auth kontrolü geçici olarak devre dışı)
     Timer(const Duration(milliseconds: 3000), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const AuthGateScreen(),
+            builder: (context) => const HomeScreen(),
           ),
         );
       }

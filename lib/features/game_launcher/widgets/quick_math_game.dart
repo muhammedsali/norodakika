@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'dart:math';
+import '../../../services/audio_service.dart';
 
 class QuickMathGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
@@ -37,6 +38,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   late AnimationController _pulseController;
+  final AudioService _audioService = AudioService();
 
   @override
   void initState() {
@@ -151,6 +153,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
     _totalQuestions++;
     
     if (answer == _correctAnswer) {
+      _audioService.playCorrect(); // ✅ Doğru cevap sesi
       _correctAnswers++;
       _combo++;
       if (_combo > _bestCombo) _bestCombo = _combo;
@@ -166,11 +169,13 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
       
       // Her 5 doğru cevapta level artışı
       if (_correctAnswers % 5 == 0) {
+        _audioService.playLevelUp(); // 🎉 Seviye atlama sesi
         setState(() {
           _level++;
         });
       }
     } else {
+      _audioService.playWrong(); // ❌ Yanlış cevap sesi
       _lives--;
       _combo = 0;
       _score = (_score - 10).clamp(0, 999999);
@@ -192,6 +197,8 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
     _progressTimer?.cancel();
     final duration = DateTime.now().difference(_startTime!).inSeconds;
     final successRate = _totalQuestions > 0 ? _correctAnswers / _totalQuestions : 0.0;
+
+    _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
 
     widget.onComplete({
       'score': _score.toDouble(),

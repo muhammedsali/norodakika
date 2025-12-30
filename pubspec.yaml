@@ -30,6 +30,9 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.19.0
   uuid: ^4.2.1
+  
+  # Audio
+  audioplayers: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -44,12 +47,14 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/games/
+    - assets/sounds/
 
 # Uygulama İkonu Konfigürasyonu
 flutter_launcher_icons:
   android: true
-  ios: true
+  ios: false  # iOS klasörü yok, sadece Android için
   image_path: "assets/icons/app_icon.png"
   min_sdk_android: 21
   adaptive_icon_background: "#4F46E5"
   adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  remove_alpha_ios: true  # iOS için alpha channel uyarısını kaldırır
