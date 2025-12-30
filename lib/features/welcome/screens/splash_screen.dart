@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
-import 'welcome_screen.dart';
+import '../../auth/screens/auth_gate_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,12 +40,12 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // 3 saniye sonra WelcomeScreen'e geç
+    // 3 saniye sonra AuthGateScreen'e geç
     Timer(const Duration(milliseconds: 3000), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const WelcomeScreen(),
+            builder: (context) => const AuthGateScreen(),
           ),
         );
       }

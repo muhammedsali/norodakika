@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../daily_plan/screens/daily_plan_screen.dart';
 import '../../stats/screens/stats_screen.dart';
 import '../../stats/providers/user_stats_provider.dart';
 import '../../stats/widgets/radar_chart_widget.dart';
