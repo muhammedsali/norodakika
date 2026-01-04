@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../services/audio_service.dart';
 
 /// Görsel algı oyunu: 4 karttan farklı olanı hızlıca bul.
 class OddOneOutGame extends StatefulWidget {
@@ -38,6 +39,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   late List<_CardFace> _options;
   late int _oddIndex;
   bool _isFinished = false;
+  final AudioService _audioService = AudioService();
 
   @override
   void initState() {
@@ -87,6 +89,8 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   }
 
   void _handleTimeout() {
+    _audioService.playWrong(); // ❌ Süre doldu
+    HapticFeedback.mediumImpact();
     _streak = 0;
     _hearts = max(0, _hearts - 1);
     _score = max(0, _score - 80);
@@ -137,15 +141,20 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   void _onSelect(int index) {
     if (_isFinished) return;
     HapticFeedback.selectionClick();
+    _audioService.playTap(); // 👆 Dokunma sesi
 
     final isCorrect = index == _oddIndex;
     setState(() {
       if (isCorrect) {
+        _audioService.playCorrect(); // ✅ Doğru cevap sesi
+        HapticFeedback.lightImpact();
         _correct++;
         _streak++;
         _bestStreak = max(_bestStreak, _streak);
         _score += 140 + (_streak * 12);
       } else {
+        _audioService.playWrong(); // ❌ Yanlış cevap sesi
+        HapticFeedback.mediumImpact();
         _wrong++;
         _streak = 0;
         _hearts = max(0, _hearts - 1);
@@ -168,13 +177,15 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
     final successRate = _rounds == 0 ? 0.0 : _correct / _rounds;
     final duration = totalSeconds - max(0, _timeRemaining);
 
+    _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
+
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
       'duration': duration,
-      'correct': _correct,
-      'wrong': _wrong,
-      'bestStreak': _bestStreak,
+      'totalAttempts': _rounds,
+      'correctAttempts': _correct,
+      'wrongAttempts': _wrong,
     });
 
     setState(() {});

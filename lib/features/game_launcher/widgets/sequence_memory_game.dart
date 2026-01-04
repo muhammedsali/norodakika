@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../services/audio_service.dart';
 
 /// Simon benzeri sıra tekrarlama oyunu.
 /// Gösterilen hücre sırasını aynı sırayla dokun.
@@ -40,6 +41,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   bool _isFinished = false;
 
   Timer? _gameTimer;
+  final AudioService _audioService = AudioService();
 
   @override
   void initState() {
@@ -115,13 +117,16 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
   void _handleTap(int index) {
     if (_isFinished || _isPlaying || _timeRemaining <= 0) return;
-    HapticFeedback.lightImpact();
+    HapticFeedback.selectionClick();
+    _audioService.playTap(); // 👆 Dokunma sesi
 
     final expected = _sequence[_input.length];
     final isCorrect = expected == index;
 
     setState(() {
       if (isCorrect) {
+        _audioService.playCorrect(); // ✅ Doğru cevap sesi
+        HapticFeedback.lightImpact();
         _input.add(index);
         _score += 35;
         if (_input.length == _sequence.length) {
@@ -129,10 +134,13 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
           _streak++;
           _bestStreak = max(_bestStreak, _streak);
           _score += 180 + (_round * 12);
+          _audioService.playLevelUp(); // 🎉 Seviye tamamlandı
           _round++;
           _startRound();
         }
       } else {
+        _audioService.playWrong(); // ❌ Yanlış cevap sesi
+        HapticFeedback.mediumImpact();
         _streak = 0;
         _hearts = max(0, _hearts - 1);
         _score = max(0, _score - 120);
@@ -152,14 +160,17 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
     final successRate = _attempts == 0 ? 0.0 : _completed / _attempts;
     final duration = totalSeconds - max(0, _timeRemaining);
+    final wrongAttempts = _attempts - _completed;
+
+    _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
 
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
       'duration': duration,
-      'completed': _completed,
-      'attempts': _attempts,
-      'bestStreak': _bestStreak,
+      'totalAttempts': _attempts,
+      'correctAttempts': _completed,
+      'wrongAttempts': wrongAttempts,
     });
 
     setState(() {});
