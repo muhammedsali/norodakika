@@ -3,13 +3,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/memory/memory_bank.dart';
+import '../../../services/local_storage_service.dart';
 import '../../auth/providers/auth_provider.dart';
 
-class StatsScreen extends ConsumerWidget {
+enum TimeFilter { day, week, month }
+
+class StatsScreen extends ConsumerStatefulWidget {
   const StatsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<StatsScreen> createState() => _StatsScreenState();
+}
+
+class _StatsScreenState extends ConsumerState<StatsScreen> {
+  TimeFilter _selectedFilter = TimeFilter.day;
+  Future<List<Map<String, dynamic>>>? _historyFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // Önce sahte verileri ekle, sonra history'yi yükle
+    _historyFuture = _initializeData();
+  }
+
+  Future<List<Map<String, dynamic>>> _initializeData() async {
+    // Şuanlık her zaman sahte veriler ekle (test amaçlı)
+    await LocalStorageService.addMockData();
+    // Veriler eklendikten sonra history'yi döndür
+    return await LocalStorageService.getGameHistory();
+  }
+
+  void _refreshHistory() {
+    setState(() {
+      _historyFuture = LocalStorageService.getGameHistory();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.value;
     final theme = Theme.of(context);
@@ -17,14 +48,35 @@ class StatsScreen extends ConsumerWidget {
     final textColorPrimary = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final textColorSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
 
-    // Kullanıcı yoksa bile ilerleme sekmesi boş kalmasın diye sahte veri gösteriyoruz.
+    // Kullanıcı yoksa local storage'dan veri oku
     if (user == null) {
-      final mockHistory = _fakeHistory();
-      return _buildStatsBody(
-        history: mockHistory,
-        isDark: isDark,
-        textColorPrimary: textColorPrimary,
-        textColorSecondary: textColorSecondary,
+      // _historyFuture null ise başlat
+      _historyFuture ??= _initializeData();
+      
+      return FutureBuilder<List<Map<String, dynamic>>>(
+        future: _historyFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          final history = snapshot.data ?? [];
+          // Eğer history boşsa sahte verileri göster
+          final displayHistory = history.isNotEmpty ? history : _fakeHistory();
+          
+          return _buildStatsBody(
+            history: displayHistory,
+            isDark: isDark,
+            textColorPrimary: textColorPrimary,
+            textColorSecondary: textColorSecondary,
+            selectedFilter: _selectedFilter,
+            onFilterChanged: (filter) {
+              setState(() {
+                _selectedFilter = filter;
+              });
+            },
+          );
+        },
       );
     }
 
@@ -42,6 +94,12 @@ class StatsScreen extends ConsumerWidget {
           isDark: isDark,
           textColorPrimary: textColorPrimary,
           textColorSecondary: textColorSecondary,
+          selectedFilter: _selectedFilter,
+          onFilterChanged: (filter) {
+            setState(() {
+              _selectedFilter = filter;
+            });
+          },
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -62,95 +120,118 @@ class StatsScreen extends ConsumerWidget {
     required bool isDark,
     required Color textColorPrimary,
     required Color textColorSecondary,
+    required TimeFilter selectedFilter,
+    required Function(TimeFilter) onFilterChanged,
   }) {
-    final radarStats = MemoryBank.calculateRadarStats(history);
+    // Filtreye göre history'yi filtrele
+    final filteredHistory = _filterHistoryByTime(history, selectedFilter);
+    final radarStats = MemoryBank.calculateRadarStats(filteredHistory);
     final categories = MemoryBank.categories;
 
-    // Bugün özeti için hesaplamalar
+    // Seçilen filtreye göre özet hesaplamaları
     final now = DateTime.now();
-    final todayAttempts = history.where((h) {
-      if (h is Map && h['timestamp'] != null) {
-        try {
-          final ts = DateTime.parse(h['timestamp'].toString());
-          return ts.year == now.year && ts.month == now.month && ts.day == now.day;
-        } catch (_) {
-          return false;
-        }
-      }
-      return false;
-    }).toList();
+    final filteredAttempts = filteredHistory;
 
-    final gamesToday = todayAttempts.length;
-    final totalSecondsToday = todayAttempts.fold<int>(0, (prev, h) {
+    final gamesCount = filteredAttempts.length;
+    final totalSeconds = filteredAttempts.fold<int>(0, (prev, h) {
       if (h is Map && h['duration'] != null) {
         final d = int.tryParse(h['duration'].toString()) ?? 0;
         return prev + d;
       }
       return prev;
     });
-    final totalMinutesToday = (totalSecondsToday / 60).floor();
+    final totalMinutes = (totalSeconds / 60).floor();
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          // Bugün Özeti Kartı
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 20),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1F2937) : Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // Filtre başlığı
+    String filterTitle;
+    String filterSubtitle;
+    switch (selectedFilter) {
+      case TimeFilter.day:
+        filterTitle = 'Bugün özeti';
+        filterSubtitle = gamesCount > 0
+            ? '$gamesCount oyun, yaklaşık $totalMinutes dk'
+            : 'Bugün henüz oyun oynamadın';
+        break;
+      case TimeFilter.week:
+        filterTitle = 'Bu hafta özeti';
+        filterSubtitle = gamesCount > 0
+            ? '$gamesCount oyun, yaklaşık $totalMinutes dk'
+            : 'Bu hafta henüz oyun oynamadın';
+        break;
+      case TimeFilter.month:
+        filterTitle = 'Bu ay özeti';
+        filterSubtitle = gamesCount > 0
+            ? '$gamesCount oyun, yaklaşık $totalMinutes dk'
+            : 'Bu ay henüz oyun oynamadın';
+        break;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: isDark
+              ? [
+                  const Color(0xFF0B1220),
+                  const Color(0xFF111827),
+                  const Color(0xFF1F2937),
+                ]
+              : [
+                  const Color(0xFFF9FAFB),
+                  const Color(0xFFF3F4F6),
+                  Colors.white,
+                ],
+        ),
+      ),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            // Başlık
+            Row(
+              mainAxisSize: MainAxisSize.max,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Bugün özeti',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: textColorPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      gamesToday > 0
-                          ? '$gamesToday oyun, yaklaşık $totalMinutesToday dk'
-                          : 'Bugün henüz oyun oynamadın',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: textColorSecondary,
-                      ),
-                    ),
-                  ],
-                ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4F46E5).withValues(alpha: 0.08),
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                    ),
                     borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: Row(
+                  child: const Icon(
+                    Icons.insights,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.today, size: 18, color: Color(0xFF4F46E5)),
-                      const SizedBox(width: 6),
                       Text(
-                        '${now.day}.${now.month}.${now.year}',
-                        style: GoogleFonts.robotoMono(
-                          fontSize: 12,
-                          color: const Color(0xFF4F46E5),
+                        'İlerleme',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: textColorPrimary,
+                        ),
+                      ),
+                      Text(
+                        'Bilişsel performans analizi',
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 13,
+                          color: textColorSecondary,
                         ),
                       ),
                     ],
@@ -158,104 +239,534 @@ class StatsScreen extends ConsumerWidget {
                 ),
               ],
             ),
-          ),
+            const SizedBox(height: 24),
 
-          // Radar Chart
-          Container(
-            height: 300,
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF020617) : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+            // Filtre Butonları
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(6),
+              margin: const EdgeInsets.only(bottom: 24),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1F2937).withValues(alpha: 0.6)
+                    : Colors.white.withValues(alpha: 0.8),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
+                  width: 1.5,
                 ),
-              ],
-            ),
-            child: RadarChart(
-              RadarChartData(
-                dataSets: [
-                  RadarDataSet(
-                    fillColor: const Color(0xFF4F46E5).withValues(alpha: 0.3),
-                    borderColor: const Color(0xFF4F46E5),
-                    borderWidth: 2,
-                    dataEntries: categories.map((category) {
-                      final value = radarStats[category] ?? 0.0;
-                      // Normalize to 0-1 aralığı
-                      return RadarEntry(value: (value / 100).clamp(0.0, 1.0));
-                    }).toList(),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
                 ],
-                tickCount: 5,
-                ticksTextStyle: GoogleFonts.poppins(
-                  fontSize: 10,
-                  color: textColorSecondary,
-                ),
-                tickBorderData: const BorderSide(color: Colors.grey, width: 1),
-                borderData: FlBorderData(show: true),
-                radarBackgroundColor: isDark ? const Color(0xFF020617) : Colors.grey[100],
-                gridBorderData: const BorderSide(color: Colors.grey, width: 1),
-                titlePositionPercentageOffset: 0.2,
-                getTitle: (index, angle) {
-                  return RadarChartTitle(
-                    text: categories[index],
-                    angle: angle,
-                    positionPercentageOffset: 0.15,
-                  );
-                },
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Expanded(
+                    child: _buildFilterButton(
+                      'Gün',
+                      Icons.today,
+                      TimeFilter.day,
+                      selectedFilter,
+                      onFilterChanged,
+                      isDark,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildFilterButton(
+                      'Hafta',
+                      Icons.date_range,
+                      TimeFilter.week,
+                      selectedFilter,
+                      onFilterChanged,
+                      isDark,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _buildFilterButton(
+                      'Ay',
+                      Icons.calendar_month,
+                      TimeFilter.month,
+                      selectedFilter,
+                      onFilterChanged,
+                      isDark,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 24),
 
-          // İstatistik Kartları
-          ...categories.map((category) {
-            final value = radarStats[category] ?? 0.0;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1F2937) : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
+            // Özet Kartı - Modern Gradient
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              margin: const EdgeInsets.only(bottom: 24),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    const Color(0xFF4F46E5),
+                    const Color(0xFF7C3AED),
+                    const Color(0xFF9333EA),
                   ],
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      category,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: textColorPrimary,
-                      ),
-                    ),
-                    Text(
-                      '${value.toStringAsFixed(1)} / 100',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF6E00FF),
-                      ),
-                    ),
-                  ],
-                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4F46E5).withValues(alpha: 0.4),
+                    blurRadius: 24,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
               ),
-            );
-          }).toList(),
-        ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              filterTitle,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              filterSubtitle,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 14,
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Icon(
+                          selectedFilter == TimeFilter.day
+                              ? Icons.today
+                              : selectedFilter == TimeFilter.week
+                                  ? Icons.date_range
+                                  : Icons.calendar_month,
+                          size: 24,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.access_time,
+                          size: 16,
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          _getFilterDateRange(selectedFilter),
+                          style: GoogleFonts.robotoMono(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Radar Chart - Modern Card
+            Container(
+              height: 340,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? const Color(0xFF1F2937).withValues(alpha: 0.8)
+                    : Colors.white.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: isDark
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+            child: filteredHistory.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.bar_chart,
+                          size: 48,
+                          color: textColorSecondary,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Seçilen dönemde veri yok',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: textColorSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : RadarChart(
+                    RadarChartData(
+                      dataSets: [
+                        RadarDataSet(
+                          fillColor: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                          borderColor: const Color(0xFF4F46E5),
+                          borderWidth: 3,
+                          dataEntries: categories.map((category) {
+                            final value = radarStats[category] ?? 0.0;
+                            // Normalize to 0-1 aralığı
+                            return RadarEntry(value: (value / 100).clamp(0.0, 1.0));
+                          }).toList(),
+                        ),
+                      ],
+                      tickCount: 5,
+                      ticksTextStyle: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: textColorSecondary,
+                      ),
+                      tickBorderData: BorderSide(
+                        color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                        width: 1.5,
+                      ),
+                      borderData: FlBorderData(show: true),
+                      radarBackgroundColor: isDark
+                          ? const Color(0xFF111827)
+                          : const Color(0xFFF9FAFB),
+                      gridBorderData: BorderSide(
+                        color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                        width: 1.5,
+                      ),
+                      titlePositionPercentageOffset: 0.2,
+                      getTitle: (index, angle) {
+                        return RadarChartTitle(
+                          text: categories[index],
+                          angle: angle,
+                          positionPercentageOffset: 0.15,
+                        );
+                      },
+                    ),
+                  ),
+            ),
+            const SizedBox(height: 24),
+
+            // İstatistik Kartları - Modern Progress Cards
+            ...categories.asMap().entries.map((entry) {
+              final index = entry.key;
+              final category = entry.value;
+              final value = radarStats[category] ?? 0.0;
+              final progress = (value / 100).clamp(0.0, 1.0);
+              
+              // Her kategori için farklı renk
+              final categoryColors = [
+                [const Color(0xFFEF4444), const Color(0xFFDC2626)], // Kırmızı
+                [const Color(0xFF3B82F6), const Color(0xFF2563EB)], // Mavi
+                [const Color(0xFF10B981), const Color(0xFF059669)], // Yeşil
+                [const Color(0xFFF59E0B), const Color(0xFFD97706)], // Turuncu
+                [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)], // Mor
+                [const Color(0xFFEC4899), const Color(0xFFDB2777)], // Pembe
+                [const Color(0xFF06B6D4), const Color(0xFF0891B2)], // Cyan
+              ];
+              
+              final colors = categoryColors[index % categoryColors.length];
+              final icon = _getCategoryIcon(category);
+              
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF1F2937).withValues(alpha: 0.6)
+                        : Colors.white.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isDark
+                          ? const Color(0xFF374151)
+                          : const Color(0xFFE5E7EB),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: colors,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: colors[0].withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    icon,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        category,
+                                        style: GoogleFonts.spaceGrotesk(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: textColorPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${value.toStringAsFixed(1)} / 100',
+                                        style: GoogleFonts.spaceGrotesk(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: colors[0],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Progress Bar
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 10,
+                          backgroundColor: isDark
+                              ? const Color(0xFF374151)
+                              : const Color(0xFFE5E7EB),
+                          valueColor: AlwaysStoppedAnimation<Color>(colors[0]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildFilterButton(
+    String label,
+    IconData icon,
+    TimeFilter filter,
+    TimeFilter selectedFilter,
+    Function(TimeFilter) onFilterChanged,
+    bool isDark,
+  ) {
+    final isSelected = filter == selectedFilter;
+    return GestureDetector(
+      onTap: () => onFilterChanged(filter),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? const LinearGradient(
+                  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                )
+              : null,
+          color: isSelected ? null : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected
+                    ? Colors.white
+                    : isDark
+                        ? const Color(0xFF9CA3AF)
+                        : const Color(0xFF6B7280),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected
+                      ? Colors.white
+                      : isDark
+                          ? const Color(0xFF9CA3AF)
+                          : const Color(0xFF6B7280),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Hafıza':
+        return Icons.psychology;
+      case 'Dikkat':
+        return Icons.center_focus_strong;
+      case 'Refleks':
+        return Icons.flash_on;
+      case 'Mantık':
+        return Icons.extension;
+      case 'Sayısal Zeka':
+        return Icons.calculate;
+      case 'Görsel Algı':
+        return Icons.visibility;
+      case 'Dil':
+        return Icons.translate;
+      default:
+        return Icons.star;
+    }
+  }
+
+  List _filterHistoryByTime(List history, TimeFilter filter) {
+    final now = DateTime.now();
+    DateTime startDate;
+
+    switch (filter) {
+      case TimeFilter.day:
+        startDate = DateTime(now.year, now.month, now.day);
+        break;
+      case TimeFilter.week:
+        // Bu haftanın başlangıcı (Pazartesi)
+        final weekday = now.weekday;
+        startDate = now.subtract(Duration(days: weekday - 1));
+        startDate = DateTime(startDate.year, startDate.month, startDate.day);
+        break;
+      case TimeFilter.month:
+        startDate = DateTime(now.year, now.month, 1);
+        break;
+    }
+
+    return history.where((h) {
+      if (h is Map && h['timestamp'] != null) {
+        try {
+          final ts = DateTime.parse(h['timestamp'].toString());
+          return ts.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
+              ts.isBefore(now.add(const Duration(days: 1)));
+        } catch (_) {
+          return false;
+        }
+      }
+      return false;
+    }).toList();
+  }
+
+  String _getFilterDateRange(TimeFilter filter) {
+    final now = DateTime.now();
+    switch (filter) {
+      case TimeFilter.day:
+        return '${now.day}.${now.month}.${now.year}';
+      case TimeFilter.week:
+        final weekday = now.weekday;
+        final weekStart = now.subtract(Duration(days: weekday - 1));
+        return '${weekStart.day}.${weekStart.month} - ${now.day}.${now.month}';
+      case TimeFilter.month:
+        return '${now.month}/${now.year}';
+    }
   }
 }
 

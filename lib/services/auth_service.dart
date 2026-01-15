@@ -1,11 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../core/models/user_model.dart';
 import '../core/memory/memory_bank.dart';
+import '../main.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // google_sign_in 7.x: singleton + initialize() gerekiyor
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _googleInitialized = false;
+
+  Future<void> _ensureGoogleInitialized() async {
+    if (_googleInitialized) return;
+    if (googleServerClientId.isEmpty) {
+      throw 'Google Sign-In için serverClientId eksik. Firebase Console > Credentials bölümünden Web client ID (OAuth 2.0) oluşturup GOOGLE_SERVER_CLIENT_ID olarak geçin.';
+    }
+    await _googleSignIn.initialize(serverClientId: googleServerClientId);
+    _googleInitialized = true;
+  }
 
   // Mevcut kullanıcıyı al
   User? get currentUser => _auth.currentUser;
@@ -73,8 +87,48 @@ class AuthService {
     }
   }
 
+  // Google ile giriş / kayıt
+  Future<void> signInWithGoogle() async {
+    try {
+      await _ensureGoogleInitialized();
+
+      final googleUser = await _googleSignIn.authenticate();
+      final googleAuth = googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+      final user = userCredential.user;
+      if (user == null) return;
+
+      // Firestore'da kullanıcı dokümanı yoksa oluştur
+      try {
+        final docRef = _firestore.collection('users').doc(user.uid);
+        final snapshot = await docRef.get();
+        if (!snapshot.exists) {
+          final userModel =
+              UserModel.fromJson(MemoryBank.createUserModel(user.uid));
+          await docRef.set(userModel.toJson());
+        }
+      } catch (e) {
+        // Kritik değil: kullanıcı Auth ile giriş yapmış olabilir
+        print('Uyarı: Google profil veritabanına yazılamadı: $e');
+      }
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw 'Google ile giriş yapılamadı: $e';
+    }
+  }
+
   // Çıkış Yap
   Future<void> logout() async {
+    // Google ile giriş yapıldıysa oturumu da kapat
+    try {
+      await _ensureGoogleInitialized();
+      await _googleSignIn.signOut();
+    } catch (_) {}
     await _auth.signOut();
   }
 

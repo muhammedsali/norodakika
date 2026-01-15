@@ -5,7 +5,7 @@ import 'dart:async';
 import '../../../core/models/game_model.dart';
 import '../../../core/models/attempt_model.dart';
 import '../../../core/memory/memory_bank.dart';
-// import '../../../services/local_storage_service.dart'; // Artık kullanılmıyor
+import '../../../services/local_storage_service.dart';
 import '../../../core/api/api_service.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../widgets/reflex_tap_game.dart';
@@ -98,21 +98,29 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
   Future<void> _onGameComplete(Map<String, dynamic> result) async {
     final userAsync = ref.read(currentUserProvider);
     final user = userAsync.value;
-    
-    if (user == null) return;
 
-    final difficulty = await ref.read(firestoreServiceProvider).getGameDifficulty(
-      userId: user.uid,
-      gameId: widget.game.id,
-    );
+    // Zorluk seviyesini al (user varsa Firestore'dan, yoksa local storage'dan)
+    double difficulty = 1.0;
+    String userId = 'guest';
+    
+    if (user != null) {
+      userId = user.uid;
+      difficulty = await ref.read(firestoreServiceProvider).getGameDifficulty(
+        userId: user.uid,
+        gameId: widget.game.id,
+      );
+    } else {
+      // Auth olmadan da local storage'dan zorluk seviyesini al
+      difficulty = await LocalStorageService.getGameDifficulty(widget.game.id);
+    }
 
     setState(() {
       _isGameComplete = true;
       _gameResult = result;
     });
 
-    // Attempt kaydet
-    await _saveAttempt(result, difficulty, user.uid);
+    // Attempt kaydet (hem Firestore hem local storage'a)
+    await _saveAttempt(result, difficulty, userId);
   }
 
   Future<void> _saveAttempt(
@@ -136,28 +144,48 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         area: widget.game.area,
       );
 
-      // Firestore'a kaydet
-      await ref.read(firestoreServiceProvider).saveAttempt(attempt);
+      // Her zaman local storage'a kaydet (auth olmadan da çalışsın)
+      await LocalStorageService.saveAttempt(attempt);
 
-      // API'ye gönder (opsiyonel)
-      try {
-        await ApiService.submitAttempt(attempt);
-      } catch (e) {
-        // API hatası kritik değil
-        print('API gönderim hatası: $e');
+      // Eğer user varsa Firestore'a da kaydet
+      if (userId != 'guest') {
+        try {
+          await ref.read(firestoreServiceProvider).saveAttempt(attempt);
+        } catch (e) {
+          print('Firestore kaydetme hatası: $e');
+        }
+
+        // API'ye gönder (opsiyonel)
+        try {
+          await ApiService.submitAttempt(attempt);
+        } catch (e) {
+          // API hatası kritik değil
+          print('API gönderim hatası: $e');
+        }
+
+        // Zorluk seviyesini güncelle (Firestore)
+        final newDifficulty = MemoryBank.updateDifficulty(
+          difficulty,
+          successRate,
+        );
+        
+        try {
+          await ref.read(firestoreServiceProvider).updateGameDifficulty(
+            userId: userId,
+            gameId: widget.game.id,
+            newDifficulty: newDifficulty,
+          );
+        } catch (e) {
+          print('Firestore zorluk güncelleme hatası: $e');
+        }
       }
 
-      // Zorluk seviyesini güncelle
+      // Zorluk seviyesini local storage'a da kaydet
       final newDifficulty = MemoryBank.updateDifficulty(
         difficulty,
         successRate,
       );
-      
-      await ref.read(firestoreServiceProvider).updateGameDifficulty(
-        userId: userId,
-        gameId: widget.game.id,
-        newDifficulty: newDifficulty,
-      );
+      await LocalStorageService.saveGameDifficulty(widget.game.id, newDifficulty);
     } catch (e) {
       print('Attempt kaydetme hatası: $e');
     }

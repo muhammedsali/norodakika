@@ -461,8 +461,11 @@ class _WordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF4F5F7);
+    final baseColor = isDark ? const Color(0xFF1F2937) : const Color(0xFFF4F5F7);
     final selectedColor = const Color(0xFF22C55E);
+    final textColor = isDark 
+        ? (selected ? Colors.white : const Color(0xFFE5E7EB))
+        : (selected ? Colors.white : const Color(0xFF0F172A));
 
     return GestureDetector(
       onTap: onTap,
@@ -472,6 +475,9 @@ class _WordCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected ? selectedColor : baseColor,
           borderRadius: BorderRadius.circular(12),
+          border: isDark && !selected
+              ? Border.all(color: const Color(0xFF374151), width: 1)
+              : null,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
@@ -485,7 +491,7 @@ class _WordCard extends StatelessWidget {
           style: GoogleFonts.spaceGrotesk(
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: selected ? Colors.white : const Color(0xFF0F172A),
+            color: textColor,
           ),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../providers/auth_provider.dart';
+import 'auth_gate_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -45,7 +46,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 backgroundColor: Colors.green,
               ),
             );
-            Navigator.pop(context);
+
+            // Kayıt sonrasında kullanıcı zaten giriş yapmış oluyor.
+            // AuthGate, güncel auth durumuna göre otomatik olarak Home'a yönlendirir.
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const AuthGateScreen()),
+              (route) => false,
+            );
           },
           loading: () {},
           error: (error, _) {
