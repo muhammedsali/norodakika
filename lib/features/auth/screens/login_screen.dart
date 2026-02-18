@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/i18n/app_strings.dart';
+import '../../settings/providers/language_provider.dart';
 import '../providers/auth_provider.dart';
 import 'register_screen.dart';
 
@@ -38,8 +40,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           },
           loading: () {},
           error: (error, _) {
+            final lang = ref.read(languageProvider);
+            final s = AppStrings(lang);
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Giriş hatası: $error')),
+              SnackBar(content: Text('${s.loginErrorPrefix}: $error')),
             );
           },
         );
@@ -58,8 +62,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       },
       loading: () {},
       error: (error, _) {
+        final lang = ref.read(languageProvider);
+        final s = AppStrings(lang);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Google giriş hatası: $error')),
+          SnackBar(content: Text('${s.googleLoginErrorPrefix}: $error')),
         );
       },
     );
@@ -68,6 +74,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -82,7 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 children: [
                   // Logo veya başlık
                   Text(
-                    'NöroDakika',
+                    s.appName,
                     style: GoogleFonts.poppins(
                       fontSize: 42,
                       fontWeight: FontWeight.bold,
@@ -91,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Bilişsel Eğitim Platformu',
+                    s.platformTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.grey[600],
@@ -116,7 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'E-posta',
+                        labelText: s.emailLabel,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -130,10 +138,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'E-posta gerekli';
+                          return s.emailRequired;
                         }
                         if (!value.contains('@')) {
-                          return 'Geçerli bir e-posta girin';
+                          return s.emailInvalid;
                         }
                         return null;
                       },
@@ -158,7 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Şifre',
+                        labelText: s.passwordLabel,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -172,10 +180,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Şifre gerekli';
+                          return s.passwordRequired;
                         }
                         if (value.length < 6) {
-                          return 'Şifre en az 6 karakter olmalı';
+                          return s.passwordMinLength;
                         }
                         return null;
                       },
@@ -200,7 +208,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: authState.isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              'Giriş Yap',
+                              s.loginButton,
                               style: GoogleFonts.poppins(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -225,7 +233,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         backgroundColor: Colors.white,
                       ),
                       child: Text(
-                        'Google ile üye ol',
+                        s.googleSignUp,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -248,7 +256,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         backgroundColor: Colors.white,
                       ),
                       child: Text(
-                        'Google ile giriş yap',
+                        s.googleSignIn,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -269,7 +277,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       );
                     },
                     child: Text(
-                      'Hesabın yok mu? Kayıt ol',
+                      s.noAccountRegister,
                       style: GoogleFonts.poppins(
                         color: const Color(0xFF6E00FF),
                         fontSize: 14,

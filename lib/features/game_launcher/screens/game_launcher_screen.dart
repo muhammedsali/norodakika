@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../core/models/game_model.dart';
+import '../../../core/i18n/app_strings.dart';
 import '../../settings/providers/theme_provider.dart';
+import '../../settings/providers/language_provider.dart';
 import '../../shared/widgets/game_card_widgets.dart';
 import '../screens/game_play_screen.dart';
 
@@ -20,6 +22,8 @@ class GameLauncherScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
     
     // Günlük plan modunda ise, günlük planı al
     List<Map<String, dynamic>> displayItems;
@@ -55,7 +59,9 @@ class GameLauncherScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          isDailyPlan && gameId == null ? 'Günün Antrenmanı' : (gameId != null ? 'Oyun' : '7 Mini Oyun'),
+          isDailyPlan && gameId == null
+              ? s.todaysWorkout
+              : (gameId != null ? s.gameTitle : s.sevenMiniGames),
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -67,7 +73,7 @@ class GameLauncherScreen extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
             child: Text(
-              'Bugün için önerilen oyunlar. Her oyunu sırayla oynayarak beyin antrenmanını tamamla!',
+              s.dailyPlanDescription,
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -81,7 +87,7 @@ class GameLauncherScreen extends ConsumerWidget {
         child: displayItems.isEmpty
             ? Center(
                 child: Text(
-                  'Bugün için plan yok',
+                  s.noPlanToday,
                   style: GoogleFonts.poppins(
                     color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                   ),

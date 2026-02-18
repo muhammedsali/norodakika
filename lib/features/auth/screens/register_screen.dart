@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/i18n/app_strings.dart';
+import '../../settings/providers/language_provider.dart';
 import '../providers/auth_provider.dart';
 import 'auth_gate_screen.dart';
 
@@ -34,6 +36,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       if (mounted) {
         final authState = ref.read(authNotifierProvider);
+        final lang = ref.read(languageProvider);
+        final s = AppStrings(lang);
         
         // Önceki snackbar'ları temizle
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -41,8 +45,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         authState.when(
           data: (_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Kayıt başarılı! Giriş yapılıyor...'),
+              SnackBar(
+                content: Text(s.registerSuccessSnack),
                 backgroundColor: Colors.green,
               ),
             );
@@ -71,6 +75,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -92,7 +98,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Kayıt Ol',
+                    s.registerTitle,
                     style: GoogleFonts.poppins(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -118,7 +124,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        labelText: 'E-posta',
+                        labelText: s.emailLabel,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -132,10 +138,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'E-posta gerekli';
+                          return s.emailRequired;
                         }
                         if (!value.contains('@')) {
-                          return 'Geçerli bir e-posta girin';
+                          return s.emailInvalid;
                         }
                         return null;
                       },
@@ -160,7 +166,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _passwordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Şifre',
+                        labelText: s.passwordLabel,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -174,10 +180,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Şifre gerekli';
+                          return s.passwordRequired;
                         }
                         if (value.length < 6) {
-                          return 'Şifre en az 6 karakter olmalı';
+                          return s.passwordMinLength;
                         }
                         return null;
                       },
@@ -202,7 +208,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _confirmPasswordController,
                       obscureText: true,
                       decoration: InputDecoration(
-                        labelText: 'Şifre Tekrar',
+                        labelText: s.confirmPasswordLabel,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20),
                           borderSide: BorderSide.none,
@@ -216,10 +222,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Şifre tekrarı gerekli';
+                          return s.confirmPasswordRequired;
                         }
                         if (value != _passwordController.text) {
-                          return 'Şifreler eşleşmiyor';
+                          return s.passwordsDontMatch;
                         }
                         return null;
                       },
@@ -244,7 +250,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       child: authState.isLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              'Kayıt Ol',
+                              s.registerTitle,
                               style: GoogleFonts.poppins(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../../core/i18n/app_strings.dart';
+import '../../settings/providers/language_provider.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final bool isDarkMode;
@@ -15,6 +17,8 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.value;
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
     final bool isDark = isDarkMode;
     final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
     final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
@@ -22,7 +26,7 @@ class ProfileScreen extends ConsumerWidget {
     final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     final displayEmail = user?.email ?? 'kullanici@ornek.com';
-    final displayName = user?.displayName ?? 'Kullanıcı';
+    final displayName = user?.displayName ?? s.userFallback;
     final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : (displayEmail.isNotEmpty ? displayEmail[0].toUpperCase() : 'U');
 
     return Scaffold(
@@ -35,7 +39,7 @@ class ProfileScreen extends ConsumerWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Profil',
+          s.profileTitle,
           style: GoogleFonts.spaceGrotesk(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -125,7 +129,7 @@ class ProfileScreen extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(
-                              'Seviye: Başlangıç',
+                              s.levelBeginner,
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
@@ -156,7 +160,7 @@ class ProfileScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Genel Bilgiler',
+                      s.generalInfo,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -168,7 +172,7 @@ class ProfileScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Toplam oturum',
+                          s.totalSessions,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 13,
                             color: subtitleColor,
@@ -188,7 +192,7 @@ class ProfileScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Günlük hedef',
+                          s.dailyGoal,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 13,
                             color: subtitleColor,
@@ -229,7 +233,7 @@ class ProfileScreen extends ConsumerWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Çıkış Yap',
+                    s.logout,
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

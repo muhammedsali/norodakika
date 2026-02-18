@@ -179,6 +179,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
       'score': _score.toDouble(),
       'successRate': successRate,
       'duration': gameDuration - _timeRemaining,
+      'missedTargets': _missedTargets,
     });
   }
 
@@ -215,7 +216,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -259,7 +260,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                                     size: 20,
                                     color: index < _lives
                                         ? Colors.red
-                                        : subtitleColor.withOpacity(0.3),
+                                        : subtitleColor.withValues(alpha: 0.3),
                                   ),
                                 );
                               }),
@@ -293,7 +294,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                             gradient: LinearGradient(
                               colors: [
                                 _targetColor,
-                                _targetColor.withOpacity(0.7),
+                                _targetColor.withValues(alpha: 0.7),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(3),
@@ -322,10 +323,10 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: _targetColor.withOpacity(0.1 + _pulseController.value * 0.1),
+                      color: _targetColor.withValues(alpha: 0.1 + _pulseController.value * 0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: _targetColor.withOpacity(0.5),
+                        color: _targetColor.withValues(alpha: 0.5),
                         width: 2,
                       ),
                     ),
@@ -340,7 +341,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                             color: _targetColor,
                             boxShadow: [
                               BoxShadow(
-                                color: _targetColor.withOpacity(0.5),
+                                color: _targetColor.withValues(alpha: 0.5),
                                 blurRadius: 8,
                                 spreadRadius: 2,
                               ),
@@ -395,8 +396,8 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          _targetColor.withOpacity(0.3),
-                                          _targetColor.withOpacity(0.1),
+                                          _targetColor.withValues(alpha: 0.3),
+                                          _targetColor.withValues(alpha: 0.1),
                                         ],
                                       ),
                                     ),
@@ -417,7 +418,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                                           color: dot.color,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: dot.color.withOpacity(0.6),
+                                              color: dot.color.withValues(alpha: 0.6),
                                               blurRadius: 12,
                                               spreadRadius: 2,
                                             ),

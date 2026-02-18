@@ -7,7 +7,9 @@ import '../../../core/models/attempt_model.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../services/local_storage_service.dart';
 import '../../../core/api/api_service.dart';
+import '../../../core/i18n/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../settings/providers/language_provider.dart';
 import '../widgets/reflex_tap_game.dart';
 import '../widgets/reflex_dash_game.dart';
 import '../widgets/quick_math_game.dart';
@@ -194,6 +196,9 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
   void _showResultDialog() {
     if (_gameResult == null) return;
 
+    final lang = ref.read(languageProvider);
+    final s = AppStrings(lang);
+
     final score = (_gameResult!['score'] as num?)?.toDouble() ?? 0.0;
     final successRate = (_gameResult!['successRate'] as num?)?.toDouble() ?? 0.0;
     final duration = (_gameResult!['duration'] as num?)?.toInt() ?? 0;
@@ -254,7 +259,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Oyun tamamlandı',
+                      s.gameCompleted,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -292,7 +297,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Başarı oranı',
+                                s.successRate,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 13,
                                   color: textColor,
@@ -314,7 +319,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Süre: ${duration.toString()} sn',
+                      s.durationSeconds(duration),
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 13,
                         color: textColor,
@@ -375,7 +380,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                                 ),
                               ),
                               child: Text(
-                                'Ana ekrana dön',
+                                s.backToHome,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -401,6 +406,9 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     if (!_isGameStarted || _isGameComplete) {
       return true;
     }
+
+    final lang = ref.read(languageProvider);
+    final s = AppStrings(lang);
 
     final baseTheme = Theme.of(context);
     final effectiveIsDark =
@@ -461,7 +469,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Oyundan çıkmak istiyor musun?',
+                      s.exitGameTitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -470,10 +478,11 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'İlerleyişin kaydedildi (varsa) fakat bu oyunu şimdi sonlandıracaksın.',
+                      s.exitGameText,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 13,
                         color: textColor,
+                        height: 1.4,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -522,7 +531,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                                 ),
                               ),
                               child: Text(
-                                'Ana ekrana dön',
+                                s.backToHome,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
@@ -556,6 +565,9 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
   }
 
   Widget _buildGameWidget() {
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
     if (!_isGameStarted) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -638,7 +650,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                'Bu oyun yakında eklenecek!',
+                s.comingSoon,
                 style: GoogleFonts.poppins(
                   fontSize: 16,
                   color: Colors.grey[400],

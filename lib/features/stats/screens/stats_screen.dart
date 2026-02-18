@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../services/local_storage_service.dart';
+import '../../../core/i18n/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
+import '../../settings/providers/language_provider.dart';
 
 enum TimeFilter { day, week, month }
 
@@ -33,16 +35,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     return await LocalStorageService.getGameHistory();
   }
 
-  void _refreshHistory() {
-    setState(() {
-      _historyFuture = LocalStorageService.getGameHistory();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.value;
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final textColorPrimary = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
@@ -84,7 +82,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
     return userDataAsync.when(
       data: (userData) {
-        final rawHistory = (userData == null || userData.history == null)
+        final rawHistory = (userData == null)
             ? <dynamic>[]
             : List.from(userData.history as List);
         final history = rawHistory.isNotEmpty ? rawHistory : _fakeHistory();
@@ -105,7 +103,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
         child: Text(
-          'Hata: $error',
+          s.errorPrefix(error),
           style: GoogleFonts.poppins(
             fontSize: 14,
             color: textColorSecondary,
@@ -123,13 +121,15 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     required TimeFilter selectedFilter,
     required Function(TimeFilter) onFilterChanged,
   }) {
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
     // Filtreye göre history'yi filtrele
     final filteredHistory = _filterHistoryByTime(history, selectedFilter);
     final radarStats = MemoryBank.calculateRadarStats(filteredHistory);
     final categories = MemoryBank.categories;
 
     // Seçilen filtreye göre özet hesaplamaları
-    final now = DateTime.now();
     final filteredAttempts = filteredHistory;
 
     final gamesCount = filteredAttempts.length;
@@ -147,22 +147,22 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     String filterSubtitle;
     switch (selectedFilter) {
       case TimeFilter.day:
-        filterTitle = 'Bugün özeti';
+        filterTitle = s.summaryToday;
         filterSubtitle = gamesCount > 0
-            ? '$gamesCount oyun, yaklaşık $totalMinutes dk'
-            : 'Bugün henüz oyun oynamadın';
+            ? s.gamesAndMinutes(gamesCount, totalMinutes)
+            : s.noGamesToday;
         break;
       case TimeFilter.week:
-        filterTitle = 'Bu hafta özeti';
+        filterTitle = s.summaryWeek;
         filterSubtitle = gamesCount > 0
-            ? '$gamesCount oyun, yaklaşık $totalMinutes dk'
-            : 'Bu hafta henüz oyun oynamadın';
+            ? s.gamesAndMinutes(gamesCount, totalMinutes)
+            : s.noGamesWeek;
         break;
       case TimeFilter.month:
-        filterTitle = 'Bu ay özeti';
+        filterTitle = s.summaryMonth;
         filterSubtitle = gamesCount > 0
-            ? '$gamesCount oyun, yaklaşık $totalMinutes dk'
-            : 'Bu ay henüz oyun oynamadın';
+            ? s.gamesAndMinutes(gamesCount, totalMinutes)
+            : s.noGamesMonth;
         break;
     }
 
@@ -220,7 +220,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'İlerleme',
+                        s.statsTitle,
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
@@ -228,7 +228,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         ),
                       ),
                       Text(
-                        'Bilişsel performans analizi',
+                        s.statsSubtitle,
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 13,
                           color: textColorSecondary,
@@ -270,7 +270,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 children: [
                   Expanded(
                     child: _buildFilterButton(
-                      'Gün',
+                      s.filterDay,
                       Icons.today,
                       TimeFilter.day,
                       selectedFilter,
@@ -281,7 +281,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildFilterButton(
-                      'Hafta',
+                      s.filterWeek,
                       Icons.date_range,
                       TimeFilter.week,
                       selectedFilter,
@@ -292,7 +292,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _buildFilterButton(
-                      'Ay',
+                      s.filterMonth,
                       Icons.calendar_month,
                       TimeFilter.month,
                       selectedFilter,
@@ -449,7 +449,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'Seçilen dönemde veri yok',
+                          s.noDataForPeriod,
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             color: textColorSecondary,
@@ -492,7 +492,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       titlePositionPercentageOffset: 0.2,
                       getTitle: (index, angle) {
                         return RadarChartTitle(
-                          text: categories[index],
+                          text: s.categoryLabel(categories[index]),
                           angle: angle,
                           positionPercentageOffset: 0.15,
                         );
@@ -586,7 +586,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        category,
+                                        s.categoryLabel(category),
                                         style: GoogleFonts.spaceGrotesk(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -639,7 +639,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     IconData icon,
     TimeFilter filter,
     TimeFilter selectedFilter,
-    Function(TimeFilter) onFilterChanged,
+    ValueChanged<TimeFilter> onFilterChanged,
     bool isDark,
   ) {
     final isSelected = filter == selectedFilter;
@@ -704,18 +704,25 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   IconData _getCategoryIcon(String category) {
     switch (category) {
       case 'Hafıza':
+      case 'Memory':
         return Icons.psychology;
       case 'Dikkat':
+      case 'Attention':
         return Icons.center_focus_strong;
       case 'Refleks':
+      case 'Reflex':
         return Icons.flash_on;
       case 'Mantık':
+      case 'Logic':
         return Icons.extension;
       case 'Sayısal Zeka':
+      case 'Numerical':
         return Icons.calculate;
       case 'Görsel Algı':
+      case 'Visual':
         return Icons.visibility;
       case 'Dil':
+      case 'Language':
         return Icons.translate;
       default:
         return Icons.star;

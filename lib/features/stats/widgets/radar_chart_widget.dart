@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../settings/providers/language_provider.dart';
+import '../../../core/i18n/app_strings.dart';
 
 class RadarChartWidget extends StatelessWidget {
   final Map<String, double> stats;
   final bool isDarkMode;
+  final AppLanguage language;
 
   const RadarChartWidget({
     super.key,
     required this.stats,
     required this.isDarkMode,
+    required this.language,
   });
 
   @override
   Widget build(BuildContext context) {
-    final areas = ['Refleks', 'Dikkat', 'Hafıza', 'Sayısal', 'Mantık', 'Dil'];
+    final s = AppStrings(language);
+    final areasTr = ['Refleks', 'Dikkat', 'Hafıza', 'Sayısal', 'Mantık', 'Dil'];
     final colors = [
       const Color(0xFF6366F1),
       const Color(0xFFF97316),
@@ -24,7 +29,7 @@ class RadarChartWidget extends StatelessWidget {
       const Color(0xFFEC4899),
     ];
 
-    final dataEntries = areas.map((area) {
+    final dataEntries = areasTr.map((area) {
       final value = stats[area] ?? 0.0;
       return value.clamp(0.0, 100.0);
     }).toList();
@@ -77,9 +82,9 @@ class RadarChartWidget extends StatelessWidget {
                   width: 1,
                 ),
                 getTitle: (index, angle) {
-                  if (index >= areas.length) return const RadarChartTitle(text: '');
+                  if (index >= areasTr.length) return const RadarChartTitle(text: '');
                   return RadarChartTitle(
-                    text: areas[index],
+                    text: s.categoryLabel(areasTr[index]),
                     angle: angle,
                   );
                 },
@@ -107,10 +112,10 @@ class RadarChartWidget extends StatelessWidget {
             spacing: 12,
             runSpacing: 8,
             alignment: WrapAlignment.center,
-            children: areas.asMap().entries.map((entry) {
+            children: areasTr.asMap().entries.map((entry) {
               final index = entry.key;
-              final area = entry.value;
-              final value = stats[area] ?? 0.0;
+              final areaTr = areasTr[index];
+              final value = stats[areaTr] ?? 0.0;
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
@@ -130,7 +135,7 @@ class RadarChartWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '$area: ${value.toInt()}%',
+                      '${s.categoryLabel(areaTr)}: ${value.toInt()}%',
                       style: GoogleFonts.poppins(
                         fontSize: 11,
                         fontWeight: FontWeight.w500,

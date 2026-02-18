@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../core/models/game_model.dart';
+import '../../../core/i18n/app_strings.dart';
 import '../../shared/widgets/game_card_widgets.dart';
 import '../../settings/providers/theme_provider.dart';
+import '../../settings/providers/language_provider.dart';
 import '../../auth/screens/auth_gate_screen.dart';
 
 class WelcomeScreen extends ConsumerWidget {
@@ -13,6 +15,8 @@ class WelcomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
     final games = MemoryBank.games
         .map((g) => GameModel.fromMap(g))
         .toList();
@@ -30,7 +34,7 @@ class WelcomeScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'NöroDakika',
+                    s.appName,
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -41,7 +45,7 @@ class WelcomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Zihnini geliştiren mini oyunlar',
+                    s.welcomeSubtitle,
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 16,
                       color: isDarkMode
@@ -63,7 +67,7 @@ class WelcomeScreen extends ConsumerWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       child: Text(
-                        'Oyunlar',
+                        s.gamesTitle,
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -92,7 +96,7 @@ class WelcomeScreen extends ConsumerWidget {
                           area: game.area,
                           isDarkMode: isDarkMode,
                           onTap: () {
-                            _showLoginPrompt(context, isDarkMode);
+                            _showLoginPrompt(context, isDarkMode, s);
                           },
                         );
                       },
@@ -124,7 +128,7 @@ class WelcomeScreen extends ConsumerWidget {
                     elevation: 8,
                     shadowColor:
                         (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
-                            .withOpacity(0.35),
+                            .withValues(alpha: 0.35),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(999),
                       side: isDarkMode
@@ -141,7 +145,7 @@ class WelcomeScreen extends ConsumerWidget {
                       const Icon(Icons.play_arrow_rounded, size: 24),
                       const SizedBox(width: 8),
                       Text(
-                        'Hadi Oynayalım',
+                        s.letsPlay,
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -158,7 +162,7 @@ class WelcomeScreen extends ConsumerWidget {
     );
   }
 
-  void _showLoginPrompt(BuildContext context, bool isDarkMode) {
+  void _showLoginPrompt(BuildContext context, bool isDarkMode, AppStrings s) {
     showDialog(
       context: context,
       builder: (ctx) {
@@ -207,7 +211,7 @@ class WelcomeScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Giriş Yapın',
+                                s.loginRequiredTitle,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 22,
                                   fontWeight: FontWeight.w700,
@@ -216,7 +220,7 @@ class WelcomeScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Oyunları oynamak ve ilerlemenizi takip etmek için giriş yapmanız gerekiyor.',
+                                s.loginRequiredText,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 14,
                                   height: 1.4,
@@ -262,7 +266,7 @@ class WelcomeScreen extends ConsumerWidget {
                           elevation: 2,
                         ),
                         child: Text(
-                          'Giriş Yap / Üye Ol',
+                          s.loginOrRegister,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

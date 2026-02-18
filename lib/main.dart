@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'features/welcome/screens/splash_screen.dart';
+import 'features/settings/providers/language_provider.dart';
 import 'features/settings/providers/theme_provider.dart';
 import 'firebase_options.dart';
 
@@ -30,6 +31,7 @@ class NorodakikaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
+    ref.watch(languageProvider);
     
     return MaterialApp(
       title: 'NöroDakika',

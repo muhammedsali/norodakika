@@ -14,6 +14,7 @@ import '../../../core/models/game_model.dart';
 import '../../../services/local_storage_service.dart';
 import '../../settings/providers/language_provider.dart';
 import '../../settings/providers/theme_provider.dart';
+import '../../../core/i18n/app_strings.dart';
 import '../widgets/home_bottom_nav.dart';
 import '../../shared/widgets/game_card_widgets.dart';
 import '../../profile/providers/avatar_provider.dart';
@@ -51,8 +52,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.value;
     final appLanguage = ref.watch(languageProvider);
+    final s = AppStrings(appLanguage);
     final isDarkMode = ref.watch(themeProvider);
-    final userName = user?.displayName ?? user?.email?.split('@').first ?? 'Kullanıcı';
+    final userName = user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
     
     // Sistem status bar ikonlarını tema ile uyumlu yap
     final overlayStyle = isDarkMode
@@ -124,35 +126,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isDark = isDarkMode;
     final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
-    final steps = lang == AppLanguage.en
-        ? const [
-            {
-              'title': 'Welcome!',
-              'text': 'Norodakika helps you train your mind with short, focused mini games.'
-            },
-            {
-              'title': 'Today’s Workout',
-              'text': 'Use the purple button on the home screen to start your daily plan.'
-            },
-            {
-              'title': 'Track Progress',
-              'text': 'See your radar chart and daily summary on the Progress tab.'
-            },
-          ]
-        : const [
-            {
-              'title': 'Hoş geldin!',
-              'text': 'NöroDakika, kısa mini oyunlarla zihnini antrenman yapman için tasarlandı.'
-            },
-            {
-              'title': 'Günün Antrenmanı',
-              'text': 'Ana ekrandaki mor butondan bugün için önerilen oyun planını başlatabilirsin.'
-            },
-            {
-              'title': 'İlerleme Takibi',
-              'text': 'Alt barda İlerleme sekmesinden radar grafiği ve günlük özetini görebilirsin.'
-            },
-          ];
+    final s = AppStrings(lang);
+    final steps = [
+      {
+        'title': s.onboardingWelcomeTitle,
+        'text': s.onboardingWelcomeText,
+      },
+      {
+        'title': s.onboardingDailyTitle,
+        'text': s.onboardingDailyText,
+      },
+      {
+        'title': s.onboardingProgressTitle,
+        'text': s.onboardingProgressText,
+      },
+    ];
 
     final current = steps[_onboardingStep.clamp(0, steps.length - 1)];
 
@@ -184,7 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       await LocalStorageService.setOnboardingSeen();
                     },
                     child: Text(
-                      lang == AppLanguage.en ? 'Skip' : 'Atla',
+                      s.onboardingSkip,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -286,8 +274,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     child: Text(
                       _onboardingStep < steps.length - 1
-                          ? (lang == AppLanguage.en ? 'Next' : 'İleri')
-                          : (lang == AppLanguage.en ? 'Start' : 'Başla'),
+                          ? s.onboardingNext
+                          : s.onboardingStart,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -305,9 +293,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _showAvatarPicker(BuildContext context) {
     final isDarkMode = ref.read(themeProvider);
+    final lang = ref.read(languageProvider);
+    final s = AppStrings(lang);
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
       builder: (context) => Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
@@ -317,21 +308,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(height: 12),
             Container(
-              width: 40,
-              height: 4,
+              width: 44,
+              height: 5,
               decoration: BoxDecoration(
                 color: isDarkMode ? Colors.white24 : Colors.black12,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             const SizedBox(height: 20),
             Text(
-              'Profil Resmi Seç',
+              s.chooseAvatarTitle,
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : const Color(0xFF1F2937),
+                color: isDarkMode ? Colors.white : const Color(0xFF111827),
               ),
             ),
             const SizedBox(height: 24),
@@ -385,7 +377,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          avatar['name'] as String,
+                          s.avatarLabel(avatar['name'] as String),
                           style: GoogleFonts.poppins(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -446,6 +438,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final iconData = _getGameIconData(gameId);
     final gameColor = iconData['color'] as Color;
     final emoji = iconData['emoji'] as String;
+    final lang = ref.read(languageProvider);
+    final s = AppStrings(lang);
 
     showDialog(
       context: context,
@@ -594,7 +588,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      '~2-3 dakika',
+                                      s.approxTwoThreeMinutes,
                                       style: GoogleFonts.spaceGrotesk(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -681,7 +675,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    'Nasıl Oynanır?',
+                                    s.howToPlay,
                                     style: GoogleFonts.spaceGrotesk(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
@@ -786,7 +780,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     ),
                                     const SizedBox(width: 14),
                                     Text(
-                                      'Oyunu Başlat',
+                                      s.startGame,
                                       style: GoogleFonts.spaceGrotesk(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
@@ -890,6 +884,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildPrimaryCtaButton(BuildContext context) {
     final isDarkMode = ref.watch(themeProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -926,7 +922,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               child: Center(
                 child: Text(
-                  'Başla: Günün Antrenmanı',
+                  s.startTodaysWorkout,
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -943,12 +939,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildExpandedProgressSection() {
     final isDarkMode = ref.watch(themeProvider);
     final statsAsync = ref.watch(userStatsProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'İlerleme',
+          s.progressSectionTitle,
           style: GoogleFonts.spaceGrotesk(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -984,7 +982,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Henüz oyun oynamadın',
+                        s.noGamesYetTitle,
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -993,7 +991,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Oyun oynamaya başlayınca ilerleme grafin burada görünecek',
+                        s.noGamesYetSubtitle,
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
@@ -1008,6 +1006,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return RadarChartWidget(
               stats: stats,
               isDarkMode: isDarkMode,
+              language: lang,
             );
           },
           loading: () => Container(
@@ -1040,7 +1039,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             child: Center(
               child: Text(
-                'Veriler yüklenemedi',
+                s.statsLoadFailed,
                 style: GoogleFonts.poppins(
                   color: Colors.red,
                 ),
@@ -1055,6 +1054,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildHeader(String userName) {
     final isDarkMode = ref.watch(themeProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Container(
@@ -1106,7 +1107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Muhammed Sali',
+                    userName,
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -1125,7 +1126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      'Görev: 2/5',
+                      s.taskProgressLabel(2, 5),
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -1153,6 +1154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
     final appLanguage = ref.watch(languageProvider);
+    final s = AppStrings(appLanguage);
 
     return Container(
       color: bgColor,
@@ -1162,7 +1164,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Ayarlar',
+              s.settingsTitle,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -1171,7 +1173,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Uygulamayı sana göre özelleştir.',
+              s.settingsSubtitle,
               style: GoogleFonts.spaceGrotesk(
                 fontSize: 13,
                 color: subtitleColor,
@@ -1218,7 +1220,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Karanlık Mod',
+                          s.darkModeTitle,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -1227,7 +1229,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Geceleri gözünü yormayan koyu tema.',
+                          s.darkModeSubtitle,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 12,
                             color: subtitleColor,
@@ -1295,7 +1297,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Dil',
+                          s.languageTitle,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -1304,7 +1306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Uygulama dilini değiştir.',
+                          s.languageSubtitle,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 12,
                             color: subtitleColor,
@@ -1346,7 +1348,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       items: [
                         DropdownMenuItem(
                           child: Text(
-                            'Türkçe',
+                            s.languageTurkish,
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -1357,7 +1359,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         DropdownMenuItem(
                           child: Text(
-                            'English',
+                            s.languageEnglish,
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -1401,7 +1403,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                     leading: const Icon(Icons.person_rounded, color: Color(0xFF4F46E5)),
                     title: Text(
-                      'Profil ve Hesap',
+                      s.profileAndAccountTitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -1409,7 +1411,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     subtitle: Text(
-                      'Kullanıcı bilgilerini ve hedeflerini düzenle.',
+                      s.profileAndAccountSubtitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 12,
                         color: subtitleColor,
@@ -1430,7 +1432,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                     leading: const Icon(Icons.today_rounded, color: Color(0xFF4F46E5)),
                     title: Text(
-                      'Günün Planı',
+                      s.dayPlanTitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -1438,7 +1440,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     subtitle: Text(
-                      'Bugünkü antrenman kartlarını gör.',
+                      s.dayPlanSubtitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 12,
                         color: subtitleColor,
@@ -1459,7 +1461,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                     leading: const Icon(Icons.bar_chart_rounded, color: Color(0xFF4F46E5)),
                     title: Text(
-                      'İlerleme ve İstatistikler',
+                      s.progressAndStatsTitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -1467,7 +1469,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     subtitle: Text(
-                      'Radar grafiği ve detaylı performansın.',
+                      s.progressAndStatsSubtitle,
                       style: GoogleFonts.spaceGrotesk(
                         fontSize: 12,
                         color: subtitleColor,
@@ -1526,7 +1528,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'NöroDakika Hakkında',
+                          s.aboutTitle,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -1535,7 +1537,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Zihinsel becerilerini kısa, bilimsel mini oyunlarla takip et ve geliştir. Bu sürüm MVP aşamasındadır.',
+                          s.aboutText,
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 12,
                             height: 1.4,

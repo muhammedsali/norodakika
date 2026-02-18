@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../settings/providers/language_provider.dart';
+import '../../../core/i18n/app_strings.dart';
 
 class HomeBottomNav extends StatelessWidget {
   final int selectedTab;
@@ -18,10 +19,11 @@ class HomeBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final homeLabel = language == AppLanguage.en ? 'Home' : 'Ana Sayfa';
-    final gamesLabel = language == AppLanguage.en ? 'Games' : 'Oyunlar';
-    final progressLabel = language == AppLanguage.en ? 'Progress' : 'İlerleme';
-    final settingsLabel = language == AppLanguage.en ? 'Settings' : 'Ayarlar';
+    final s = AppStrings(language);
+    final homeLabel = s.navHome;
+    final gamesLabel = s.navGames;
+    final progressLabel = s.navProgress;
+    final settingsLabel = s.navSettings;
 
     return Container(
       height: 80,
