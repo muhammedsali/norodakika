@@ -117,6 +117,11 @@ class AuthService {
       }
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return;
+      }
+      throw 'Google ile giriş yapılamadı: $e';
     } catch (e) {
       throw 'Google ile giriş yapılamadı: $e';
     }

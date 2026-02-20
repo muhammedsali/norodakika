@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../../settings/providers/language_provider.dart';
+import '../../auth/screens/auth_gate_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final bool isDarkMode;
@@ -221,7 +222,12 @@ class ProfileScreen extends ConsumerWidget {
                   onPressed: () async {
                     await ref.read(authNotifierProvider.notifier).logout();
                     if (context.mounted) {
-                      Navigator.pop(context);
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const AuthGateScreen(),
+                        ),
+                        (route) => false,
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
