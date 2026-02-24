@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../stats/screens/stats_screen.dart';
 import '../../stats/providers/user_stats_provider.dart';
-import '../../stats/widgets/radar_chart_widget.dart';
 import '../../game_launcher/screens/game_launcher_screen.dart';
 import '../../game_launcher/screens/game_play_screen.dart';
 import '../../profile/screens/profile_screen.dart';
@@ -16,7 +15,6 @@ import '../../settings/providers/language_provider.dart';
 import '../../settings/providers/theme_provider.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../widgets/home_bottom_nav.dart';
-import '../../shared/widgets/game_card_widgets.dart';
 import '../../profile/providers/avatar_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -31,11 +29,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedTab = 0; // 0: Ana Sayfa, 1: Oyunlar, 2: İlerleme, 3: Ayarlar
   bool _showOnboarding = false;
   int _onboardingStep = 0;
+  final TextEditingController _gamesSearchController = TextEditingController();
+  String _gamesQuery = '';
+  String _gamesFilter = 'all';
+
+  static const _intelligenceKeys = <String>[
+    'verbal',
+    'logical',
+    'visual',
+    'bodily',
+    'musical',
+    'social',
+    'intrapersonal',
+    'naturalist',
+  ];
 
   @override
   void initState() {
     super.initState();
     _loadOnboardingState();
+    _gamesSearchController.addListener(() {
+      final next = _gamesSearchController.text;
+      if (next != _gamesQuery) {
+        setState(() {
+          _gamesQuery = next;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _gamesSearchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadOnboardingState() async {
@@ -75,6 +101,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         .toList();
 
     return Scaffold(
+      extendBody: true,
       backgroundColor:
           isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6),
       body: Stack(
@@ -83,7 +110,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               children: [
                 // Üst Header
-                _buildHeader(userName),
+                if (_selectedTab != 0 && _selectedTab != 1) _buildHeader(userName),
                 
                 Expanded(
                   child: () {
@@ -105,7 +132,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (_showOnboarding) _buildOnboardingOverlay(context, appLanguage),
         ],
       ),
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
+        color: Colors.transparent,
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: HomeBottomNav(
           selectedTab: _selectedTab,
@@ -423,6 +451,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return {'icon': Icons.find_in_page, 'color': Color(0xFFF97316), 'emoji': '🔍'};
       case 'LANG02':
         return {'icon': Icons.speed, 'color': Color(0xFF06B6D4), 'emoji': '💨'};
+      case 'MUS01':
+        return {'icon': Icons.music_note, 'color': Color(0xFFF59E0B), 'emoji': '🎵'};
+      case 'SOC01':
+        return {'icon': Icons.emoji_emotions, 'color': Color(0xFFEC4899), 'emoji': '🙂'};
+      case 'NAT01':
+        return {'icon': Icons.nature, 'color': Color(0xFF10B981), 'emoji': '🌿'};
+      case 'KIN01':
+        return {'icon': Icons.sports_martial_arts, 'color': Color(0xFF3B82F6), 'emoji': '⚖️'};
+      case 'SPA01':
+        return {'icon': Icons.route, 'color': Color(0xFF8B5CF6), 'emoji': '🧭'};
+      case 'INT01':
+        return {'icon': Icons.self_improvement, 'color': Color(0xFF06B6D4), 'emoji': '🧘'};
       default:
         return {'icon': Icons.sports_esports, 'color': Color(0xFF4F46E5), 'emoji': '🎮'};
     }
@@ -816,36 +856,680 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildHomeTabBody(BuildContext context, List<GameModel> games) {
     final isDarkMode = ref.watch(themeProvider);
+    final appLanguage = ref.watch(languageProvider);
+    final s = AppStrings(appLanguage);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
+    final userName =
+        user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
+
+    final quickMath = games.where((g) => g.id == 'NUM01').isNotEmpty
+        ? games.firstWhere((g) => g.id == 'NUM01')
+        : games.first;
+
+    const completedToday = 2;
+    const plannedToday = 3;
+    final dailyProgress = plannedToday == 0 ? 0.0 : completedToday / plannedToday;
+
+    final bg = isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildPrimaryCtaButton(context),
-          const SizedBox(height: 24),
-          _buildExpandedProgressSection(),
+          _buildHomeWelcomeHeader(userName: userName, isDarkMode: isDarkMode),
+          const SizedBox(height: 22),
+          _buildSectionLabel(s.homeDailyProgress, isDarkMode),
+          const SizedBox(height: 12),
+          _buildDailyProgressCard(
+            isDarkMode: isDarkMode,
+            completedToday: completedToday,
+            plannedToday: plannedToday,
+            progress: dailyProgress,
+            onViewDetails: () {
+              setState(() {
+                _selectedTab = 2;
+              });
+            },
+          ),
+          const SizedBox(height: 26),
+          _buildSectionLabel(s.homeUpNext, isDarkMode),
+          const SizedBox(height: 12),
+          _buildUpNextCard(
+            context: context,
+            isDarkMode: isDarkMode,
+            game: quickMath,
+          ),
+          const SizedBox(height: 26),
+          _buildSectionLabel(s.homeInsights, isDarkMode),
+          const SizedBox(height: 12),
+          Container(
+            color: bg,
+            child: _buildCognitiveScoreCard(isDarkMode: isDarkMode),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildGamesTabBody(BuildContext context, List<GameModel> games) {
-    final isDarkMode = ref.watch(themeProvider);
-    // Tüm oyunların tam grid görünümü
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+  Widget _buildHomeWelcomeHeader({
+    required String userName,
+    required bool isDarkMode,
+  }) {
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () => _showAvatarPicker(context),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final selectedAvatar = ref.watch(avatarProvider);
+              final avatarData = AvatarData.getAvatar(selectedAvatar);
+              return Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: avatarData['colors'] as List<Color>,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  avatarData['icon'] as IconData,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                s.homeWelcomeBack,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: subtitleColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                userName,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+                spreadRadius: -8,
+              ),
+            ],
+          ),
+          child: IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: titleColor,
+              size: 22,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSectionLabel(String text, bool isDarkMode) {
+    final c = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
+    return Text(
+      text,
+      style: GoogleFonts.poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.2,
+        color: c,
+      ),
+    );
+  }
+
+  Widget _buildDailyProgressCard({
+    required bool isDarkMode,
+    required int completedToday,
+    required int plannedToday,
+    required double progress,
+    required VoidCallback onViewDetails,
+  }) {
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final blue = const Color(0xFF2563EB);
+    final pct = (progress * 100).clamp(0, 100).round();
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+            spreadRadius: -12,
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  s.homeDailyGoalTitle,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: titleColor,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  s.dailyGoalCompleted(completedToday, plannedToday),
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: subtitleColor,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                SizedBox(
+                  height: 34,
+                  child: ElevatedButton(
+                    onPressed: onViewDetails,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: blue.withOpacity(0.12),
+                      foregroundColor: blue,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    child: Text(
+                      s.homeViewDetails,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          SizedBox(
+            width: 72,
+            height: 72,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress.clamp(0.0, 1.0),
+                  strokeWidth: 7,
+                  backgroundColor: blue.withOpacity(isDarkMode ? 0.18 : 0.12),
+                  valueColor: AlwaysStoppedAnimation<Color>(blue),
+                ),
+                Text(
+                  '$pct%',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: titleColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpNextCard({
+    required BuildContext context,
+    required bool isDarkMode,
+    required GameModel game,
+  }) {
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final blue = const Color(0xFF2563EB);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+            spreadRadius: -12,
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Tüm Oyunlar',
-            style: GoogleFonts.spaceGrotesk(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              height: 120,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF111827).withOpacity(isDarkMode ? 0.6 : 0.08),
+                    const Color(0xFF111827).withOpacity(isDarkMode ? 0.25 : 0.03),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: const Center(
+                child: Icon(Icons.image_rounded, size: 40, color: Color(0xFF9CA3AF)),
+              ),
             ),
           ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      game.name,
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      game.description.isNotEmpty ? game.description : game.area,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        height: 1.4,
+                        color: subtitleColor,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: blue.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '2',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: blue,
+                      ),
+                    ),
+                    Text(
+                      s.homeMinutesShort,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: blue,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
+          SizedBox(
+            height: 52,
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                _showGameStartSheet(
+                  context: context,
+                  gameId: game.id,
+                  title: game.name,
+                  description: game.description.isNotEmpty ? game.description : game.area,
+                  isDarkMode: isDarkMode,
+                );
+              },
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: Text(
+                s.homeStartTraining,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: blue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCognitiveScoreCard({
+    required bool isDarkMode,
+  }) {
+    final statsAsync = ref.watch(userStatsProvider);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
+    return statsAsync.when(
+      data: (stats) {
+        final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+        final titleColor =
+            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+        final subtitleColor =
+            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
+        final memory = (stats['Hafıza'] ?? 0).toDouble();
+        final focus = (stats['Dikkat'] ?? 0).toDouble();
+        final speed = (stats['Refleks'] ?? 0).toDouble();
+        final total = memory + focus + speed;
+        final globalPts = (total * 10).round();
+
+        double norm(double v) {
+          if (total <= 0) return 0;
+          return (v / total).clamp(0.0, 1.0);
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+                spreadRadius: -12,
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            s.cognitiveScore,
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: titleColor,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22C55E).withOpacity(0.14),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            '+12%',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF22C55E),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? const Color(0xFF111827)
+                                : const Color(0xFFF9FAFB),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black
+                                    .withOpacity(isDarkMode ? 0.25 : 0.08),
+                                blurRadius: 18,
+                                offset: const Offset(0, 10),
+                                spreadRadius: -12,
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '$globalPts',
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: titleColor,
+                                  ),
+                                ),
+                                Text(
+                                  s.globalPts,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.9,
+                                    color: subtitleColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              _buildInsightBar(
+                                label: 'MEMORY',
+                                value: memory.round(),
+                                percent: norm(memory),
+                                color: const Color(0xFF2563EB),
+                                isDarkMode: isDarkMode,
+                              ),
+                              const SizedBox(height: 10),
+                              _buildInsightBar(
+                                label: 'FOCUS',
+                                value: focus.round(),
+                                percent: norm(focus),
+                                color: const Color(0xFF60A5FA),
+                                isDarkMode: isDarkMode,
+                              ),
+                              const SizedBox(height: 10),
+                              _buildInsightBar(
+                                label: 'SPEED',
+                                value: speed.round(),
+                                percent: norm(speed),
+                                color: const Color(0xFF3B82F6),
+                                isDarkMode: isDarkMode,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildInsightBar({
+    required String label,
+    required int value,
+    required double percent,
+    required Color color,
+    required bool isDarkMode,
+  }) {
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final track = color.withOpacity(isDarkMode ? 0.18 : 0.12);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.6,
+                  color: subtitleColor,
+                ),
+              ),
+            ),
+            Text(
+              '$value',
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                color: subtitleColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: LinearProgressIndicator(
+            value: percent.clamp(0.0, 1.0),
+            minHeight: 6,
+            backgroundColor: track,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGamesTabBody(BuildContext context, List<GameModel> games) {
+    final isDarkMode = ref.watch(themeProvider);
+    final appLanguage = ref.watch(languageProvider);
+    final s = AppStrings(appLanguage);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
+    final userName = user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
+
+    final filteredGames = games.where((g) {
+      final intelligenceKey = g.intelligence;
+      final matchesFilter =
+          _gamesFilter == 'all' || intelligenceKey == _gamesFilter;
+      if (!matchesFilter) return false;
+      if (_gamesQuery.trim().isEmpty) return true;
+      final q = _gamesQuery.toLowerCase().trim();
+      return g.name.toLowerCase().contains(q) ||
+          g.area.toLowerCase().contains(q) ||
+          g.description.toLowerCase().contains(q);
+    }).toList();
+
+    // Tüm oyunların tam grid görünümü (Stitch benzeri tasarım)
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildGamesTabHeader(userName, isDarkMode, s),
+          const SizedBox(height: 16),
+          _buildGamesSearchBar(isDarkMode, s),
+          const SizedBox(height: 14),
+          _buildGamesFilterChips(isDarkMode, s),
+          const SizedBox(height: 18),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -853,27 +1537,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 16,
               mainAxisSpacing: 16,
-              childAspectRatio: 0.8,
+              childAspectRatio: 0.86,
             ),
-            itemCount: games.length,
+            itemCount: filteredGames.length,
             itemBuilder: (context, index) {
-              final game = games[index];
-              return GridGameCard(
-                gameId: game.id,
-                title: game.name,
-                area: game.area,
+              final game = filteredGames[index];
+              return _buildStitchGameCard(
+                context: context,
+                game: game,
                 isDarkMode: isDarkMode,
-                onTap: () {
-                  _showGameStartSheet(
-                    context: context,
-                    gameId: game.id,
-                    title: game.name,
-                    description: game.description.isNotEmpty
-                        ? game.description
-                        : game.area,
-                    isDarkMode: isDarkMode,
-                  );
-                },
               );
             },
           ),
@@ -882,168 +1554,84 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildPrimaryCtaButton(BuildContext context) {
-    final isDarkMode = ref.watch(themeProvider);
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 64,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const GameLauncherScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    isDarkMode ? const Color(0xFF1F2937) : const Color(0xFF4F46E5),
-                foregroundColor: Colors.white,
-                elevation: 8,
-                shadowColor:
-                    (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
-                        .withValues(alpha: 0.35),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                  side: isDarkMode
-                      ? const BorderSide(
-                          color: Color(0xFF818CF8),
-                          width: 1.2,
-                        )
-                      : BorderSide.none,
-                ),
-              ),
-              child: Center(
-                child: Text(
-                  s.startTodaysWorkout,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildGamesTabHeader(String userName, bool isDarkMode, AppStrings s) {
+    final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
-  Widget _buildExpandedProgressSection() {
-    final isDarkMode = ref.watch(themeProvider);
-    final statsAsync = ref.watch(userStatsProvider);
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text(
-          s.progressSectionTitle,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
-          ),
-        ),
-        const SizedBox(height: 16),
-        statsAsync.when(
-          data: (stats) {
-            final hasData = stats.values.any((value) => value > 0);
-            if (!hasData) {
+        GestureDetector(
+          onTap: () => _showAvatarPicker(context),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final selectedAvatar = ref.watch(avatarProvider);
+              final avatarData = AvatarData.getAvatar(selectedAvatar);
               return Container(
-                padding: const EdgeInsets.all(40),
+                width: 46,
+                height: 46,
                 decoration: BoxDecoration(
-                  color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isDarkMode
-                        ? const Color(0xFF374151)
-                        : const Color(0xFFE5E7EB),
-                    width: 1,
+                  gradient: LinearGradient(
+                    colors: avatarData['colors'] as List<Color>,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.show_chart_rounded,
-                        size: 48,
-                        color: isDarkMode
-                            ? Colors.grey[600]
-                            : Colors.grey[400],
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        s.noGamesYetTitle,
-                        style: GoogleFonts.poppins(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        s.noGamesYetSubtitle,
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Icon(
+                  avatarData['icon'] as IconData,
+                  color: Colors.white,
+                  size: 22,
                 ),
               );
-            }
-            return RadarChartWidget(
-              stats: stats,
-              isDarkMode: isDarkMode,
-              language: lang,
-            );
-          },
-          loading: () => Container(
-            height: 300,
-            decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isDarkMode
-                    ? const Color(0xFF374151)
-                    : const Color(0xFFE5E7EB),
-                width: 1,
-              ),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            },
           ),
-          error: (error, stack) => Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: isDarkMode
-                    ? const Color(0xFF374151)
-                    : const Color(0xFFE5E7EB),
-                width: 1,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                s.statsLoadFailed,
-                style: GoogleFonts.poppins(
-                  color: Colors.red,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                s.appName,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
                 ),
               ),
+              const SizedBox(height: 2),
+              Text(
+                '${s.dailyGoal}: 85%',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: subtitleColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+                spreadRadius: -8,
+              ),
+            ],
+          ),
+          child: IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: titleColor,
+              size: 22,
             ),
           ),
         ),
@@ -1051,6 +1639,242 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _buildGamesSearchBar(bool isDarkMode, AppStrings s) {
+    final bg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final hint = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
+    final text = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+            spreadRadius: -10,
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _gamesSearchController,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          color: text,
+        ),
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search_rounded, color: hint),
+          hintText: s.gamesSearchHint,
+          hintStyle: GoogleFonts.poppins(fontSize: 13, color: hint),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGamesFilterChips(bool isDarkMode, AppStrings s) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        _buildGamesChip(
+          filterKey: 'all',
+          label: s.gamesChipAll,
+          isDarkMode: isDarkMode,
+          accentColor: const Color(0xFF2563EB),
+        ),
+        ..._intelligenceKeys.map((key) {
+          return _buildGamesChip(
+            filterKey: key,
+            label: s.intelligenceLabel(key),
+            isDarkMode: isDarkMode,
+            accentColor: _getIntelligenceColor(key),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildGamesChip({
+    required String filterKey,
+    required String label,
+    required bool isDarkMode,
+    required Color accentColor,
+  }) {
+    final isActive = _gamesFilter == filterKey;
+    final activeBg = accentColor;
+    final inactiveBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final activeText = Colors.white;
+    final inactiveText = accentColor;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: () {
+          setState(() {
+            _gamesFilter = filterKey;
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+          decoration: BoxDecoration(
+            color: isActive ? activeBg : inactiveBg,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: accentColor.withOpacity(isActive ? 0.0 : (isDarkMode ? 0.55 : 0.45)),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.06),
+                blurRadius: 18,
+                offset: const Offset(0, 10),
+                spreadRadius: -12,
+              ),
+            ],
+          ),
+          child: Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isActive ? activeText : inactiveText,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getIntelligenceColor(String intelligenceKey) {
+    switch (intelligenceKey) {
+      case 'verbal':
+        return const Color(0xFF7C3AED); // purple
+      case 'logical':
+        return const Color(0xFF2563EB); // blue
+      case 'visual':
+        return const Color(0xFF0EA5E9); // sky
+      case 'bodily':
+        return const Color(0xFFF97316); // orange
+      case 'musical':
+        return const Color(0xFFEC4899); // pink
+      case 'social':
+        return const Color(0xFF10B981); // emerald
+      case 'intrapersonal':
+        return const Color(0xFF14B8A6); // teal
+      case 'naturalist':
+        return const Color(0xFF22C55E); // green
+      default:
+        return const Color(0xFF6B7280); // gray
+    }
+  }
+
+  Widget _buildStitchGameCard({
+    required BuildContext context,
+    required GameModel game,
+    required bool isDarkMode,
+  }) {
+    final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
+    final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
+    final iconData = _getGameIconData(game.id);
+    final icon = iconData['icon'] as IconData;
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+    final intelligenceKey = game.intelligence;
+    final intelLabel = s.intelligenceLabel(intelligenceKey).toUpperCase();
+    final intelColor = _getIntelligenceColor(intelligenceKey);
+
+    final tagBg = intelColor.withOpacity(isDarkMode ? 0.22 : 0.18);
+    final bottomText = game.area;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          _showGameStartSheet(
+            context: context,
+            gameId: game.id,
+            title: game.name,
+            description: game.description.isNotEmpty ? game.description : game.area,
+            isDarkMode: isDarkMode,
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+                spreadRadius: -12,
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: intelColor.withOpacity(isDarkMode ? 0.22 : 0.18),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: intelColor, size: 24),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                game.name,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                  height: 1.15,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: tagBg,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  intelLabel,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: intelColor,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                bottomText,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: subtitleColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _buildHeader(String userName) {
     final isDarkMode = ref.watch(themeProvider);

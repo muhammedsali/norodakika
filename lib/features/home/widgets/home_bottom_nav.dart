@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../settings/providers/language_provider.dart';
-import '../../../core/i18n/app_strings.dart';
 
 class HomeBottomNav extends StatelessWidget {
   final int selectedTab;
@@ -19,83 +17,53 @@ class HomeBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = AppStrings(language);
-    final homeLabel = s.navHome;
-    final gamesLabel = s.navGames;
-    final progressLabel = s.navProgress;
-    final settingsLabel = s.navSettings;
-
     return Container(
-      height: 80,
-      decoration: const BoxDecoration(color: Colors.transparent),
+      height: 95,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+
+        
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-          borderRadius: BorderRadius.circular(999),
-          border: isDarkMode
-              ? Border.all(
-                  color: const Color(0xFF4B5563),
-                  width: 1,
-                )
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.12),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: isDarkMode
+          ? const Color(0xFF1F2937) // Dark capsule
+          : const Color(0xFFE5E7EB), // Light capsule
+          borderRadius: BorderRadius.circular(40),
+
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildNavItem(Icons.home_rounded, homeLabel, selectedTab == 0, () {
-              onTabSelected(0);
-            }),
-            _buildNavItem(Icons.sports_esports_rounded, gamesLabel, selectedTab == 1, () {
-              onTabSelected(1);
-            }),
-            _buildNavItem(Icons.bar_chart_rounded, progressLabel, selectedTab == 2, () {
-              onTabSelected(2);
-            }),
-            _buildNavItem(Icons.settings_rounded, settingsLabel, selectedTab == 3, () {
-              onTabSelected(3);
-            }),
+            _navItem(Icons.home_rounded, 0),
+            _navItem(Icons.extension_rounded, 1),
+            _navItem(Icons.bar_chart_rounded, 2),
+            _navItem(Icons.person_rounded, 3),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(
-      IconData icon, String label, bool isSelected, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? const Color(0xFF4F46E5)
-                  : (isDarkMode ? Colors.white70 : const Color(0xFF4B5563)),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: GoogleFonts.spaceGrotesk(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: isSelected
-                    ? const Color(0xFF4F46E5)
-                    : (isDarkMode ? Colors.white70 : const Color(0xFF4B5563)),
-              ),
-            ),
-          ],
+  Widget _navItem(IconData icon, int index) {
+    final bool isActive = selectedTab == index;
+
+    return GestureDetector(
+      onTap: () => onTabSelected(index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: isActive
+              ?(isDarkMode ? const Color(0xFF374151) : Colors.white)
+              : Colors.transparent,
+        ),
+        child: Icon(
+          icon,
+          color: isActive
+              ? const Color(0xFF2563EB) // Mavi aktif icon
+              : const Color(0xFF94A3B8), // Pasif icon
+          size: 24,
         ),
       ),
     );

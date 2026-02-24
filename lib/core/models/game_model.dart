@@ -3,12 +3,14 @@ class GameModel {
   final String name;
   final String area;
   final String description;
+  final String intelligence;
 
   GameModel({
     required this.id,
     required this.name,
     required this.area,
     required this.description,
+    required this.intelligence,
   });
 
   factory GameModel.fromMap(Map<String, dynamic> map) {
@@ -17,6 +19,7 @@ class GameModel {
       name: map['name'] ?? '',
       area: map['area'] ?? '',
       description: map['description'] ?? '',
+      intelligence: map['intelligence'] ?? 'intrapersonal',
     );
   }
 
@@ -26,6 +29,7 @@ class GameModel {
       'name': name,
       'area': area,
       'description': description,
+      'intelligence': intelligence,
     };
   }
 }

@@ -22,6 +22,12 @@ import '../widgets/recall_phase_game.dart';
 import '../widgets/word_sprint_game.dart';
 import '../widgets/sequence_memory_game.dart';
 import '../widgets/odd_one_out_game.dart';
+import '../widgets/rhythm_match_game.dart';
+import '../widgets/emotion_mirror_game.dart';
+import '../widgets/nature_sort_game.dart';
+import '../widgets/balance_tap_game.dart';
+import '../widgets/route_builder_game.dart';
+import '../widgets/focus_checkin_game.dart';
 
 class GamePlayScreen extends ConsumerStatefulWidget {
   final GameModel game;
@@ -635,6 +641,36 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
           key: ValueKey('oddone_$_runId'),
           onComplete: _onGameComplete,
         );
+      case 'MUS01':
+        return RhythmMatchGame(
+          key: ValueKey('rhythm_$_runId'),
+          onComplete: _onGameComplete,
+        );
+      case 'SOC01':
+        return EmotionMirrorGame(
+          key: ValueKey('emotion_$_runId'),
+          onComplete: _onGameComplete,
+        );
+      case 'NAT01':
+        return NatureSortGame(
+          key: ValueKey('nature_$_runId'),
+          onComplete: _onGameComplete,
+        );
+      case 'KIN01':
+        return BalanceTapGame(
+          key: ValueKey('balance_$_runId'),
+          onComplete: _onGameComplete,
+        );
+      case 'SPA01':
+        return RouteBuilderGame(
+          key: ValueKey('route_$_runId'),
+          onComplete: _onGameComplete,
+        );
+      case 'INT01':
+        return FocusCheckInGame(
+          key: ValueKey('checkin_$_runId'),
+          onComplete: _onGameComplete,
+        );
       default:
         return Center(
           child: Column(
@@ -735,6 +771,42 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
           'icon': Icons.speed,
           'gradient': [Color(0xFF06B6D4), Color(0xFF0891B2)],
           'emoji': '💨',
+        };
+      case 'MUS01':
+        return {
+          'icon': Icons.music_note,
+          'gradient': [Color(0xFFF59E0B), Color(0xFFD97706)],
+          'emoji': '🎵',
+        };
+      case 'SOC01':
+        return {
+          'icon': Icons.emoji_emotions,
+          'gradient': [Color(0xFFEC4899), Color(0xFFDB2777)],
+          'emoji': '🙂',
+        };
+      case 'NAT01':
+        return {
+          'icon': Icons.nature,
+          'gradient': [Color(0xFF10B981), Color(0xFF059669)],
+          'emoji': '🌿',
+        };
+      case 'KIN01':
+        return {
+          'icon': Icons.sports_martial_arts,
+          'gradient': [Color(0xFF3B82F6), Color(0xFF2563EB)],
+          'emoji': '⚖️',
+        };
+      case 'SPA01':
+        return {
+          'icon': Icons.route,
+          'gradient': [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+          'emoji': '🧭',
+        };
+      case 'INT01':
+        return {
+          'icon': Icons.self_improvement,
+          'gradient': [Color(0xFF06B6D4), Color(0xFF0891B2)],
+          'emoji': '🧘',
         };
       default:
         return {

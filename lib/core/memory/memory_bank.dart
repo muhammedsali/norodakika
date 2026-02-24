@@ -18,73 +18,127 @@ class MemoryBank {
       "id": "REF01",
       "name": "Reflex Tap",
       "area": "Refleks",
+      "intelligence": "bodily",
       "description": "Tepki süresi ölçümü + Go/No-Go mekanizması."
     },
     {
       "id": "REF02",
       "name": "Reflex Dash",
       "area": "Refleks",
+      "intelligence": "bodily",
       "description": "Şeritler üzerinde kayan hedeflere hızlı tepki."
     },
     {
       "id": "ATT01",
       "name": "Stroop Tap",
       "area": "Dikkat",
+      "intelligence": "intrapersonal",
       "description": "Renk-kelime uyumsuzluğu ile dikkat testi."
     },
     {
       "id": "ATT02",
       "name": "Focus Line",
       "area": "Dikkat + Görsel Algı",
+      "intelligence": "visual",
       "description": "Yatay çizgi üzerindeki hedef renk noktalara odaklanma."
     },
     {
       "id": "MEM01",
       "name": "N-Back Mini",
       "area": "Hafıza + Dikkat",
+      "intelligence": "intrapersonal",
       "description": "Çalışan bellek testi (1-back / 2-back)."
     },
     {
       "id": "LOG01",
       "name": "Logic Puzzle",
       "area": "Mantık + Görsel Algı",
+      "intelligence": "logical",
       "description": "Mantık dizisi çözme + görsel algı."
     },
     {
       "id": "NUM01",
       "name": "Quick Math",
       "area": "Sayısal Zeka",
+      "intelligence": "logical",
       "description": "Zaman baskılı mental aritmetik."
     },
     {
       "id": "MEM02",
       "name": "Memory Board",
       "area": "Hafıza + Görsel Algı",
+      "intelligence": "visual",
       "description": "Kart eşleştirme + görsel hafıza."
     },
     {
       "id": "MEM03",
       "name": "Recall Phase",
       "area": "Dil + Hafıza",
+      "intelligence": "verbal",
       "description": "Kelime gösterim ve hatırlama testi."
     },
     {
       "id": "MEM04",
       "name": "Sequence Echo",
       "area": "Hafıza + Dikkat",
+      "intelligence": "musical",
       "description": "Gösterilen hücre sırasını aynen tekrar et."
     },
     {
       "id": "VIS02",
       "name": "Odd One Out",
       "area": "Görsel Algı + Dikkat",
+      "intelligence": "visual",
       "description": "Farklı kartı hızlıca bulma oyunu."
     },
     {
       "id": "LANG02",
       "name": "Word Sprint",
       "area": "Dil",
+      "intelligence": "verbal",
       "description": "Gerçek ve uydurma kelimeleri ayırt etme oyunu."
+    },
+    {
+      "id": "MUS01",
+      "name": "Rhythm Match",
+      "area": "Dikkat + Refleks",
+      "intelligence": "musical",
+      "description": "Ritmi tekrar et: kısa ses/ritim dizilerini doğru sırayla yakala."
+    },
+    {
+      "id": "SOC01",
+      "name": "Emotion Mirror",
+      "area": "Dil + Dikkat",
+      "intelligence": "social",
+      "description": "Duygu ifadelerini eşleştir: hızlı karar + sosyal ipuçlarını ayırt etme."
+    },
+    {
+      "id": "NAT01",
+      "name": "Nature Sort",
+      "area": "Mantık + Görsel Algı",
+      "intelligence": "naturalist",
+      "description": "Doğa temalı nesneleri kategorilere ayır: örüntü tanıma ve sınıflandırma."
+    },
+    {
+      "id": "KIN01",
+      "name": "Balance Tap",
+      "area": "Refleks",
+      "intelligence": "bodily",
+      "description": "Dengeyi koru: ekranın iki yanına hızlı ve dengeli dokunuşlarla hedefi ortada tut."
+    },
+    {
+      "id": "SPA01",
+      "name": "Route Builder",
+      "area": "Mantık + Görsel Algı",
+      "intelligence": "visual",
+      "description": "En kısa yolu kur: ızgara üzerinde engelleri aşarak rota planla."
+    },
+    {
+      "id": "INT01",
+      "name": "Focus Check-In",
+      "area": "Dikkat",
+      "intelligence": "intrapersonal",
+      "description": "Kısa odak check-in: dikkatini toparla ve gün içi mini hedefi tamamla."
     }
   ];
 

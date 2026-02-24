@@ -173,6 +173,75 @@ class AppStrings {
   String taskProgressLabel(int current, int total) =>
       isEn ? 'Task: $current/$total' : 'Görev: $current/$total';
 
+  // Home - Stitch home UI
+  String get homeWelcomeBack => isEn ? 'WELCOME BACK,' : 'TEKRAR HOŞ GELDİN,';
+  String get homeDailyProgress => isEn ? 'DAILY PROGRESS' : 'GÜNLÜK İLERLEME';
+  String get homeDailyGoalTitle => isEn ? 'Daily Goal' : 'Günlük Hedef';
+  String dailyGoalCompleted(int completed, int planned) => isEn
+      ? '$completed of $planned games completed today'
+      : 'Bugün $planned oyundan $completed tanesi tamamlandı';
+  String get homeViewDetails => isEn ? 'VIEW DETAILS' : 'DETAYLARI GÖR';
+  String get homeUpNext => isEn ? 'UP NEXT' : 'SIRADAKİ';
+  String get homeInsights => isEn ? 'INSIGHTS' : 'İÇGÖRÜLER';
+  String get homeStartTraining => isEn ? 'Start Training' : 'Antrenmana Başla';
+  String get homeMinutesShort => isEn ? 'MIN' : 'DK';
+
+  // Games tab - Stitch games UI
+  String get gamesSearchHint => isEn ? 'Search games...' : 'Oyun ara...';
+  String get gamesChipAll => isEn ? 'All' : 'Tümü';
+
+  // Legacy chips (backward compatibility)
+  String get gamesChipMemory => isEn ? 'Memory' : 'Hafıza';
+  String get gamesChipLogic => isEn ? 'Logic' : 'Mantık';
+  String get gamesChipSpeed => isEn ? 'Speed' : 'Hız';
+
+  // Games tab - Gardner 8 filters
+  String get intelVerbal => isEn ? 'Verbal' : 'Sözel';
+  String get intelLogical => isEn ? 'Logical' : 'Mantıksal';
+  String get intelVisual => isEn ? 'Visual' : 'Görsel';
+  String get intelBodily => isEn ? 'Bodily' : 'Bedensel';
+  String get intelMusical => isEn ? 'Musical' : 'Müziksel';
+  String get intelSocial => isEn ? 'Social' : 'Sosyal';
+  String get intelIntrapersonal => isEn ? 'Inner' : 'İçsel';
+  String get intelNaturalist => isEn ? 'Nature' : 'Doğacı';
+
+  // Games tab - tags & card meta
+  String get tagMemory => isEn ? 'MEMORY' : 'HAFIZA';
+  String get tagLogic => isEn ? 'LOGIC' : 'MANTIK';
+  String get tagSpeed => isEn ? 'SPEED' : 'HIZ';
+  String get tagAttention => isEn ? 'ATTENTION' : 'DİKKAT';
+
+  String intelligenceLabel(String intelligenceKey) {
+    switch (intelligenceKey) {
+      case 'verbal':
+        return intelVerbal;
+      case 'logical':
+        return intelLogical;
+      case 'visual':
+        return intelVisual;
+      case 'bodily':
+        return intelBodily;
+      case 'musical':
+        return intelMusical;
+      case 'social':
+        return intelSocial;
+      case 'intrapersonal':
+        return intelIntrapersonal;
+      case 'naturalist':
+        return intelNaturalist;
+      default:
+        return intelIntrapersonal;
+    }
+  }
+  String get metaLast => isEn ? 'Last' : 'Son';
+  String get metaScore => isEn ? 'Score' : 'Skor';
+  String get metaLevel => isEn ? 'Level' : 'Seviye';
+  String get metaStreak => isEn ? 'Streak' : 'Seri';
+
+  // Insights card
+  String get cognitiveScore => isEn ? 'Cognitive Score' : 'Bilişsel Skor';
+  String get globalPts => isEn ? 'GLOBAL PTS' : 'GLOBAL PUAN';
+
   String avatarLabel(String avatarNameTr) {
     if (!isEn) return avatarNameTr;
     switch (avatarNameTr) {
