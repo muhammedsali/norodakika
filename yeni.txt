@@ -1,0 +1,53 @@
+Yeni proje
+
+Kullanılan yazılımlar / paketler (bu projeden):
+
+Kullanılan diller / formatlar
+- Dart (Flutter uygulama kodu)
+- YAML (pubspec.yaml ve proje konfig)
+
+Flutter / Dart
+- Flutter SDK
+- Dart SDK: >=3.0.0 <4.0.0
+
+State management
+- flutter_riverpod: ^2.5.1
+
+HTTP / API
+- http: ^1.2.0
+- dio: ^5.4.0
+
+Firebase (Auth + Firestore)
+- firebase_core: ^2.24.2
+- firebase_auth: ^4.16.0
+- cloud_firestore: ^4.14.0
+
+Google giriş
+- google_sign_in: ^7.2.0
+
+UI / Tasarım
+- fl_chart: ^0.66.0
+- google_fonts: ^6.1.0
+- font_awesome_flutter: ^10.7.0
+
+Utils
+- shared_preferences: ^2.2.2
+- intl: ^0.19.0
+- uuid: ^4.2.1
+
+Audio
+- audioplayers: ^5.2.1
+
+Dev / Tooling
+- flutter_lints: ^3.0.1
+- flutter_launcher_icons: ^0.13.1
+
+Asset klasörleri
+- assets/images/
+- assets/icons/
+- assets/games/
+- assets/sounds/
+
+Notlar
+- Firebase için yeni projede de "flutterfire configure" çalıştırıp platform dosyalarını üretmen gerekir.
+- Launcher icon ayarı: min_sdk_android: 21, ikon dosyaları assets/icons/ altında.
