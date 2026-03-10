@@ -138,6 +138,14 @@ class AppStrings {
       : 'Uygulama dilini değiştir.';
   String get languageTurkish => isEn ? 'Turkish' : 'Türkçe';
   String get languageEnglish => 'English';
+  String get soundTitle => isEn ? 'Sound Effects' : 'Ses Efektleri';
+  String get soundSubtitle => isEn
+      ? 'Enable or disable game sounds.'
+      : 'Oyun seslerini aç veya kapat.';
+  String get notificationTitle => isEn ? 'Notifications' : 'Bildirimler';
+  String get notificationSubtitle => isEn
+      ? 'Daily reminders and updates.'
+      : 'Günlük hatırlatmalar ve güncellemeler.';
   String get accountSectionTitle => isEn ? 'Account & Progress' : 'Hesap ve İlerleme';
   String get profileAndAccountTitle => isEn ? 'Profile & Account' : 'Profil ve Hesap';
   String get profileAndAccountSubtitle => isEn
@@ -151,6 +159,24 @@ class AppStrings {
   String get progressAndStatsSubtitle => isEn
       ? 'Radar chart and detailed performance.'
       : 'Radar grafiği ve detaylı performansın.';
+  String get clearDataTitle => isEn ? 'Clear Local Data' : 'Yerel Veriyi Temizle';
+  String get clearDataSubtitle => isEn
+      ? 'Delete cached game data and settings.'
+      : 'Önbellekteki oyun verilerini ve ayarları sil.';
+  String get clearDataConfirm => isEn
+      ? 'Are you sure? This will delete all local data.'
+      : 'Emin misin? Tüm yerel veriler silinecek.';
+  String get clearDataSuccess => isEn
+      ? 'Local data cleared successfully'
+      : 'Yerel veriler başarıyla temizlendi';
+  String get deleteAccountTitle => isEn ? 'Delete Account' : 'Hesabı Sil';
+  String get deleteAccountSubtitle => isEn
+      ? 'Permanently delete your account and all data.'
+      : 'Hesabını ve tüm verilerini kalıcı olarak sil.';
+  String get deleteAccountConfirm => isEn
+      ? 'This action cannot be undone. Are you sure?'
+      : 'Bu işlem geri alınamaz. Emin misin?';
+  String get versionTitle => isEn ? 'Version' : 'Sürüm';
   String get aboutTitle => isEn ? 'About Norodakika' : 'NöroDakika Hakkında';
   String get aboutText => isEn
       ? 'Track and improve your cognitive skills with short, science-based mini games. This version is an MVP.'

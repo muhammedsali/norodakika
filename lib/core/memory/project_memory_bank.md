@@ -312,6 +312,7 @@ Bu projede yayın/ürün kontrolü için her zeka türü en az 1 oyunla ilişkil
 - İstatistik ekranı
 - Android yapılandırması
 - TR/EN dil desteği (AppStrings + languageProvider)
+- **Ayarlar ekranı (SettingsScreen)** - Tema, dil, ses/bildirim ayarları, profil bağlantıları, çıkış/veri temizleme
 
 ### 🚧 Devam Eden
 - Oyun iyileştirmeleri ve dengeleme (difficulty/result standardizasyonu)
@@ -319,10 +320,9 @@ Bu projede yayın/ürün kontrolü için her zeka türü en az 1 oyunla ilişkil
 
 ### 📅 Planlanan
 - iOS yapılandırması
-- Ayarlar ekranı
-- Bildirimler
+- Bildirimler (push notification entegrasyonu)
 - Testler
 
 ---
 
-*Son güncelleme: 2026-02-24*
+*Son güncelleme: 2026-03-10*
