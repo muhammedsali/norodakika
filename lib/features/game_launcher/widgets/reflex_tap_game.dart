@@ -160,17 +160,15 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
       _isTargetVisible = false;
     });
 
-    if (widget.onComplete != null) {
-      final durationSeconds = gameDuration;
-      final successRate = _totalTaps == 0 ? 0.0 : _correctTaps / _totalTaps;
+    final durationSeconds = gameDuration;
+    final successRate = _totalTaps == 0 ? 0.0 : _correctTaps / _totalTaps;
 
-      widget.onComplete({
-        'score': _score.toDouble(),
-        'successRate': successRate,
-        'duration': durationSeconds,
-      });
+    widget.onComplete({
+      'score': _score.toDouble(),
+      'successRate': successRate,
+      'duration': durationSeconds,
+    });
     }
-  }
 
   void _scheduleNextTarget() {
     if (_timeRemaining <= 0 || _isPaused || !mounted) return;
@@ -381,13 +379,13 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
         ],
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.1),
+          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
@@ -466,7 +464,7 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
                 boxShadow: _isTargetVisible
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF10B981).withOpacity(_glowAnimation.value),
+                          color: const Color(0xFF10B981).withValues(alpha: _glowAnimation.value),
                           blurRadius: 50,
                           spreadRadius: 10,
                         )
@@ -517,7 +515,7 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
             blurRadius: 40,
           )
         ],

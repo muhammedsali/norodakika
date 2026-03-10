@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../../settings/providers/language_provider.dart';
@@ -78,6 +79,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
     }
   }
+
+  Future<void> _handleGoogleSignIn() async {
+    await ref.read(authNotifierProvider.notifier).signInWithGoogle();
+
+    if (!mounted) return;
+    final authState = ref.read(authNotifierProvider);
+    authState.when(
+      data: (_) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthGateScreen()),
+          (route) => false,
+        );
+      },
+      loading: () {},
+      error: (error, _) {
+        final lang = ref.read(languageProvider);
+        final s = AppStrings(lang);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${s.googleLoginErrorPrefix}: $error')),
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -389,6 +414,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                                     fontWeight: FontWeight.w600,
                                                   ),
                                                 ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 24),
+                                      child: Text(
+                                        s.googleSignIn,
+                                        textAlign: TextAlign.center,
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white70,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 44,
+                                      child: OutlinedButton(
+                                        onPressed: authState.isLoading
+                                            ? null
+                                            : _handleGoogleSignIn,
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF544A56),
+                                          side: const BorderSide(
+                                            color: Color(0xFFABA4AD),
+                                            width: 2,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        child: const FaIcon(
+                                          FontAwesomeIcons.google,
+                                          size: 20,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),

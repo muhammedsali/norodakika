@@ -173,7 +173,7 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.15),
+                                      color: Colors.black.withValues(alpha: 0.15),
                                       blurRadius: 12,
                                       offset: const Offset(0, 6),
                                     )
@@ -276,12 +276,12 @@ class _ActionButton extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [color, color.withOpacity(0.85)],
+              colors: [color, color.withValues(alpha: 0.85)],
             ),
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.25),
+                color: color.withValues(alpha: 0.25),
                 blurRadius: 18,
                 offset: const Offset(0, 10),
               ),

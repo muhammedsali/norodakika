@@ -167,19 +167,19 @@ Kısa teknik özet:
 
 ### 🎨 UI/UX İyileştirmeleri
 - [ ] Oyun kartları için görseller eklenecek
-- [ ] Animasyonlar eklenecek
-- [ ] Loading state'leri iyileştirilecek
+- [x] Animasyonlar eklenecek
+- [x] Loading state'leri iyileştirilecek
 - [ ] Error handling UI'ları eklenecek
-- [ ] Empty state'ler eklenecek
-- [ ] Splash screen oluşturulacak
+- [x] Empty state'ler eklenecek
+- [x] Splash screen oluşturulacak
 - [ ] App icon tasarlanacak
-- [ ] Oyun sonu ekranları iyileştirilecek
+- [x] Oyun sonu ekranları iyileştirilecek
 
 ### 📊 İstatistikler ve Analitik
-- [ ] Detaylı istatistik ekranları eklenecek
-- [ ] Geçmiş performans grafikleri eklenecek
-- [ ] Kategori bazlı analizler eklenecek
-- [ ] Kullanıcı ilerleme takibi iyileştirilecek
+- [x] Detaylı istatistik ekranları eklenecek
+- [x] Geçmiş performans grafikleri eklenecek
+- [x] Kategori bazlı analizler eklenecek
+- [x] Kullanıcı ilerleme takibi iyileştirilecek
 - [ ] Haftalık/aylık raporlar
 
 ### 🔔 Bildirimler
@@ -189,13 +189,13 @@ Kısa teknik özet:
 - [ ] Local notification sistemi
 
 ### ⚙️ Ayarlar
-- [ ] Ayarlar ekranı oluşturulacak
+- [x] Ayarlar ekranı oluşturulacak
 - [ ] Bildirim ayarları
 - [ ] Ses ayarları
-- [ ] Tema ayarları (dark mode)
-- [ ] Dil seçenekleri
-- [ ] Veri sıfırlama
-- [ ] Hesap silme
+- [x] Tema ayarları (dark mode)
+- [x] Dil seçenekleri
+- [x] Veri sıfırlama
+- [x] Hesap silme
 
 ### 💾 Veri Yönetimi
 - [ ] Veri export/import özelliği

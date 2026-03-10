@@ -4,8 +4,13 @@ import 'dart:async';
 
 class MemoryBoardGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const MemoryBoardGame({super.key, required this.onComplete});
+  const MemoryBoardGame({
+    super.key, 
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<MemoryBoardGame> createState() => _MemoryBoardGameState();
@@ -37,7 +42,21 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   void initState() {
     super.initState();
     _initializeGame();
-    _startTimer();
+    if (!widget.isPaused) {
+      _startTimer();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant MemoryBoardGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+      } else {
+        _startTimer();
+      }
+    }
   }
 
   @override
@@ -77,7 +96,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   }
 
   void _handleCardTap(int index) {
-    if (_isProcessing || _gameCards[index].isFlipped || _gameCards[index].isMatched) {
+    if (widget.isPaused || _isProcessing || _gameCards[index].isFlipped || _gameCards[index].isMatched) {
       return;
     }
 
@@ -165,7 +184,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -198,10 +217,10 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: accentColor.withOpacity(0.1),
+                        color: accentColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: accentColor.withOpacity(0.3),
+                          color: accentColor.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Row(
@@ -260,7 +279,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: accentColor.withOpacity(isDark ? 0.2 : 0.1),
+                    color: accentColor.withValues(alpha: isDark ? 0.2 : 0.1),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -299,8 +318,8 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
           boxShadow: [
             BoxShadow(
               color: item.isFlipped 
-                ? Colors.black.withOpacity(isDark ? 0.2 : 0.05) 
-                : accentColor.withOpacity(0.4),
+                ? Colors.black.withValues(alpha: isDark ? 0.2 : 0.05) 
+                : accentColor.withValues(alpha: 0.4),
               blurRadius: item.isFlipped ? 5 : 10,
               offset: item.isFlipped ? const Offset(0, 2) : const Offset(0, 6),
             ),
@@ -318,7 +337,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
                   style: GoogleFonts.spaceGrotesk(
                     fontSize: 28,
                     fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
         ),
@@ -330,7 +349,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 20, color: color.withOpacity(0.8)),
+        Icon(icon, size: 20, color: color.withValues(alpha: 0.8)),
         const SizedBox(height: 4),
         Text(
           value,

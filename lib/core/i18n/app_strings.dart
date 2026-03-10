@@ -20,11 +20,13 @@ class AppStrings {
   String get onboardingWelcomeText => isEn
       ? 'Norodakika helps you train your mind with short, focused mini games.'
       : 'NöroDakika, kısa mini oyunlarla zihnini antrenman yapman için tasarlandı.';
-  String get onboardingDailyTitle => isEn ? 'Today\'s Workout' : 'Günün Antrenmanı';
+  String get onboardingDailyTitle =>
+      isEn ? 'Today\'s Workout' : 'Günün Antrenmanı';
   String get onboardingDailyText => isEn
       ? 'Use the purple button on the home screen to start your daily plan.'
       : 'Ana ekrandaki mor butondan bugün için önerilen oyun planını başlatabilirsin.';
-  String get onboardingProgressTitle => isEn ? 'Track Progress' : 'İlerleme Takibi';
+  String get onboardingProgressTitle =>
+      isEn ? 'Track Progress' : 'İlerleme Takibi';
   String get onboardingProgressText => isEn
       ? 'See your radar chart and daily summary on the Progress tab.'
       : 'Alt barda İlerleme sekmesinden radar grafiği ve günlük özetini görebilirsin.';
@@ -33,15 +35,17 @@ class AppStrings {
   String get onboardingStart => isEn ? 'Start' : 'Başla';
 
   // Welcome
-  String get welcomeSubtitle =>
-      isEn ? 'Mini games that sharpen your mind' : 'Zihnini geliştiren mini oyunlar';
+  String get welcomeSubtitle => isEn
+      ? 'Mini games that sharpen your mind'
+      : 'Zihnini geliştiren mini oyunlar';
   String get gamesTitle => isEn ? 'Games' : 'Oyunlar';
   String get letsPlay => isEn ? 'Let\'s Play' : 'Hadi Oynayalım';
   String get loginRequiredTitle => isEn ? 'Sign in' : 'Giriş Yapın';
   String get loginRequiredText => isEn
       ? 'You need to sign in to play games and track your progress.'
       : 'Oyunları oynamak ve ilerlemenizi takip etmek için giriş yapmanız gerekiyor.';
-  String get loginOrRegister => isEn ? 'Sign in / Sign up' : 'Giriş Yap / Üye Ol';
+  String get loginOrRegister =>
+      isEn ? 'Sign in / Sign up' : 'Giriş Yap / Üye Ol';
 
   // Splash
   String get splashTagline => isEn
@@ -59,13 +63,13 @@ class AppStrings {
   String get emailRequired => isEn ? 'Email is required' : 'E-posta gerekli';
   String get emailInvalid =>
       isEn ? 'Enter a valid email' : 'Geçerli bir e-posta girin';
-  String get passwordRequired => isEn ? 'Password is required' : 'Şifre gerekli';
+  String get passwordRequired =>
+      isEn ? 'Password is required' : 'Şifre gerekli';
   String get passwordMinLength => isEn
       ? 'Password must be at least 6 characters'
       : 'Şifre en az 6 karakter olmalı';
   String get loginButton => isEn ? 'Sign In' : 'Giriş Yap';
-  String get googleSignUp =>
-      isEn ? 'Sign up with Google' : 'Google ile üye ol';
+  String get googleSignUp => isEn ? 'Sign up with Google' : 'Google ile üye ol';
   String get googleSignIn =>
       isEn ? 'Sign in with Google' : 'Google ile giriş yap';
   String get noAccountRegister =>
@@ -73,8 +77,7 @@ class AppStrings {
 
   // Register
   String get registerTitle => isEn ? 'Sign Up' : 'Kayıt Ol';
-  String get confirmPasswordLabel =>
-      isEn ? 'Confirm Password' : 'Şifre Tekrar';
+  String get confirmPasswordLabel => isEn ? 'Confirm Password' : 'Şifre Tekrar';
   String get confirmPasswordRequired =>
       isEn ? 'Confirmation is required' : 'Şifre tekrarı gerekli';
   String get passwordsDontMatch =>
@@ -98,10 +101,12 @@ class AppStrings {
       : '$gamesCount oyun, yaklaşık $totalMinutes dk';
   String get noGamesToday =>
       isEn ? 'You haven\'t played today yet' : 'Bugün henüz oyun oynamadın';
-  String get noGamesWeek =>
-      isEn ? 'You haven\'t played this week yet' : 'Bu hafta henüz oyun oynamadın';
-  String get noGamesMonth =>
-      isEn ? 'You haven\'t played this month yet' : 'Bu ay henüz oyun oynamadın';
+  String get noGamesWeek => isEn
+      ? 'You haven\'t played this week yet'
+      : 'Bu hafta henüz oyun oynamadın';
+  String get noGamesMonth => isEn
+      ? 'You haven\'t played this month yet'
+      : 'Bu ay henüz oyun oynamadın';
   String get noDataForPeriod =>
       isEn ? 'No data for the selected period' : 'Seçilen dönemde veri yok';
 
@@ -133,21 +138,21 @@ class AppStrings {
       ? 'A darker theme that\'s easier on your eyes at night.'
       : 'Geceleri gözünü yormayan koyu tema.';
   String get languageTitle => isEn ? 'Language' : 'Dil';
-  String get languageSubtitle => isEn
-      ? 'Change the app language.'
-      : 'Uygulama dilini değiştir.';
+  String get languageSubtitle =>
+      isEn ? 'Change the app language.' : 'Uygulama dilini değiştir.';
   String get languageTurkish => isEn ? 'Turkish' : 'Türkçe';
   String get languageEnglish => 'English';
   String get soundTitle => isEn ? 'Sound Effects' : 'Ses Efektleri';
-  String get soundSubtitle => isEn
-      ? 'Enable or disable game sounds.'
-      : 'Oyun seslerini aç veya kapat.';
+  String get soundSubtitle =>
+      isEn ? 'Enable or disable game sounds.' : 'Oyun seslerini aç veya kapat.';
   String get notificationTitle => isEn ? 'Notifications' : 'Bildirimler';
   String get notificationSubtitle => isEn
       ? 'Daily reminders and updates.'
       : 'Günlük hatırlatmalar ve güncellemeler.';
-  String get accountSectionTitle => isEn ? 'Account & Progress' : 'Hesap ve İlerleme';
-  String get profileAndAccountTitle => isEn ? 'Profile & Account' : 'Profil ve Hesap';
+  String get accountSectionTitle =>
+      isEn ? 'Account & Progress' : 'Hesap ve İlerleme';
+  String get profileAndAccountTitle =>
+      isEn ? 'Profile & Account' : 'Profil ve Hesap';
   String get profileAndAccountSubtitle => isEn
       ? 'Edit your user info and goals.'
       : 'Kullanıcı bilgilerini ve hedeflerini düzenle.';
@@ -155,11 +160,13 @@ class AppStrings {
   String get dayPlanSubtitle => isEn
       ? 'See today\'s workout cards.'
       : 'Bugünkü antrenman kartlarını gör.';
-  String get progressAndStatsTitle => isEn ? 'Progress & Stats' : 'İlerleme ve İstatistikler';
+  String get progressAndStatsTitle =>
+      isEn ? 'Progress & Stats' : 'İlerleme ve İstatistikler';
   String get progressAndStatsSubtitle => isEn
       ? 'Radar chart and detailed performance.'
       : 'Radar grafiği ve detaylı performansın.';
-  String get clearDataTitle => isEn ? 'Clear Local Data' : 'Yerel Veriyi Temizle';
+  String get clearDataTitle =>
+      isEn ? 'Clear Local Data' : 'Yerel Veriyi Temizle';
   String get clearDataSubtitle => isEn
       ? 'Delete cached game data and settings.'
       : 'Önbellekteki oyun verilerini ve ayarları sil.';
@@ -183,19 +190,23 @@ class AppStrings {
       : 'Zihinsel becerilerini kısa, bilimsel mini oyunlarla takip et ve geliştir. Bu sürüm MVP aşamasındadır.';
 
   // Home - misc dialogs
-  String get chooseAvatarTitle => isEn ? 'Choose Profile Picture' : 'Profil Resmi Seç';
+  String get chooseAvatarTitle =>
+      isEn ? 'Choose Profile Picture' : 'Profil Resmi Seç';
   String get howToPlay => isEn ? 'How to Play?' : 'Nasıl Oynanır?';
   String get startGame => isEn ? 'Start Game' : 'Oyunu Başlat';
   String get approxTwoThreeMinutes => isEn ? '~2-3 minutes' : '~2-3 dakika';
 
   // Home - main UI
-  String get startTodaysWorkout => isEn ? 'Start: Today\'s Workout' : 'Başla: Günün Antrenmanı';
+  String get startTodaysWorkout =>
+      isEn ? 'Start: Today\'s Workout' : 'Başla: Günün Antrenmanı';
   String get progressSectionTitle => isEn ? 'Progress' : 'İlerleme';
-  String get noGamesYetTitle => isEn ? 'You haven\'t played yet' : 'Henüz oyun oynamadın';
+  String get noGamesYetTitle =>
+      isEn ? 'You haven\'t played yet' : 'Henüz oyun oynamadın';
   String get noGamesYetSubtitle => isEn
       ? 'Once you start playing, your progress chart will appear here.'
       : 'Oyun oynamaya başlayınca ilerleme grafin burada görünecek';
-  String get statsLoadFailed => isEn ? 'Failed to load data' : 'Veriler yüklenemedi';
+  String get statsLoadFailed =>
+      isEn ? 'Failed to load data' : 'Veriler yüklenemedi';
   String taskProgressLabel(int current, int total) =>
       isEn ? 'Task: $current/$total' : 'Görev: $current/$total';
 
@@ -259,6 +270,7 @@ class AppStrings {
         return intelIntrapersonal;
     }
   }
+
   String get metaLast => isEn ? 'Last' : 'Son';
   String get metaScore => isEn ? 'Score' : 'Skor';
   String get metaLevel => isEn ? 'Level' : 'Seviye';
@@ -291,13 +303,16 @@ class AppStrings {
   // Game play
   String get gameCompleted => isEn ? 'Game completed' : 'Oyun tamamlandı';
   String get successRate => isEn ? 'Success rate' : 'Başarı oranı';
-  String durationSeconds(int seconds) => isEn ? 'Time: $seconds s' : 'Süre: $seconds sn';
+  String durationSeconds(int seconds) =>
+      isEn ? 'Time: $seconds s' : 'Süre: $seconds sn';
   String get backToHome => isEn ? 'Back to home' : 'Ana ekrana dön';
-  String get exitGameTitle => isEn ? 'Do you want to exit the game?' : 'Oyundan çıkmak istiyor musun?';
+  String get exitGameTitle =>
+      isEn ? 'Do you want to exit the game?' : 'Oyundan çıkmak istiyor musun?';
   String get exitGameText => isEn
       ? 'Your progress is saved (if available), but you will end this game now.'
       : 'İlerleyişin kaydedildi (varsa) fakat bu oyunu şimdi sonlandıracaksın.';
-  String get comingSoon => isEn ? 'This game will be added soon!' : 'Bu oyun yakında eklenecek!';
+  String get comingSoon =>
+      isEn ? 'This game will be added soon!' : 'Bu oyun yakında eklenecek!';
 
   // Generic
   String errorPrefix(Object error) => isEn ? 'Error: $error' : 'Hata: $error';

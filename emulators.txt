@@ -1,0 +1,12 @@
+1 available emulator:
+
+Id                    ??? Name                  ??? Manufacturer ??? Platform
+
+Medium_Phone_API_36.0 ??? Medium Phone API 36.0 ??? Generic      ??? android
+
+To run an emulator, run 'flutter emulators --launch <emulator id>'.
+To create a new emulator, run 'flutter emulators --create [--name xyz]'.
+
+You can find more information on managing emulators at the links below:
+  https://developer.android.com/studio/run/managing-avds
+  https://developer.android.com/studio/command-line/avdmanager

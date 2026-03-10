@@ -11,8 +11,13 @@ import 'package:google_fonts/google_fonts.dart';
 /// Can, seri ve süre takibi ile gerçek oyun hissi.
 class RecallPhaseGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const RecallPhaseGame({super.key, required this.onComplete});
+  const RecallPhaseGame({
+    super.key,
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<RecallPhaseGame> createState() => _RecallPhaseGameState();
@@ -47,32 +52,103 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
   int _missed = 0;
 
   DateTime? _startTime;
+  Duration _elapsedDuration = Duration.zero;
+  DateTime? _pauseStartTime;
 
   @override
   void initState() {
     super.initState();
     _buildPool();
-    _startGame();
+    _resetState();
+    _startMemorizePhase();
+    if (widget.isPaused) {
+      _pauseStartTime = DateTime.now();
+      _phaseTimer?.cancel();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant RecallPhaseGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _phaseTimer?.cancel();
+        _pauseStartTime = DateTime.now();
+      } else {
+        if (_pauseStartTime != null) {
+          _elapsedDuration += DateTime.now().difference(_pauseStartTime!);
+          _pauseStartTime = null;
+        }
+        if (!_isFinished) {
+          _startPhaseTimer();
+        }
+      }
+    }
+  }
+
+  void _startPhaseTimer() {
+    _phaseTimer?.cancel();
+    _phaseTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted || _isFinished) return;
+      setState(() {
+        _timeRemaining--;
+      });
+      if (_timeRemaining <= 0) {
+        if (_isMemorize) {
+          _startRecallPhase();
+        } else {
+          _finish();
+        }
+      }
+    });
   }
 
   void _buildPool() {
     // Çeşitli tema karışımı
     const bank = [
-      'Okyanus', 'Galaksi', 'Dağ', 'Orman', 'Vadi', 'Çöl', 'Ada', 'Volkan',
-      'Ritim', 'Kadans', 'Melodi', 'Armoni', 'Tempo', 'Senfoni',
-      'Kahve', 'Çay', 'Tarçın', 'Nane', 'Limon', 'Bal',
-      'Kuantum', 'Foton', 'Plazma', 'Nötron', 'Atom', 'Molekül',
-      'Rüzgar', 'Yağmur', 'Şimşek', 'Gökkuşağı', 'Pus', 'Dalgıç',
-      'Merhamet', 'Cesaret', 'Sabır', 'Neşe', 'Umut', 'Şefkat',
+      'Okyanus',
+      'Galaksi',
+      'Dağ',
+      'Orman',
+      'Vadi',
+      'Çöl',
+      'Ada',
+      'Volkan',
+      'Ritim',
+      'Kadans',
+      'Melodi',
+      'Armoni',
+      'Tempo',
+      'Senfoni',
+      'Kahve',
+      'Çay',
+      'Tarçın',
+      'Nane',
+      'Limon',
+      'Bal',
+      'Kuantum',
+      'Foton',
+      'Plazma',
+      'Nötron',
+      'Atom',
+      'Molekül',
+      'Rüzgar',
+      'Yağmur',
+      'Şimşek',
+      'Gökkuşağı',
+      'Pus',
+      'Dalgıç',
+      'Merhamet',
+      'Cesaret',
+      'Sabır',
+      'Neşe',
+      'Umut',
+      'Şefkat',
     ];
     _wordPool = List<String>.from(bank)..shuffle(_rng);
     _wordPool = _wordPool.take(poolSize).toList();
   }
 
-  void _startGame() {
-    _resetState();
-    _startMemorizePhase();
-  }
 
   void _resetState() {
     _startTime = DateTime.now();
@@ -94,36 +170,22 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
     _shownWords = _shownWords.take(shownCount).toList();
     _choices = List<String>.from(_wordPool)..shuffle(_rng);
 
-    _phaseTimer?.cancel();
-    _phaseTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted || _isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
-        _startRecallPhase();
-      }
-    });
+    if (!widget.isPaused) {
+      _startPhaseTimer();
+    }
   }
 
   void _startRecallPhase() {
     _isMemorize = false;
     _timeRemaining = recallSeconds;
-    _phaseTimer?.cancel();
-    _phaseTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted || _isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
-        _finish();
-      }
-    });
+    if (!widget.isPaused) {
+      _startPhaseTimer();
+    }
     setState(() {});
   }
 
   void _toggleWord(String word) {
-    if (_isMemorize || _isFinished) return;
+    if (_isMemorize || _isFinished || widget.isPaused) return;
 
     HapticFeedback.selectionClick();
 
@@ -137,7 +199,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
   }
 
   void _submitSelection() {
-    if (_isMemorize || _isFinished) return;
+    if (_isMemorize || _isFinished || widget.isPaused) return;
 
     int localCorrect = 0;
     int localWrong = 0;
@@ -184,14 +246,18 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
     _isFinished = true;
     _phaseTimer?.cancel();
 
-    final duration = DateTime.now().difference(_startTime ?? DateTime.now()).inSeconds;
+    Duration finalDuration = DateTime.now().difference(_startTime!);
+    if (_pauseStartTime != null) {
+      _elapsedDuration += DateTime.now().difference(_pauseStartTime!);
+    }
+    finalDuration -= _elapsedDuration;
     final totalTarget = _shownWords.length;
     final successRate = totalTarget == 0 ? 0.0 : _correct / totalTarget;
 
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
-      'duration': duration,
+      'duration': finalDuration.inSeconds,
       'correct': _correct,
       'wrong': _wrong,
       'missed': _missed,
@@ -231,8 +297,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
                     : _buildRecallPanel(isDark, panel),
               ),
               const SizedBox(height: 12),
-              if (!_isMemorize && !_isFinished)
-                _buildSubmitButton(panel),
+              if (!_isMemorize && !_isFinished) _buildSubmitButton(panel),
             ],
           ),
         ),
@@ -242,7 +307,8 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
 
   Widget _buildHeader(bool isDark, Color panel) {
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -251,7 +317,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -317,9 +383,11 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
       child: LinearProgressIndicator(
         value: progress.clamp(0, 1),
         minHeight: 12,
-        backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+        backgroundColor:
+            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
         valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+          Color.lerp(
+              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
         ),
       ),
     );
@@ -333,7 +401,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -367,7 +435,8 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
                             color: Colors.white,
                           ),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
                         backgroundColor: const Color(0xFF2563EB),
                       ),
                     )
@@ -388,7 +457,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -439,7 +508,8 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF4F46E5),
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
     );
@@ -461,9 +531,10 @@ class _WordCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = isDark ? const Color(0xFF1F2937) : const Color(0xFFF4F5F7);
+    final baseColor =
+        isDark ? const Color(0xFF1F2937) : const Color(0xFFF4F5F7);
     final selectedColor = const Color(0xFF22C55E);
-    final textColor = isDark 
+    final textColor = isDark
         ? (selected ? Colors.white : const Color(0xFFE5E7EB))
         : (selected ? Colors.white : const Color(0xFF0F172A));
 
@@ -480,7 +551,7 @@ class _WordCard extends StatelessWidget {
               : null,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),

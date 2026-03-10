@@ -10,10 +10,12 @@ import '../../../services/audio_service.dart';
 /// 60 sn, 3 can, seri/bonus, kaçan kelime cezası, hızlanan spawn.
 class WordSprintGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
   const WordSprintGame({
     super.key,
     required this.onComplete,
+    required this.isPaused,
   });
 
   @override
@@ -61,11 +63,27 @@ class _WordSprintGameState extends State<WordSprintGame> {
   @override
   void initState() {
     super.initState();
-    _startGame();
+    _resetState();
+    if (!widget.isPaused) {
+      _startTimers();
+    }
   }
 
-  void _startGame() {
-    _resetState();
+  @override
+  void didUpdateWidget(covariant WordSprintGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+        _spawnTimer?.cancel();
+      } else if (!_isFinished) {
+        _startTimers();
+      }
+    }
+  }
+
+  void _startTimers() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted || _isFinished) return;
       setState(() {
@@ -77,6 +95,8 @@ class _WordSprintGameState extends State<WordSprintGame> {
     });
     _startSpawnTimer();
   }
+
+
 
   bool _isFinished = false;
 
@@ -130,7 +150,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
   }
 
   void _onWordTap(_WordItem item) {
-    if (_isFinished) return;
+    if (_isFinished || widget.isPaused) return;
     HapticFeedback.selectionClick();
     _audioService.playTap(); // 👆 Dokunma sesi
 
@@ -237,7 +257,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -318,7 +338,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -361,7 +381,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -406,7 +426,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.02)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -457,7 +477,7 @@ class _ChipTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
@@ -502,7 +522,7 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withOpacity(0.8)),
+              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,

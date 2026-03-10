@@ -6,8 +6,13 @@ import '../../../services/audio_service.dart';
 
 class QuickMathGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const QuickMathGame({super.key, required this.onComplete});
+  const QuickMathGame({
+    super.key, 
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<QuickMathGame> createState() => _QuickMathGameState();
@@ -33,7 +38,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
   List<int> _options = [];
   Timer? _gameTimer;
   Timer? _progressTimer;
-  DateTime? _startTime;
+  int _elapsedSeconds = 0;
 
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
@@ -43,7 +48,6 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _startTime = DateTime.now();
     
     _shakeController = AnimationController(
       vsync: this,
@@ -59,7 +63,22 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
     )..repeat(reverse: true);
 
     _generateQuestion();
-    _startTimers();
+    if (!widget.isPaused) {
+      _startTimers();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant QuickMathGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _gameTimer?.cancel();
+        _progressTimer?.cancel();
+      } else {
+        _startTimers();
+      }
+    }
   }
 
   void _startTimers() {
@@ -79,8 +98,8 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
 
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
-      final elapsed = DateTime.now().difference(_startTime!).inSeconds;
-      if (elapsed >= gameDuration) {
+      _elapsedSeconds++;
+      if (_elapsedSeconds >= gameDuration) {
         _endGame();
       }
     });
@@ -88,7 +107,6 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
 
   void _generateQuestion() {
     final random = Random();
-    final levelMultiplier = _level;
     
     // Level'a göre zorluk artışı
     if (_level <= 3) {
@@ -149,6 +167,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
   }
 
   void _selectAnswer(int answer) {
+    if (widget.isPaused) return;
     _progressTimer?.cancel();
     _totalQuestions++;
     
@@ -195,7 +214,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
   void _endGame() {
     _gameTimer?.cancel();
     _progressTimer?.cancel();
-    final duration = DateTime.now().difference(_startTime!).inSeconds;
+    final duration = _elapsedSeconds;
     final successRate = _totalQuestions > 0 ? _correctAnswers / _totalQuestions : 0.0;
 
     _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
@@ -240,7 +259,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -284,7 +303,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
                                     size: 20,
                                     color: index < _lives
                                         ? Colors.red
-                                        : subtitleColor.withOpacity(0.3),
+                                        : subtitleColor.withValues(alpha: 0.3),
                                   ),
                                 );
                               }),
@@ -334,7 +353,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
                           gradient: LinearGradient(
                             colors: [
                               Colors.blue,
-                              Colors.blue.withOpacity(0.7 + _pulseController.value * 0.3),
+                              Colors.blue.withValues(alpha: 0.7 + _pulseController.value * 0.3),
                             ],
                           ),
                           borderRadius: BorderRadius.circular(4),
@@ -407,7 +426,7 @@ class _QuickMathGameState extends State<QuickMathGame> with TickerProviderStateM
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

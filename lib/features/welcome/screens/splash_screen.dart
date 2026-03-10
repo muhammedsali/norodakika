@@ -110,7 +110,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFF4F46E5)
-                                      .withOpacity(0.3),
+                                      .withValues(alpha: 0.3),
                                   blurRadius: 50,
                                   spreadRadius: 15,
                                 ),
@@ -134,7 +134,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFF4F46E5)
-                                      .withOpacity(0.5),
+                                      .withValues(alpha: 0.5),
                                   blurRadius: 30,
                                   spreadRadius: 8,
                                   offset: const Offset(0, 10),
@@ -162,7 +162,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           letterSpacing: -1.5,
                           shadows: [
                             Shadow(
-                              color: const Color(0xFF4F46E5).withOpacity(0.3),
+                              color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
                               blurRadius: 25,
                             ),
                           ],

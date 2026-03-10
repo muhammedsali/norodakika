@@ -24,7 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String _selectedCategory = 'Tümü';
   int _selectedTab = 0; // 0: Ana Sayfa, 1: Oyunlar, 2: İlerleme, 3: Ayarlar
   bool _showOnboarding = false;
   int _onboardingStep = 0;
@@ -79,8 +78,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final appLanguage = ref.watch(languageProvider);
     final s = AppStrings(appLanguage);
     final isDarkMode = ref.watch(themeProvider);
-    final userName = user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
-    
+    final userName =
+        user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
+
     // Sistem status bar ikonlarını tema ile uyumlu yap
     final overlayStyle = isDarkMode
         ? const SystemUiOverlayStyle(
@@ -95,22 +95,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
     SystemChrome.setSystemUIOverlayStyle(overlayStyle);
 
-    final games = MemoryBank.games
-        .map((g) => GameModel.fromMap(g))
-        .toList();
+    final games = MemoryBank.games.map((g) => GameModel.fromMap(g)).toList();
+
+    // TASARIM: Arka plan hafif mavi/gri tonlu
+    final bgColor =
+        isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF4F6F8);
 
     return Scaffold(
-      extendBody: true,
-      backgroundColor:
-          isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6),
+      extendBody: true, // Ekranın menünün arkasına inmesini sağlar
+      backgroundColor: bgColor,
       body: Stack(
         children: [
           SafeArea(
+            bottom:
+                false, // Menü arkasına kayması için alt güvenli alanı iptal ettik
             child: Column(
               children: [
                 // Üst Header
-                if (_selectedTab != 0 && _selectedTab != 1) _buildHeader(userName),
-                
+                if (_selectedTab != 0 && _selectedTab != 1)
+                  _buildHeader(userName),
+
                 Expanded(
                   child: () {
                     if (_selectedTab == 0) {
@@ -131,28 +135,615 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (_showOnboarding) _buildOnboardingOverlay(context, appLanguage),
         ],
       ),
-      bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: HomeBottomNav(
-          selectedTab: _selectedTab,
-          isDarkMode: isDarkMode,
-          language: appLanguage,
-          onTabSelected: (index) {
-            setState(() {
-              _selectedTab = index;
-            });
-          },
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          // Menüyü hafif yukarı kaldırdık ve dış çerçevesindeki o sert arka planı attık
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          child: HomeBottomNav(
+            selectedTab: _selectedTab,
+            isDarkMode: isDarkMode,
+            language: appLanguage,
+            onTabSelected: (index) {
+              setState(() {
+                _selectedTab = index;
+              });
+            },
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHomeTabBody(BuildContext context, List<GameModel> games) {
+    final isDarkMode = ref.watch(themeProvider);
+    final appLanguage = ref.watch(languageProvider);
+    final s = AppStrings(appLanguage);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.value;
+    final userName =
+        user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
+
+    final quickMath = games.where((g) => g.id == 'NUM01').isNotEmpty
+        ? games.firstWhere((g) => g.id == 'NUM01')
+        : games.first;
+
+    const completedToday = 2;
+    const plannedToday = 3;
+    final dailyProgress =
+        plannedToday == 0 ? 0.0 : completedToday / plannedToday;
+
+    return SingleChildScrollView(
+      // Alt menünün arkasında kalmaması için alt padding'i 120 yaptık
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHomeWelcomeHeader(userName: userName, isDarkMode: isDarkMode),
+          const SizedBox(height: 32),
+          _buildSectionLabel('DAILY PROGRESS', isDarkMode),
+          const SizedBox(height: 12),
+          _buildDailyProgressCard(
+            isDarkMode: isDarkMode,
+            completedToday: completedToday,
+            plannedToday: plannedToday,
+            progress: dailyProgress,
+            onViewDetails: () {
+              setState(() {
+                _selectedTab = 2;
+              });
+            },
+          ),
+          const SizedBox(height: 32),
+          _buildSectionLabel('UP NEXT', isDarkMode),
+          const SizedBox(height: 12),
+          _buildUpNextCard(
+            context: context,
+            isDarkMode: isDarkMode,
+            game: quickMath,
+          ),
+          const SizedBox(height: 32),
+          _buildSectionLabel('INSIGHTS', isDarkMode),
+          const SizedBox(height: 12),
+          _buildCognitiveScoreCard(isDarkMode: isDarkMode),
+        ],
+      ),
+    );
+  }
+
+  // EKSİK OLAN VE GERİ EKLENEN FONKSİYON BURASI!
+  Widget _buildHomeWelcomeHeader({
+    required String userName,
+    required bool isDarkMode,
+  }) {
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final lang = ref.watch(languageProvider);
+    final s = AppStrings(lang);
+
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: () => _showAvatarPicker(context),
+          child: Consumer(
+            builder: (context, ref, child) {
+              final selectedAvatar = ref.watch(avatarProvider);
+              final avatarData = AvatarData.getAvatar(selectedAvatar);
+              return Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: avatarData['colors'] as List<Color>,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  avatarData['icon'] as IconData,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                s.homeWelcomeBack,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.6,
+                  color: subtitleColor,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                userName,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.18 : 0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+                spreadRadius: -8,
+              ),
+            ],
+          ),
+          child: IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.notifications_none_rounded,
+              color: titleColor,
+              size: 22,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // TASARIM: Başlıklar küçük, büyük harf ve aralıklı
+  Widget _buildSectionLabel(String text, bool isDarkMode) {
+    final c = isDarkMode ? const Color(0xFF64748B) : const Color(0xFF64748B);
+    return Text(
+      text.toUpperCase(),
+      style: GoogleFonts.poppins(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1.5,
+        color: c,
+      ),
+    );
+  }
+
+  Widget _buildDailyProgressCard({
+    required bool isDarkMode,
+    required int completedToday,
+    required int plannedToday,
+    required double progress,
+    required VoidCallback onViewDetails,
+  }) {
+    final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final cardBg = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+    final blue = const Color(0xFF2563EB); // Tasarımdaki mavi
+
+    return Container(
+      padding: const EdgeInsets.all(24), // TASARIM: Geniş iç boşluk
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(28), // Daha yuvarlak köşeler
+        boxShadow: [
+          // TASARIM: Yumuşak ve geniş gölge
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Daily Goal',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: titleColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '$completedToday of $plannedToday games completed today',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: subtitleColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // View Details butonu (Pill şeklinde)
+              InkWell(
+                onTap: onViewDetails,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: blue.withValues(alpha: 0.1), // Hafif mavi arka plan
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'VIEW DETAILS',
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                      color: blue,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Yuvarlak İlerleme Çubuğu
+          SizedBox(
+            width: 64,
+            height: 64,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 6,
+                  backgroundColor: isDarkMode
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
+                  strokeCap: StrokeCap.round,
+                  valueColor: AlwaysStoppedAnimation<Color>(blue),
+                ),
+                Text(
+                  '${(progress * 100).toInt()}%',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: titleColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpNextCard({
+    required BuildContext context,
+    required bool isDarkMode,
+    required GameModel game,
+  }) {
+    final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final cardBg = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+    final blue = const Color(0xFF2563EB);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Görsel Placeholder
+          Container(
+            height: 130,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: isDarkMode
+                  ? const Color(0xFF334155)
+                  : const Color(0xFFF1F5F9),
+            ),
+            child: const Center(
+              child: Icon(Icons.image_outlined,
+                  size: 32, color: Color(0xFF94A3B8)),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      game.name,
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      game.description.isNotEmpty
+                          ? game.description
+                          : 'Boost your mental arithmetic\nspeed.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: subtitleColor,
+                        height: 1.4,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Sağdaki dk uyarısı
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isDarkMode
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: isDarkMode
+                          ? Colors.transparent
+                          : const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '2',
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: blue,
+                      ),
+                    ),
+                    Text(
+                      'MIN',
+                      style: GoogleFonts.poppins(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: subtitleColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Mavi Ana Buton
+          SizedBox(
+            width: double.infinity,
+            height: 54,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                _showGameStartSheet(
+                  context: context,
+                  gameId: game.id,
+                  title: game.name,
+                  description: game.description.isNotEmpty
+                      ? game.description
+                      : game.area,
+                  isDarkMode: isDarkMode,
+                );
+              },
+              icon: const Icon(Icons.play_arrow_rounded, size: 20),
+              label: Text(
+                'Start Training',
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: blue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCognitiveScoreCard({required bool isDarkMode}) {
+    final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final cardBg = isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+
+    final statsAsync = ref.watch(userStatsProvider);
+
+    return statsAsync.when(
+      data: (stats) {
+        final memory = (stats['Hafıza'] ?? 0).toDouble();
+        final focus = (stats['Dikkat'] ?? 0).toDouble();
+        final speed = (stats['Refleks'] ?? 0).toDouble();
+        final total = memory + focus + speed;
+        final globalPts = (total * 10).round();
+
+        return Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.04),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Cognitive Score',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: titleColor,
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF22C55E).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      '+12%',
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF16A34A),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  // Sol Taraftaki Büyük Puan
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$globalPts',
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 42,
+                            fontWeight: FontWeight.bold,
+                            color: titleColor,
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'GLOBAL PTS',
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                            color: subtitleColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Sağ Taraftaki Bar Grafikleri
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        _buildMiniInsightBar('MEMORY', memory.round(),
+                            const Color(0xFF2563EB), isDarkMode),
+                        const SizedBox(height: 12),
+                        _buildMiniInsightBar('FOCUS', focus.round(),
+                            const Color(0xFFF97316), isDarkMode),
+                        const SizedBox(height: 12),
+                        _buildMiniInsightBar('SPEED', speed.round(),
+                            const Color(0xFF14B8A6), isDarkMode),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildMiniInsightBar(
+      String label, int value, Color color, bool isDarkMode) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: isDarkMode
+                    ? const Color(0xFF94A3B8)
+                    : const Color(0xFF64748B),
+              ),
+            ),
+            Text(
+              value.toString(),
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : const Color(0xFF0F172A),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: LinearProgressIndicator(
+            value: value / 100,
+            minHeight: 6, // Tasarımdaki ince barlar
+            backgroundColor:
+                isDarkMode ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+            valueColor: AlwaysStoppedAnimation<Color>(color),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildOnboardingOverlay(BuildContext context, AppLanguage lang) {
     final isDarkMode = ref.watch(themeProvider);
     final isDark = isDarkMode;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
     final s = AppStrings(lang);
     final steps = [
       {
@@ -255,7 +846,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             decoration: BoxDecoration(
                               color: isActive
                                   ? const Color(0xFF4F46E5)
-                                  : textColor.withOpacity(0.3),
+                                  : textColor.withValues(alpha: 0.3),
                               borderRadius: BorderRadius.circular(999),
                             ),
                           );
@@ -286,9 +877,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       backgroundColor: const Color(0xFF4F46E5),
                       foregroundColor: Colors.white,
                       elevation: 8,
-                      shadowColor:
-                          (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
-                              .withValues(alpha: 0.35),
+                      shadowColor: (isDarkMode
+                              ? const Color(0xFF818CF8)
+                              : const Color(0xFF4F46E5))
+                          .withValues(alpha: 0.35),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(999),
                         side: isDarkMode
@@ -388,7 +980,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           : null,
                       boxShadow: [
                         BoxShadow(
-                          color: (avatar['colors'] as List<Color>)[0].withOpacity(0.3),
+                          color: (avatar['colors'] as List<Color>)[0]
+                              .withValues(alpha: 0.3),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -427,43 +1020,119 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Map<String, dynamic> _getGameIconData(String gameId) {
     switch (gameId) {
       case 'REF01':
-        return {'icon': Icons.touch_app, 'color': Color(0xFFEF4444), 'emoji': '⚡'};
+        return {
+          'icon': Icons.touch_app,
+          'color': const Color(0xFFEF4444),
+          'emoji': '⚡'
+        };
       case 'REF02':
-        return {'icon': Icons.directions_run, 'color': Color(0xFF10B981), 'emoji': '🏃'};
+        return {
+          'icon': Icons.directions_run,
+          'color': const Color(0xFF10B981),
+          'emoji': '🏃'
+        };
       case 'ATT01':
-        return {'icon': Icons.palette, 'color': Color(0xFF8B5CF6), 'emoji': '🎨'};
+        return {
+          'icon': Icons.palette,
+          'color': const Color(0xFF8B5CF6),
+          'emoji': '🎨'
+        };
       case 'ATT02':
-        return {'icon': Icons.remove, 'color': Color(0xFF06B6D4), 'emoji': '➖'};
+        return {
+          'icon': Icons.remove,
+          'color': const Color(0xFF06B6D4),
+          'emoji': '➖'
+        };
       case 'MEM01':
-        return {'icon': Icons.psychology, 'color': Color(0xFFEC4899), 'emoji': '🧠'};
+        return {
+          'icon': Icons.psychology,
+          'color': const Color(0xFFEC4899),
+          'emoji': '🧠'
+        };
       case 'LOG01':
-        return {'icon': Icons.extension, 'color': Color(0xFFF59E0B), 'emoji': '🧩'};
+        return {
+          'icon': Icons.extension,
+          'color': const Color(0xFFF59E0B),
+          'emoji': '🧩'
+        };
       case 'NUM01':
-        return {'icon': Icons.calculate, 'color': Color(0xFF3B82F6), 'emoji': '🔢'};
+        return {
+          'icon': Icons.calculate,
+          'color': const Color(0xFF3B82F6),
+          'emoji': '🔢'
+        };
       case 'MEM02':
-        return {'icon': Icons.grid_view, 'color': Color(0xFF14B8A6), 'emoji': '🎴'};
+        return {
+          'icon': Icons.grid_view,
+          'color': const Color(0xFF14B8A6),
+          'emoji': '🎴'
+        };
       case 'MEM03':
-        return {'icon': Icons.text_fields, 'color': Color(0xFF6366F1), 'emoji': '📝'};
+        return {
+          'icon': Icons.text_fields,
+          'color': const Color(0xFF6366F1),
+          'emoji': '📝'
+        };
       case 'MEM04':
-        return {'icon': Icons.repeat, 'color': Color(0xFFA855F7), 'emoji': '🔁'};
+        return {
+          'icon': Icons.repeat,
+          'color': const Color(0xFFA855F7),
+          'emoji': '🔁'
+        };
       case 'VIS02':
-        return {'icon': Icons.find_in_page, 'color': Color(0xFFF97316), 'emoji': '🔍'};
+        return {
+          'icon': Icons.find_in_page,
+          'color': const Color(0xFFF97316),
+          'emoji': '🔍'
+        };
       case 'LANG02':
-        return {'icon': Icons.speed, 'color': Color(0xFF06B6D4), 'emoji': '💨'};
+        return {
+          'icon': Icons.speed,
+          'color': const Color(0xFF06B6D4),
+          'emoji': '💨'
+        };
       case 'MUS01':
-        return {'icon': Icons.music_note, 'color': Color(0xFFF59E0B), 'emoji': '🎵'};
+        return {
+          'icon': Icons.music_note,
+          'color': const Color(0xFFF59E0B),
+          'emoji': '🎵'
+        };
       case 'SOC01':
-        return {'icon': Icons.emoji_emotions, 'color': Color(0xFFEC4899), 'emoji': '🙂'};
+        return {
+          'icon': Icons.emoji_emotions,
+          'color': const Color(0xFFEC4899),
+          'emoji': '🙂'
+        };
       case 'NAT01':
-        return {'icon': Icons.nature, 'color': Color(0xFF10B981), 'emoji': '🌿'};
+        return {
+          'icon': Icons.nature,
+          'color': const Color(0xFF10B981),
+          'emoji': '🌿'
+        };
       case 'KIN01':
-        return {'icon': Icons.sports_martial_arts, 'color': Color(0xFF3B82F6), 'emoji': '⚖️'};
+        return {
+          'icon': Icons.sports_martial_arts,
+          'color': const Color(0xFF3B82F6),
+          'emoji': '⚖️'
+        };
       case 'SPA01':
-        return {'icon': Icons.route, 'color': Color(0xFF8B5CF6), 'emoji': '🧭'};
+        return {
+          'icon': Icons.route,
+          'color': const Color(0xFF8B5CF6),
+          'emoji': '🧭'
+        };
       case 'INT01':
-        return {'icon': Icons.self_improvement, 'color': Color(0xFF06B6D4), 'emoji': '🧘'};
+        return {
+          'icon': Icons.self_improvement,
+          'color': const Color(0xFF06B6D4),
+          'emoji': '🧘'
+        };
       default:
-        return {'icon': Icons.sports_esports, 'color': Color(0xFF4F46E5), 'emoji': '🎮'};
+        return {
+          'icon': Icons.sports_esports,
+          'color': const Color(0xFF4F46E5),
+          'emoji': '🎮'
+        };
     }
   }
 
@@ -483,21 +1152,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(isDarkMode ? 0.75 : 0.5),
+      barrierColor: Colors.black.withValues(alpha: isDarkMode ? 0.75 : 0.5),
       builder: (ctx) {
-        final themeBg = isDarkMode
-            ? const Color(0xFF1F2937)
-            : Colors.white;
+        final themeBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
         final titleColor =
             isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
         final textColor =
             isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-        final cardBg = isDarkMode
-            ? const Color(0xFF111827)
-            : const Color(0xFFF9FAFB);
-        final borderColor = isDarkMode
-            ? const Color(0xFF374151)
-            : const Color(0xFFE5E7EB);
+        final cardBg =
+            isDarkMode ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
+        final borderColor =
+            isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
 
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -518,14 +1183,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: isDarkMode
-                        ? Colors.black.withOpacity(0.6)
-                        : Colors.black.withOpacity(0.1),
+                        ? Colors.black.withValues(alpha: 0.6)
+                        : Colors.black.withValues(alpha: 0.1),
                     blurRadius: 50,
                     spreadRadius: -10,
                     offset: const Offset(0, 25),
                   ),
                   BoxShadow(
-                    color: gameColor.withOpacity(isDarkMode ? 0.1 : 0.05),
+                    color: gameColor.withValues(alpha: isDarkMode ? 0.1 : 0.05),
                     blurRadius: 30,
                     spreadRadius: 0,
                     offset: const Offset(0, 10),
@@ -544,12 +1209,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         end: Alignment.bottomRight,
                         colors: isDarkMode
                             ? [
-                                gameColor.withOpacity(0.2),
-                                gameColor.withOpacity(0.08),
+                                gameColor.withValues(alpha: 0.2),
+                                gameColor.withValues(alpha: 0.08),
                               ]
                             : [
-                                gameColor.withOpacity(0.15),
-                                gameColor.withOpacity(0.05),
+                                gameColor.withValues(alpha: 0.15),
+                                gameColor.withValues(alpha: 0.05),
                               ],
                       ),
                       borderRadius: const BorderRadius.only(
@@ -569,13 +1234,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               end: Alignment.bottomRight,
                               colors: [
                                 gameColor,
-                                gameColor.withOpacity(0.8),
+                                gameColor.withValues(alpha: 0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: gameColor.withOpacity(0.4),
+                                color: gameColor.withValues(alpha: 0.4),
                                 blurRadius: 15,
                                 spreadRadius: 2,
                               ),
@@ -610,10 +1275,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: gameColor.withOpacity(0.15),
+                                  color: gameColor.withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                    color: gameColor.withOpacity(0.3),
+                                    color: gameColor.withValues(alpha: 0.3),
                                     width: 1,
                                   ),
                                 ),
@@ -687,8 +1352,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             boxShadow: [
                               BoxShadow(
                                 color: isDarkMode
-                                    ? Colors.black.withOpacity(0.3)
-                                    : Colors.black.withOpacity(0.03),
+                                    ? Colors.black.withValues(alpha: 0.3)
+                                    : Colors.black.withValues(alpha: 0.03),
                                 blurRadius: 10,
                                 spreadRadius: 0,
                                 offset: const Offset(0, 4),
@@ -703,7 +1368,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: gameColor.withOpacity(0.15),
+                                      color: gameColor.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
@@ -773,19 +1438,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   end: Alignment.bottomRight,
                                   colors: [
                                     gameColor,
-                                    gameColor.withOpacity(0.85),
+                                    gameColor.withValues(alpha: 0.85),
                                   ],
                                 ),
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: gameColor.withOpacity(isDarkMode ? 0.5 : 0.4),
+                                    color: gameColor.withValues(
+                                        alpha: isDarkMode ? 0.5 : 0.4),
                                     blurRadius: 25,
                                     spreadRadius: 0,
                                     offset: const Offset(0, 10),
                                   ),
                                   BoxShadow(
-                                    color: gameColor.withOpacity(0.2),
+                                    color: gameColor.withValues(alpha: 0.2),
                                     blurRadius: 15,
                                     spreadRadius: -5,
                                     offset: const Offset(0, 5),
@@ -793,7 +1459,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 ],
                               ),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 24),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -801,11 +1468,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       width: 38,
                                       height: 38,
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.25),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.25),
                                         borderRadius: BorderRadius.circular(12),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.1),
+                                            color: Colors.black
+                                                .withValues(alpha: 0.1),
                                             blurRadius: 8,
                                             offset: const Offset(0, 2),
                                           ),
@@ -827,7 +1496,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         letterSpacing: 0.3,
                                         shadows: [
                                           Shadow(
-                                            color: Colors.black.withOpacity(0.2),
+                                            color: Colors.black
+                                                .withValues(alpha: 0.2),
                                             blurRadius: 4,
                                             offset: const Offset(0, 1),
                                           ),
@@ -852,8 +1522,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-
-  Widget _buildHomeTabBody(BuildContext context, List<GameModel> games) {
+  Widget _buildGamesTabBody(BuildContext context, List<GameModel> games) {
     final isDarkMode = ref.watch(themeProvider);
     final appLanguage = ref.watch(languageProvider);
     final s = AppStrings(appLanguage);
@@ -861,649 +1530,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final user = userAsync.value;
     final userName =
         user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
-
-    final quickMath = games.where((g) => g.id == 'NUM01').isNotEmpty
-        ? games.firstWhere((g) => g.id == 'NUM01')
-        : games.first;
-
-    const completedToday = 2;
-    const plannedToday = 3;
-    final dailyProgress = plannedToday == 0 ? 0.0 : completedToday / plannedToday;
-
-    final bg = isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHomeWelcomeHeader(userName: userName, isDarkMode: isDarkMode),
-          const SizedBox(height: 22),
-          _buildSectionLabel(s.homeDailyProgress, isDarkMode),
-          const SizedBox(height: 12),
-          _buildDailyProgressCard(
-            isDarkMode: isDarkMode,
-            completedToday: completedToday,
-            plannedToday: plannedToday,
-            progress: dailyProgress,
-            onViewDetails: () {
-              setState(() {
-                _selectedTab = 2;
-              });
-            },
-          ),
-          const SizedBox(height: 26),
-          _buildSectionLabel(s.homeUpNext, isDarkMode),
-          const SizedBox(height: 12),
-          _buildUpNextCard(
-            context: context,
-            isDarkMode: isDarkMode,
-            game: quickMath,
-          ),
-          const SizedBox(height: 26),
-          _buildSectionLabel(s.homeInsights, isDarkMode),
-          const SizedBox(height: 12),
-          Container(
-            color: bg,
-            child: _buildCognitiveScoreCard(isDarkMode: isDarkMode),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHomeWelcomeHeader({
-    required String userName,
-    required bool isDarkMode,
-  }) {
-    final titleColor =
-        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor =
-        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
-
-    return Row(
-      children: [
-        GestureDetector(
-          onTap: () => _showAvatarPicker(context),
-          child: Consumer(
-            builder: (context, ref, child) {
-              final selectedAvatar = ref.watch(avatarProvider);
-              final avatarData = AvatarData.getAvatar(selectedAvatar);
-              return Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: avatarData['colors'] as List<Color>,
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  avatarData['icon'] as IconData,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                s.homeWelcomeBack,
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.6,
-                  color: subtitleColor,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                userName,
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: titleColor,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-                spreadRadius: -8,
-              ),
-            ],
-          ),
-          child: IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.notifications_none_rounded,
-              color: titleColor,
-              size: 22,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionLabel(String text, bool isDarkMode) {
-    final c = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF9CA3AF);
-    return Text(
-      text,
-      style: GoogleFonts.poppins(
-        fontSize: 12,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 1.2,
-        color: c,
-      ),
-    );
-  }
-
-  Widget _buildDailyProgressCard({
-    required bool isDarkMode,
-    required int completedToday,
-    required int plannedToday,
-    required double progress,
-    required VoidCallback onViewDetails,
-  }) {
-    final titleColor =
-        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor =
-        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
-    final blue = const Color(0xFF2563EB);
-    final pct = (progress * 100).clamp(0, 100).round();
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-            spreadRadius: -12,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  s.homeDailyGoalTitle,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: titleColor,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  s.dailyGoalCompleted(completedToday, plannedToday),
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: subtitleColor,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                SizedBox(
-                  height: 34,
-                  child: ElevatedButton(
-                    onPressed: onViewDetails,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: blue.withOpacity(0.12),
-                      foregroundColor: blue,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
-                    child: Text(
-                      s.homeViewDetails,
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 14),
-          SizedBox(
-            width: 72,
-            height: 72,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CircularProgressIndicator(
-                  value: progress.clamp(0.0, 1.0),
-                  strokeWidth: 7,
-                  backgroundColor: blue.withOpacity(isDarkMode ? 0.18 : 0.12),
-                  valueColor: AlwaysStoppedAnimation<Color>(blue),
-                ),
-                Text(
-                  '$pct%',
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: titleColor,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildUpNextCard({
-    required BuildContext context,
-    required bool isDarkMode,
-    required GameModel game,
-  }) {
-    final titleColor =
-        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor =
-        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
-    final blue = const Color(0xFF2563EB);
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
-            blurRadius: 22,
-            offset: const Offset(0, 10),
-            spreadRadius: -12,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF111827).withOpacity(isDarkMode ? 0.6 : 0.08),
-                    const Color(0xFF111827).withOpacity(isDarkMode ? 0.25 : 0.03),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: const Center(
-                child: Icon(Icons.image_rounded, size: 40, color: Color(0xFF9CA3AF)),
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      game.name,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: titleColor,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      game.description.isNotEmpty ? game.description : game.area,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        height: 1.4,
-                        color: subtitleColor,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: blue.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      '2',
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: blue,
-                      ),
-                    ),
-                    Text(
-                      s.homeMinutesShort,
-                      style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        color: blue,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 52,
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                _showGameStartSheet(
-                  context: context,
-                  gameId: game.id,
-                  title: game.name,
-                  description: game.description.isNotEmpty ? game.description : game.area,
-                  isDarkMode: isDarkMode,
-                );
-              },
-              icon: const Icon(Icons.play_arrow_rounded),
-              label: Text(
-                s.homeStartTraining,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: blue,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCognitiveScoreCard({
-    required bool isDarkMode,
-  }) {
-    final statsAsync = ref.watch(userStatsProvider);
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
-
-    return statsAsync.when(
-      data: (stats) {
-        final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
-        final titleColor =
-            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-        final subtitleColor =
-            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-
-        final memory = (stats['Hafıza'] ?? 0).toDouble();
-        final focus = (stats['Dikkat'] ?? 0).toDouble();
-        final speed = (stats['Refleks'] ?? 0).toDouble();
-        final total = memory + focus + speed;
-        final globalPts = (total * 10).round();
-
-        double norm(double v) {
-          if (total <= 0) return 0;
-          return (v / total).clamp(0.0, 1.0);
-        }
-
-        return Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
-                blurRadius: 22,
-                offset: const Offset(0, 10),
-                spreadRadius: -12,
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            s.cognitiveScore,
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: titleColor,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF22C55E).withOpacity(0.14),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            '+12%',
-                            style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF22C55E),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Container(
-                          width: 90,
-                          height: 90,
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? const Color(0xFF111827)
-                                : const Color(0xFFF9FAFB),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black
-                                    .withOpacity(isDarkMode ? 0.25 : 0.08),
-                                blurRadius: 18,
-                                offset: const Offset(0, 10),
-                                spreadRadius: -12,
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '$globalPts',
-                                  style: GoogleFonts.spaceGrotesk(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.bold,
-                                    color: titleColor,
-                                  ),
-                                ),
-                                Text(
-                                  s.globalPts,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.9,
-                                    color: subtitleColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _buildInsightBar(
-                                label: 'MEMORY',
-                                value: memory.round(),
-                                percent: norm(memory),
-                                color: const Color(0xFF2563EB),
-                                isDarkMode: isDarkMode,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildInsightBar(
-                                label: 'FOCUS',
-                                value: focus.round(),
-                                percent: norm(focus),
-                                color: const Color(0xFF60A5FA),
-                                isDarkMode: isDarkMode,
-                              ),
-                              const SizedBox(height: 10),
-                              _buildInsightBar(
-                                label: 'SPEED',
-                                value: speed.round(),
-                                percent: norm(speed),
-                                color: const Color(0xFF3B82F6),
-                                isDarkMode: isDarkMode,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => const SizedBox.shrink(),
-    );
-  }
-
-  Widget _buildInsightBar({
-    required String label,
-    required int value,
-    required double percent,
-    required Color color,
-    required bool isDarkMode,
-  }) {
-    final subtitleColor =
-        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final track = color.withOpacity(isDarkMode ? 0.18 : 0.12);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                label,
-                style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.6,
-                  color: subtitleColor,
-                ),
-              ),
-            ),
-            Text(
-              '$value',
-              style: GoogleFonts.poppins(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                color: subtitleColor,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: LinearProgressIndicator(
-            value: percent.clamp(0.0, 1.0),
-            minHeight: 6,
-            backgroundColor: track,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGamesTabBody(BuildContext context, List<GameModel> games) {
-    final isDarkMode = ref.watch(themeProvider);
-    final appLanguage = ref.watch(languageProvider);
-    final s = AppStrings(appLanguage);
-    final userAsync = ref.watch(currentUserProvider);
-    final user = userAsync.value;
-    final userName = user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
 
     final filteredGames = games.where((g) {
       final intelligenceKey = g.intelligence;
@@ -1517,9 +1543,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           g.description.toLowerCase().contains(q);
     }).toList();
 
-    // Tüm oyunların tam grid görünümü (Stitch benzeri tasarım)
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1554,8 +1579,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildGamesTabHeader(String userName, bool isDarkMode, AppStrings s) {
-    final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Row(
       children: [
@@ -1618,7 +1645,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.18 : 0.08),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
                 spreadRadius: -8,
@@ -1649,7 +1676,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.06),
+            color: Colors.black.withValues(alpha: isDarkMode ? 0.18 : 0.06),
             blurRadius: 18,
             offset: const Offset(0, 10),
             spreadRadius: -10,
@@ -1667,7 +1694,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           hintText: s.gamesSearchHint,
           hintStyle: GoogleFonts.poppins(fontSize: 13, color: hint),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
@@ -1723,12 +1751,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: isActive ? activeBg : inactiveBg,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
-              color: accentColor.withOpacity(isActive ? 0.0 : (isDarkMode ? 0.55 : 0.45)),
+              color: accentColor.withValues(
+                  alpha: isActive ? 0.0 : (isDarkMode ? 0.55 : 0.45)),
               width: 1.2,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.06),
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.18 : 0.06),
                 blurRadius: 18,
                 offset: const Offset(0, 10),
                 spreadRadius: -12,
@@ -1777,8 +1806,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required bool isDarkMode,
   }) {
     final cardBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
-    final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     final iconData = _getGameIconData(game.id);
     final icon = iconData['icon'] as IconData;
@@ -1788,7 +1819,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final intelLabel = s.intelligenceLabel(intelligenceKey).toUpperCase();
     final intelColor = _getIntelligenceColor(intelligenceKey);
 
-    final tagBg = intelColor.withOpacity(isDarkMode ? 0.22 : 0.18);
+    final tagBg = intelColor.withValues(alpha: isDarkMode ? 0.22 : 0.18);
     final bottomText = game.area;
 
     return Material(
@@ -1800,7 +1831,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             context: context,
             gameId: game.id,
             title: game.name,
-            description: game.description.isNotEmpty ? game.description : game.area,
+            description:
+                game.description.isNotEmpty ? game.description : game.area,
             isDarkMode: isDarkMode,
           );
         },
@@ -1811,7 +1843,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDarkMode ? 0.18 : 0.08),
+                color: Colors.black.withValues(alpha: isDarkMode ? 0.18 : 0.08),
                 blurRadius: 22,
                 offset: const Offset(0, 10),
                 spreadRadius: -12,
@@ -1824,7 +1856,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
-                  color: intelColor.withOpacity(isDarkMode ? 0.22 : 0.18),
+                  color: intelColor.withValues(alpha: isDarkMode ? 0.22 : 0.18),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: intelColor, size: 24),
@@ -1844,7 +1876,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: tagBg,
                   borderRadius: BorderRadius.circular(999),
@@ -1875,10 +1908,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  // BURASINI DA TASARIMA GÖRE GÜNCELLEDİM
   Widget _buildHeader(String userName) {
     final isDarkMode = ref.watch(themeProvider);
     final lang = ref.watch(languageProvider);
     final s = AppStrings(lang);
+
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Container(
@@ -1888,7 +1928,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         child: Row(
           children: [
-            // Profil Avatar
             GestureDetector(
               onTap: () => _showAvatarPicker(context),
               child: Consumer(
@@ -1896,8 +1935,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   final selectedAvatar = ref.watch(avatarProvider);
                   final avatarData = AvatarData.getAvatar(selectedAvatar);
                   return Container(
-                    width: 48,
-                    height: 48,
+                    width: 44,
+                    height: 44,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: avatarData['colors'] as List<Color>,
@@ -1905,65 +1944,69 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         end: Alignment.bottomRight,
                       ),
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: (avatarData['colors'] as List<Color>)[0].withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
                     ),
                     child: Icon(
                       avatarData['icon'] as IconData,
                       color: Colors.white,
-                      size: 24,
+                      size: 22,
                     ),
                   );
                 },
               ),
             ),
             const SizedBox(width: 12),
-            
-            // Hoş geldin mesajı
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    userName,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color:
-                          isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827),
+                    s.homeWelcomeBack,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.6,
+                      color: subtitleColor,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: (isDarkMode
-                          ? const Color(0xFF818CF8)
-                          : const Color(0xFF4F46E5))
-                      .withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(999),
+                  const SizedBox(height: 2),
+                  Text(
+                    userName,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: titleColor,
                     ),
-                    child: Text(
-                      s.taskProgressLabel(2, 5),
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color:
-                            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF4F46E5),
-                      ),
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            // Sağda boş alan (karanlık mod artık Ayarlar ekranından değişiyor)
-            const SizedBox(width: 40),
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black
+                        .withValues(alpha: isDarkMode ? 0.18 : 0.08),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                    spreadRadius: -8,
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.notifications_none_rounded,
+                  color: titleColor,
+                  size: 22,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -1973,5 +2016,4 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildSettingsTabBody() {
     return const SettingsScreen();
   }
-
 }

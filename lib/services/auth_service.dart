@@ -14,10 +14,9 @@ class AuthService {
 
   Future<void> _ensureGoogleInitialized() async {
     if (_googleInitialized) return;
-    if (googleServerClientId.isEmpty) {
-      throw 'Google Sign-In için serverClientId eksik. Firebase Console > Credentials bölümünden Web client ID (OAuth 2.0) oluşturup GOOGLE_SERVER_CLIENT_ID olarak geçin.';
+    if (googleServerClientId.isNotEmpty) {
+      await _googleSignIn.initialize(serverClientId: googleServerClientId);
     }
-    await _googleSignIn.initialize(serverClientId: googleServerClientId);
     _googleInitialized = true;
   }
 
@@ -135,6 +134,37 @@ class AuthService {
       await _googleSignIn.signOut();
     } catch (_) {}
     await _auth.signOut();
+  }
+
+  // Hesap Sil
+  Future<void> deleteAccount() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        // First delete from Firestore
+        try {
+          await _firestore.collection('users').doc(user.uid).delete();
+        } catch(e) {
+          print('Uyarı: Firestore veri silinemedi: $e');
+        }
+        
+        // Then delete the Firebase Auth user
+        await user.delete();
+        
+        // Sign out from Google if needed
+        try {
+          await _ensureGoogleInitialized();
+          await _googleSignIn.signOut();
+        } catch (_) {}
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        throw 'Hesabınızı silmek için güvenlik nedeniyle yeniden giriş yapmalısınız.';
+      }
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw 'Hesap silinemedi: $e';
+    }
   }
 
   // Hata Mesajları

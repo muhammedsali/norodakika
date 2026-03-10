@@ -10,8 +10,13 @@ import 'package:google_fonts/google_fonts.dart';
 /// uyaranla eşleşiyorsa ilgili butona basar. Yanlışlar can düşürür.
 class NBackMiniGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const NBackMiniGame({super.key, required this.onComplete});
+  const NBackMiniGame({
+    super.key, 
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<NBackMiniGame> createState() => _NBackMiniGameState();
@@ -49,15 +54,35 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   bool _answeredPosition = false;
   bool _answeredLetter = false;
 
-  @override
   void initState() {
     super.initState();
-    _startGame();
+    _resetState();
+    if (!widget.isPaused) {
+      _startTimers();
+    }
   }
 
-  void _startGame() {
-    _resetState();
-    _pushStimulus();
+  @override
+  void didUpdateWidget(covariant NBackMiniGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _gameTimer?.cancel();
+        _beatTimer?.cancel();
+      } else if (!_isFinished) {
+        _startTimers();
+      }
+    }
+  }
+
+  void _startTimers() {
+    _gameTimer?.cancel();
+    _beatTimer?.cancel();
+
+    if (_history.isEmpty) {
+      _pushStimulus();
+    }
+
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_isFinished) return;
       setState(() {
@@ -142,7 +167,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   }
 
   void _handleAnswer({required bool forPosition}) {
-    if (_isFinished || _lockedForBeat) return;
+    if (_isFinished || _lockedForBeat || widget.isPaused) return;
     if (forPosition && _answeredPosition) return;
     if (!forPosition && _answeredLetter) return;
 
@@ -255,7 +280,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -336,7 +361,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -383,7 +408,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
                             boxShadow: isActive
                                 ? [
                                     BoxShadow(
-                                      color: highlight.withOpacity(0.45),
+                                      color: highlight.withValues(alpha: 0.45),
                                       blurRadius: 18,
                                       offset: const Offset(0, 8),
                                     ),
@@ -464,7 +489,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.02)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -534,12 +559,12 @@ class _ActionButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
           ],
-          border: Border.all(color: color.withOpacity(0.6), width: 2),
+          border: Border.all(color: color.withValues(alpha: 0.6), width: 2),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -585,7 +610,7 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withOpacity(0.8)),
+              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,

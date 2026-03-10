@@ -178,7 +178,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     // en önde olan hedefi bul
     _DashTarget? hit;
     for (final target in _targets.where((t) => t.lane == lane)) {
-      if (hit == null || target.progress > hit!.progress) {
+      if (hit == null || target.progress > hit.progress) {
         hit = target;
       }
     }
@@ -281,7 +281,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -346,7 +346,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
             decoration: BoxDecoration(
               color: panelColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.black.withOpacity(0.02)),
+              border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -361,7 +361,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
                         size: 18,
                         color: i < _hearts
                             ? const Color(0xFFEF4444)
-                            : subtitleColor.withOpacity(0.35),
+                            : subtitleColor.withValues(alpha: 0.35),
                       ),
                     ),
                   ),
@@ -391,7 +391,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
           decoration: BoxDecoration(
             color: panelColor,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black.withOpacity(0.02)),
+            border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
           ),
           child: Row(
             children: [
@@ -423,7 +423,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -494,7 +494,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
                     color: panelColor,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -505,7 +505,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
                       Icons.bolt_rounded,
                       color: lane == 1
                           ? const Color(0xFF4F46E5)
-                          : subtitleColor.withOpacity(0.8),
+                          : subtitleColor.withValues(alpha: 0.8),
                     ),
                   ),
                 ),
@@ -522,14 +522,13 @@ class _DashTarget {
   final int lane; // 0,1,2
   final bool isGood;
   final double lifetimeMs;
-  double elapsedMs;
+  double elapsedMs = 0.0;
 
   _DashTarget({
     required this.id,
     required this.lane,
     required this.isGood,
     required this.lifetimeMs,
-    this.elapsedMs = 0,
   });
 
   double get progress => elapsedMs / lifetimeMs;
@@ -560,7 +559,7 @@ class _DashChip extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: colors.first.withOpacity(0.25),
+              color: colors.first.withValues(alpha: 0.25),
               blurRadius: 18,
               offset: const Offset(0, 10),
             ),
@@ -582,7 +581,7 @@ class _PauseOverlay extends StatelessWidget {
     return Positioned.fill(
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.35),
+          color: Colors.black.withValues(alpha: 0.35),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Center(

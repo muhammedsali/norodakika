@@ -67,6 +67,17 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   Future<void> logout() async {
     await ref.read(authServiceProvider).logout();
   }
+
+  Future<void> deleteAccount() async {
+    state = const AsyncValue.loading();
+    try {
+      await ref.read(authServiceProvider).deleteAccount();
+      state = const AsyncValue.data(null);
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+      rethrow;
+    }
+  }
 }
 
 final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<void>>((ref) {

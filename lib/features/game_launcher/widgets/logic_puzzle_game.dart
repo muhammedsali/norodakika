@@ -4,8 +4,13 @@ import 'dart:math';
 
 class LogicPuzzleGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const LogicPuzzleGame({super.key, required this.onComplete});
+  const LogicPuzzleGame({
+    super.key, 
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<LogicPuzzleGame> createState() => _LogicPuzzleGameState();
@@ -26,6 +31,8 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
   String? _missingShape;
   List<String> _answerOptions = [];
   DateTime? _startTime;
+  Duration _elapsedDuration = Duration.zero;
+  DateTime? _pauseStartTime;
 
   final List<String> _shapes = ['◯', '■', '△', '●', '▲', '□'];
   final Random _rng = Random();
@@ -34,10 +41,12 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
   late Animation<double> _shakeAnimation;
   late AnimationController _pulseController;
 
-  @override
   void initState() {
     super.initState();
     _startTime = DateTime.now();
+    if (widget.isPaused) {
+      _pauseStartTime = DateTime.now();
+    }
     
     _shakeController = AnimationController(
       vsync: this,
@@ -53,6 +62,23 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
     )..repeat(reverse: true);
 
     _generatePuzzle();
+  }
+
+  @override
+  void didUpdateWidget(covariant LogicPuzzleGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _pauseStartTime = DateTime.now();
+        _pulseController.stop();
+      } else {
+        if (_pauseStartTime != null) {
+          _elapsedDuration += DateTime.now().difference(_pauseStartTime!);
+          _pauseStartTime = null;
+        }
+        _pulseController.repeat(reverse: true);
+      }
+    }
   }
 
   @override
@@ -122,6 +148,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
   }
 
   void _selectAnswer(String answer) {
+    if (widget.isPaused) return;
     _totalQuestions++;
     
     if (answer == _missingShape) {
@@ -163,13 +190,18 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
   }
 
   void _endGame() {
-    final duration = DateTime.now().difference(_startTime!).inSeconds;
+    Duration finalDuration = DateTime.now().difference(_startTime!);
+    if (_pauseStartTime != null) {
+      _elapsedDuration += DateTime.now().difference(_pauseStartTime!);
+    }
+    finalDuration -= _elapsedDuration;
+
     final successRate = _totalQuestions > 0 ? _correctAnswers / _totalQuestions : 0.0;
 
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
-      'duration': duration,
+      'duration': finalDuration.inSeconds,
     });
   }
 
@@ -198,7 +230,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(isDark ? 0.3 : 0.05),
+                      color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -242,7 +274,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
                                     size: 20,
                                     color: index < _lives
                                         ? Colors.red
-                                        : subtitleColor.withOpacity(0.3),
+                                        : subtitleColor.withValues(alpha: 0.3),
                                   ),
                                 );
                               }),
@@ -287,7 +319,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
                           BoxShadow(
-                            color: accentColor.withOpacity(isDark ? 0.2 : 0.1),
+                            color: accentColor.withValues(alpha: isDark ? 0.2 : 0.1),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -315,7 +347,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
                                 height: 56,
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: accentColor.withOpacity(0.5 + _pulseController.value * 0.3),
+                                    color: accentColor.withValues(alpha: 0.5 + _pulseController.value * 0.3),
                                     width: 3,
                                   ),
                                   borderRadius: BorderRadius.circular(12),
@@ -384,7 +416,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame> with TickerProviderSt
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

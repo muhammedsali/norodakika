@@ -17,15 +17,17 @@ class SettingsScreen extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
     final language = ref.watch(languageProvider);
     final s = AppStrings(language);
-    
-    final bgColor = isDarkMode ? const Color(0xFF0B1220) : const Color(0xFFF6F8FB);
+
     final cardColor = isDarkMode ? const Color(0xFF111827) : Colors.white;
-    final titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final subtitleColor = isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-    final dividerColor = isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
+    final titleColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subtitleColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final dividerColor =
+        isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Colors.transparent, // 1. Değişiklik: Arka plan şeffaf
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -43,8 +45,10 @@ class SettingsScreen extends ConsumerWidget {
         ),
       ),
       body: SafeArea(
+        bottom: false, // SafeArea'nın alttan menüyü itmesini engelledik
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+              20, 20, 20, 120), // 2. Değişiklik: Alt padding eklendi
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -147,7 +151,8 @@ class SettingsScreen extends ConsumerWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ProfileScreen(isDarkMode: isDarkMode),
+                            builder: (_) =>
+                                ProfileScreen(isDarkMode: isDarkMode),
                           ),
                         );
                       },
@@ -163,7 +168,8 @@ class SettingsScreen extends ConsumerWidget {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const StatsScreen()),
+                          MaterialPageRoute(
+                              builder: (_) => const StatsScreen()),
                         );
                       },
                       titleColor: titleColor,
@@ -202,6 +208,17 @@ class SettingsScreen extends ConsumerWidget {
                       titleColor: titleColor,
                       subtitleColor: subtitleColor,
                       isDestructive: false,
+                    ),
+                    Divider(height: 1, color: dividerColor, indent: 56),
+                    _buildActionTile(
+                      icon: Icons.person_remove_rounded,
+                      iconColor: const Color(0xFFEF4444),
+                      title: s.deleteAccountTitle,
+                      subtitle: s.deleteAccountSubtitle,
+                      onTap: () => _showDeleteAccountDialog(context, ref, s),
+                      titleColor: titleColor,
+                      subtitleColor: subtitleColor,
+                      isDestructive: true,
                     ),
                   ],
                 ),
@@ -349,7 +366,7 @@ class SettingsScreen extends ConsumerWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: const Color(0xFF6E00FF),
+            activeThumbColor: const Color(0xFF6E00FF),
           ),
         ],
       ),
@@ -415,7 +432,9 @@ class SettingsScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                language == AppLanguage.tr ? s.languageTurkish : s.languageEnglish,
+                language == AppLanguage.tr
+                    ? s.languageTurkish
+                    : s.languageEnglish,
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
@@ -533,7 +552,8 @@ class SettingsScreen extends ConsumerWidget {
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
-                      color: isDestructive ? const Color(0xFFEF4444) : titleColor,
+                      color:
+                          isDestructive ? const Color(0xFFEF4444) : titleColor,
                     ),
                   ),
                   if (subtitle.isNotEmpty) ...[
@@ -563,7 +583,8 @@ class SettingsScreen extends ConsumerWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF111827) : Colors.white;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
 
     showModalBottomSheet(
       context: context,
@@ -594,7 +615,9 @@ class SettingsScreen extends ConsumerWidget {
                   title: s.languageTurkish,
                   isSelected: currentLanguage == AppLanguage.tr,
                   onTap: () {
-                    ref.read(languageProvider.notifier).setLanguage(AppLanguage.tr);
+                    ref
+                        .read(languageProvider.notifier)
+                        .setLanguage(AppLanguage.tr);
                     Navigator.pop(context);
                   },
                 ),
@@ -605,7 +628,9 @@ class SettingsScreen extends ConsumerWidget {
                   title: s.languageEnglish,
                   isSelected: currentLanguage == AppLanguage.en,
                   onTap: () {
-                    ref.read(languageProvider.notifier).setLanguage(AppLanguage.en);
+                    ref
+                        .read(languageProvider.notifier)
+                        .setLanguage(AppLanguage.en);
                     Navigator.pop(context);
                   },
                 ),
@@ -625,7 +650,8 @@ class SettingsScreen extends ConsumerWidget {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
 
     return InkWell(
       onTap: onTap,
@@ -667,7 +693,8 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showClearDataDialog(BuildContext context, WidgetRef ref, AppStrings s) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
 
     showDialog(
       context: context,
@@ -720,7 +747,8 @@ class SettingsScreen extends ConsumerWidget {
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref, AppStrings s) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
 
     showDialog(
       context: context,
@@ -760,6 +788,70 @@ class SettingsScreen extends ConsumerWidget {
             },
             child: Text(
               s.logout,
+              style: GoogleFonts.spaceGrotesk(
+                color: const Color(0xFFEF4444),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(
+      BuildContext context, WidgetRef ref, AppStrings s) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1F2937) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          s.deleteAccountTitle,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFFEF4444),
+          ),
+        ),
+        content: Text(
+          s.deleteAccountConfirm,
+          style: GoogleFonts.spaceGrotesk(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'İptal',
+              style: GoogleFonts.spaceGrotesk(),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await ref.read(authNotifierProvider.notifier).deleteAccount();
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const AuthGateScreen()),
+                    (route) => false,
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString()),
+                      backgroundColor: const Color(0xFFEF4444),
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(
+              s.deleteAccountTitle,
               style: GoogleFonts.spaceGrotesk(
                 color: const Color(0xFFEF4444),
                 fontWeight: FontWeight.w600,

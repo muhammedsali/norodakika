@@ -239,7 +239,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -340,12 +340,12 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
                     color: panel,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _options[i].color.withOpacity(0.5),
+                      color: _options[i].color.withValues(alpha: 0.5),
                       width: 2,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -388,7 +388,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.02)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -454,7 +454,7 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withOpacity(0.8)),
+              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,

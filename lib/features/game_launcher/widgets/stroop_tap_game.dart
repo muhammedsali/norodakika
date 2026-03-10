@@ -9,8 +9,13 @@ import 'package:google_fonts/google_fonts.dart';
 /// Kelimenin ANLAMINA karşılık gelen rengi seç; yazı rengine aldanma.
 class StroopTapGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const StroopTapGame({super.key, required this.onComplete});
+  const StroopTapGame({
+    super.key, 
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<StroopTapGame> createState() => _StroopTapGameState();
@@ -51,15 +56,29 @@ class _StroopTapGameState extends State<StroopTapGame> {
   bool _isFinished = false;
   bool _isInputLocked = false;
 
-  @override
   void initState() {
     super.initState();
-    _startGame();
-  }
-
-  void _startGame() {
     _resetState();
     _spawnQuestion();
+    if (!widget.isPaused) {
+      _startTimer();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant StroopTapGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _gameTimer?.cancel();
+      } else if (!_isFinished) {
+        _startTimer();
+      }
+    }
+  }
+
+  void _startTimer() {
+    _gameTimer?.cancel();
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_isFinished) return;
       if (!mounted) return;
@@ -106,7 +125,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
   }
 
   void _selectColor(Color selected) {
-    if (_isFinished || _isInputLocked) return;
+    if (_isFinished || _isInputLocked || widget.isPaused) return;
     _isInputLocked = true;
 
     HapticFeedback.lightImpact();
@@ -214,7 +233,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -287,7 +306,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
 
   Widget _buildPromptCard(bool isDark) {
     final panelColor = isDark ? const Color(0xFF111827) : Colors.white;
-    final shadowColor = Colors.black.withOpacity(isDark ? 0.4 : 0.08);
+    final shadowColor = Colors.black.withValues(alpha: isDark ? 0.4 : 0.08);
 
     return Expanded(
       child: Container(
@@ -319,14 +338,14 @@ class _StroopTapGameState extends State<StroopTapGame> {
               duration: const Duration(milliseconds: 180),
               child: Text(
                 _currentWord,
-                key: ValueKey(_currentWord + _currentColor.value.toString()),
+                key: ValueKey(_currentWord + _currentColor.toARGB32().toString()),
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 78,
                   fontWeight: FontWeight.w800,
                   color: _currentColor,
                   shadows: [
                     Shadow(
-                      color: _currentColor.withOpacity(0.28),
+                      color: _currentColor.withValues(alpha: 0.28),
                       blurRadius: 18,
                       offset: const Offset(0, 6),
                     ),
@@ -350,7 +369,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
 
   Widget _buildOptionsGrid(bool isDark) {
     final panelColor = isDark ? const Color(0xFF0F172A) : Colors.white;
-    final shadowColor = Colors.black.withOpacity(0.08);
+    final shadowColor = Colors.black.withValues(alpha: 0.08);
     final buttonTexts = ['KIRMIZI', 'MAVİ', 'YEŞİL', 'SARI'];
 
     return Column(
@@ -410,7 +429,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
       decoration: BoxDecoration(
         color: panelColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.02)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -486,7 +505,7 @@ class _ColorButton extends StatelessWidget {
             ),
           ],
           border: Border.all(
-            color: color.withOpacity(0.7),
+            color: color.withValues(alpha: 0.7),
             width: 2,
           ),
         ),
@@ -530,7 +549,7 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withOpacity(0.8)),
+              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,

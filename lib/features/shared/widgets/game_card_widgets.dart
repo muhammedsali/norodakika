@@ -33,27 +33,27 @@ class UnifiedGameCard extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(24),
-          splashColor: gradientColors.first.withOpacity(0.1),
-          highlightColor: gradientColors.first.withOpacity(0.05),
+          splashColor: gradientColors.first.withValues(alpha: 0.1),
+          highlightColor: gradientColors.first.withValues(alpha: 0.05),
           child: Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  gradientColors.first.withOpacity(isDarkMode ? 0.15 : 0.08),
-                  gradientColors.last.withOpacity(isDarkMode ? 0.1 : 0.05),
+                  gradientColors.first.withValues(alpha: isDarkMode ? 0.15 : 0.08),
+                  gradientColors.last.withValues(alpha: isDarkMode ? 0.1 : 0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: gradientColors.first.withOpacity(isDarkMode ? 0.3 : 0.2),
+                color: gradientColors.first.withValues(alpha: isDarkMode ? 0.3 : 0.2),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: gradientColors.first.withOpacity(isDarkMode ? 0.2 : 0.15),
+                  color: gradientColors.first.withValues(alpha: isDarkMode ? 0.2 : 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                   spreadRadius: -4,
@@ -74,7 +74,7 @@ class UnifiedGameCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: gradientColors.first.withOpacity(0.4),
+                        color: gradientColors.first.withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -90,7 +90,7 @@ class UnifiedGameCard extends StatelessWidget {
                               color: Colors.white,
                               shadows: [
                                 Shadow(
-                                  color: Colors.black.withOpacity(0.3),
+                                  color: Colors.black.withValues(alpha: 0.3),
                                   offset: const Offset(0, 2),
                                   blurRadius: 4,
                                 ),
@@ -103,7 +103,7 @@ class UnifiedGameCard extends StatelessWidget {
                             size: 32,
                             shadows: [
                               Shadow(
-                                color: Colors.black.withOpacity(0.3),
+                                color: Colors.black.withValues(alpha: 0.3),
                                 offset: const Offset(0, 2),
                                 blurRadius: 4,
                               ),
@@ -136,8 +136,8 @@ class UnifiedGameCard extends StatelessWidget {
                               ),
                               decoration: BoxDecoration(
                                 color: isDarkMode
-                                    ? Colors.white.withOpacity(0.1)
-                                    : Colors.black.withOpacity(0.05),
+                                    ? Colors.white.withValues(alpha: 0.1)
+                                    : Colors.black.withValues(alpha: 0.05),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
@@ -155,7 +155,7 @@ class UnifiedGameCard extends StatelessWidget {
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: isDarkMode
-                                          ? Colors.white.withOpacity(0.9)
+                                          ? Colors.white.withValues(alpha: 0.9)
                                           : const Color(0xFF374151),
                                     ),
                                   ),
@@ -172,8 +172,8 @@ class UnifiedGameCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      gradientColors.first.withOpacity(0.2),
-                                      gradientColors.last.withOpacity(0.2),
+                                      gradientColors.first.withValues(alpha: 0.2),
+                                      gradientColors.last.withValues(alpha: 0.2),
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(8),
@@ -221,7 +221,7 @@ class UnifiedGameCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: gradientColors.first.withOpacity(0.3),
+                        color: gradientColors.first.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -314,27 +314,27 @@ class GridGameCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
-        splashColor: gradientColors.first.withOpacity(0.1),
-        highlightColor: gradientColors.first.withOpacity(0.05),
+        splashColor: gradientColors.first.withValues(alpha: 0.1),
+        highlightColor: gradientColors.first.withValues(alpha: 0.05),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                gradientColors.first.withOpacity(isDarkMode ? 0.15 : 0.08),
-                gradientColors.last.withOpacity(isDarkMode ? 0.1 : 0.05),
+                gradientColors.first.withValues(alpha: isDarkMode ? 0.15 : 0.08),
+                gradientColors.last.withValues(alpha: isDarkMode ? 0.1 : 0.05),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: gradientColors.first.withOpacity(isDarkMode ? 0.3 : 0.2),
+              color: gradientColors.first.withValues(alpha: isDarkMode ? 0.3 : 0.2),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: gradientColors.first.withOpacity(isDarkMode ? 0.2 : 0.15),
+                color: gradientColors.first.withValues(alpha: isDarkMode ? 0.2 : 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
                 spreadRadius: -4,
@@ -361,8 +361,8 @@ class GridGameCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      gradientColors.first.withOpacity(0.2),
-                      gradientColors.last.withOpacity(0.2),
+                      gradientColors.first.withValues(alpha: 0.2),
+                      gradientColors.last.withValues(alpha: 0.2),
                     ],
                   ),
                   borderRadius: BorderRadius.circular(8),
@@ -393,7 +393,7 @@ class GridGameCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: gradientColors.first.withOpacity(0.4),
+                          color: gradientColors.first.withValues(alpha: 0.4),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -405,7 +405,7 @@ class GridGameCard extends StatelessWidget {
                       color: Colors.white,
                       shadows: [
                         Shadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           offset: const Offset(0, 2),
                           blurRadius: 4,
                         ),

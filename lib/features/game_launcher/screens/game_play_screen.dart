@@ -110,13 +110,13 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     // Zorluk seviyesini al (user varsa Firestore'dan, yoksa local storage'dan)
     double difficulty = 1.0;
     String userId = 'guest';
-    
+
     if (user != null) {
       userId = user.uid;
       difficulty = await ref.read(firestoreServiceProvider).getGameDifficulty(
-        userId: user.uid,
-        gameId: widget.game.id,
-      );
+            userId: user.uid,
+            gameId: widget.game.id,
+          );
     } else {
       // Auth olmadan da local storage'dan zorluk seviyesini al
       difficulty = await LocalStorageService.getGameDifficulty(widget.game.id);
@@ -176,13 +176,13 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
           difficulty,
           successRate,
         );
-        
+
         try {
           await ref.read(firestoreServiceProvider).updateGameDifficulty(
-            userId: userId,
-            gameId: widget.game.id,
-            newDifficulty: newDifficulty,
-          );
+                userId: userId,
+                gameId: widget.game.id,
+                newDifficulty: newDifficulty,
+              );
         } catch (e) {
           print('Firestore zorluk güncelleme hatası: $e');
         }
@@ -193,7 +193,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         difficulty,
         successRate,
       );
-      await LocalStorageService.saveGameDifficulty(widget.game.id, newDifficulty);
+      await LocalStorageService.saveGameDifficulty(
+          widget.game.id, newDifficulty);
     } catch (e) {
       print('Attempt kaydetme hatası: $e');
     }
@@ -206,7 +207,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     final s = AppStrings(lang);
 
     final score = (_gameResult!['score'] as num?)?.toDouble() ?? 0.0;
-    final successRate = (_gameResult!['successRate'] as num?)?.toDouble() ?? 0.0;
+    final successRate =
+        (_gameResult!['successRate'] as num?)?.toDouble() ?? 0.0;
     final duration = (_gameResult!['duration'] as num?)?.toInt() ?? 0;
 
     final baseTheme = Theme.of(context);
@@ -216,20 +218,17 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(effectiveIsDark ? 0.75 : 0.5),
+      barrierColor:
+          Colors.black.withValues(alpha: effectiveIsDark ? 0.75 : 0.5),
       builder: (ctx) {
-        final bgColor = effectiveIsDark
-            ? const Color(0xFF1F2937)
-            : Colors.white;
-        final titleColor = effectiveIsDark
-            ? const Color(0xFFF9FAFB)
-            : const Color(0xFF111827);
-        final textColor = effectiveIsDark
-            ? const Color(0xFF9CA3AF)
-            : const Color(0xFF6B7280);
-        final borderColor = effectiveIsDark
-            ? const Color(0xFF374151)
-            : const Color(0xFFE5E7EB);
+        final bgColor =
+            effectiveIsDark ? const Color(0xFF1F2937) : Colors.white;
+        final titleColor =
+            effectiveIsDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+        final textColor =
+            effectiveIsDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+        final borderColor =
+            effectiveIsDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
 
         return Center(
           child: Padding(
@@ -248,8 +247,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                   boxShadow: [
                     BoxShadow(
                       color: effectiveIsDark
-                          ? Colors.black.withOpacity(0.6)
-                          : Colors.black.withOpacity(0.15),
+                          ? Colors.black.withValues(alpha: 0.6)
+                          : Colors.black.withValues(alpha: 0.15),
                       blurRadius: 40,
                       spreadRadius: 0,
                       offset: const Offset(0, 20),
@@ -407,10 +406,15 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     );
   }
 
-  Future<bool> _showExitConfirmDialog() async {
+  Future<void> _showExitConfirmDialog(bool didPop) async {
+    if (didPop) return;
+
     // Oyun sonucu zaten gösteriliyorsa veya hiç başlamadıysa direkt çık
     if (!_isGameStarted || _isGameComplete) {
-      return true;
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+      return;
     }
 
     final lang = ref.read(languageProvider);
@@ -419,18 +423,13 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     final baseTheme = Theme.of(context);
     final effectiveIsDark =
         widget.isDarkOverride ?? baseTheme.brightness == Brightness.dark;
-    final bgColor = effectiveIsDark
-        ? const Color(0xFF1F2937)
-        : Colors.white;
-    final titleColor = effectiveIsDark
-        ? const Color(0xFFF9FAFB)
-        : const Color(0xFF111827);
-    final textColor = effectiveIsDark
-        ? const Color(0xFF9CA3AF)
-        : const Color(0xFF6B7280);
-    final borderColor = effectiveIsDark
-        ? const Color(0xFF374151)
-        : const Color(0xFFE5E7EB);
+    final bgColor = effectiveIsDark ? const Color(0xFF1F2937) : Colors.white;
+    final titleColor =
+        effectiveIsDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColor =
+        effectiveIsDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final borderColor =
+        effectiveIsDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
 
     setState(() {
       _isPaused = true;
@@ -439,7 +438,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
     final result = await showDialog<bool>(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withOpacity(effectiveIsDark ? 0.75 : 0.5),
+      barrierColor:
+          Colors.black.withValues(alpha: effectiveIsDark ? 0.75 : 0.5),
       builder: (ctx) {
         return Center(
           child: Padding(
@@ -458,8 +458,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                   boxShadow: [
                     BoxShadow(
                       color: effectiveIsDark
-                          ? Colors.black.withOpacity(0.6)
-                          : Colors.black.withOpacity(0.15),
+                          ? Colors.black.withValues(alpha: 0.6)
+                          : Colors.black.withValues(alpha: 0.15),
                       blurRadius: 40,
                       spreadRadius: 0,
                       offset: const Offset(0, 20),
@@ -565,9 +565,11 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
       setState(() {
         _isPaused = false;
       });
+    } else {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     }
-
-    return shouldExit;
   }
 
   Widget _buildGameWidget() {
@@ -595,46 +597,55 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         return QuickMathGame(
           key: ValueKey('quickmath_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'MEM02':
         return MemoryBoardGame(
           key: ValueKey('memoryboard_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'ATT01':
         return StroopTapGame(
           key: ValueKey('stroop_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'ATT02':
         return FocusLineGame(
           key: ValueKey('focusline_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'MEM01':
         return NBackMiniGame(
           key: ValueKey('nback_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'LOG01':
         return LogicPuzzleGame(
           key: ValueKey('logic_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'MEM03':
         return RecallPhaseGame(
           key: ValueKey('recall_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'LANG02':
         return WordSprintGame(
           key: ValueKey('wordsprint_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'MEM04':
         return SequenceMemoryGame(
           key: ValueKey('sequenceecho_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'VIS02':
         return OddOneOutGame(
@@ -841,11 +852,11 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
               colors: effectiveIsDark
                   ? [
                       bgColor,
-                      gradientColors[0].withOpacity(0.1),
+                      gradientColors[0].withValues(alpha: 0.1),
                     ]
                   : [
                       bgColor,
-                      gradientColors[0].withOpacity(0.05),
+                      gradientColors[0].withValues(alpha: 0.05),
                     ],
             ),
           ),
@@ -869,7 +880,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: gradientColors[0].withOpacity(0.3),
+                                color: gradientColors[0].withValues(alpha: 0.3),
                                 blurRadius: 40,
                                 spreadRadius: 10,
                               ),
@@ -889,7 +900,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             borderRadius: BorderRadius.circular(36),
                             boxShadow: [
                               BoxShadow(
-                                color: gradientColors[0].withOpacity(0.5),
+                                color: gradientColors[0].withValues(alpha: 0.5),
                                 blurRadius: 25,
                                 spreadRadius: 5,
                                 offset: const Offset(0, 8),
@@ -916,7 +927,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                         letterSpacing: -1,
                         shadows: [
                           Shadow(
-                            color: gradientColors[0].withOpacity(0.3),
+                            color: gradientColors[0].withValues(alpha: 0.3),
                             blurRadius: 20,
                           ),
                         ],
@@ -988,8 +999,11 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
 
     return Theme(
       data: themedData,
-      child: WillPopScope(
-        onWillPop: _showExitConfirmDialog,
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (bool didPop, dynamic result) {
+          _showExitConfirmDialog(didPop);
+        },
         child: Scaffold(
           backgroundColor: bgColor,
           body: _showLogo ? _buildLogoScreen() : _buildGameWidget(),

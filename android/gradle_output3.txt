@@ -1,0 +1,35 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :gradle:checkKotlinGradlePluginConfigurationErrors
+> Task :gradle:compileKotlin UP-TO-DATE
+> Task :gradle:compileJava NO-SOURCE
+> Task :gradle:compileGroovy NO-SOURCE
+> Task :gradle:pluginDescriptors UP-TO-DATE
+> Task :gradle:processResources UP-TO-DATE
+> Task :gradle:classes UP-TO-DATE
+> Task :gradle:jar UP-TO-DATE
+> Task :clean
+> Task :app:externalNativeBuildCleanDebug
+> Task :app:externalNativeBuildCleanProfile
+> Task :app:externalNativeBuildCleanRelease
+> Task :app:clean UP-TO-DATE
+> Task :audioplayers_android:clean UP-TO-DATE
+> Task :cloud_firestore:clean UP-TO-DATE
+> Task :firebase_auth:clean UP-TO-DATE
+> Task :firebase_core:clean UP-TO-DATE
+> Task :google_sign_in_android:clean UP-TO-DATE
+> Task :path_provider_android:clean UP-TO-DATE
+> Task :shared_preferences_android:clean UP-TO-DATE
+
+> Task :dependencies
+
+------------------------------------------------------------
+Root project 'android'
+------------------------------------------------------------
+
+No configurations
+
+A web-based, searchable dependency report is available by adding the --scan option.
+
+BU?LD SUCCESSFUL in 37s
+18 actionable tasks: 6 executed, 12 up-to-date

@@ -7,10 +7,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 class FocusLineGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
   const FocusLineGame({
     super.key,
     required this.onComplete,
+    required this.isPaused,
   });
 
   @override
@@ -62,7 +64,23 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
         .animate(_shakeController);
 
     _resetTargetColor();
-    _startGame();
+    _resetState();
+    if (!widget.isPaused) {
+      _startTimers();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant FocusLineGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+        _spawnTimer?.cancel();
+      } else if (_timeRemaining > 0) {
+        _startTimers();
+      }
+    }
   }
 
   void _resetTargetColor() {
@@ -70,7 +88,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     _targetColor = colors[_rng.nextInt(colors.length)];
   }
 
-  void _startGame() {
+  void _resetState() {
     _timeRemaining = gameDuration;
     _score = 0;
     _level = 1;
@@ -82,6 +100,11 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     _missedTargets = 0;
     _dots.clear();
     _spawnInterval = baseSpawnInterval;
+  }
+
+  void _startTimers() {
+    _timer?.cancel();
+    _spawnTimer?.cancel();
 
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) return;
@@ -92,6 +115,16 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
           _level++;
           _spawnInterval = (baseSpawnInterval * (1 - (_level - 1) * 0.1)).clamp(600, baseSpawnInterval).toInt();
           _resetTargetColor();
+          
+          // Güncellenmiş spawnInterval ile spawn timer'ı yeniden başlat
+          _spawnTimer?.cancel();
+          _spawnTimer = Timer.periodic(
+            Duration(milliseconds: _spawnInterval),
+            (t) {
+              if (!mounted || _timeRemaining <= 0) return;
+              _spawnDot();
+            },
+          );
         }
       });
       if (_timeRemaining <= 0) {
@@ -141,6 +174,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   }
 
   void _onDotTap(_FocusDot dot) {
+    if (_timeRemaining <= 0 || widget.isPaused) return;
     HapticFeedback.lightImpact();
 
     setState(() {

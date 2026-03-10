@@ -300,12 +300,12 @@ class _OptionButton extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [color, color.withOpacity(0.85)],
+              colors: [color, color.withValues(alpha: 0.85)],
             ),
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 blurRadius: 16,
                 offset: const Offset(0, 10),
               )

@@ -234,14 +234,14 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            base.withOpacity(isHighlighted ? 1 : 0.85),
-                            base.withOpacity(isHighlighted ? 0.85 : 0.55),
+                            base.withValues(alpha: isHighlighted ? 1 : 0.85),
+                            base.withValues(alpha: isHighlighted ? 0.85 : 0.55),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(22),
                         boxShadow: [
                           BoxShadow(
-                            color: base.withOpacity(isHighlighted ? 0.5 : 0.25),
+                            color: base.withValues(alpha: isHighlighted ? 0.5 : 0.25),
                             blurRadius: isHighlighted ? 24 : 16,
                             offset: const Offset(0, 10),
                           ),

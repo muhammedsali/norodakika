@@ -126,7 +126,7 @@ class ProfileScreen extends ConsumerWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4F46E5).withOpacity(0.12),
+                              color: const Color(0xFF4F46E5).withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(999),
                             ),
                             child: Text(

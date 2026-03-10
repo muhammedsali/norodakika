@@ -21,14 +21,11 @@ class HomeBottomNav extends StatelessWidget {
       height: 95,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Container(
-
-        
         decoration: BoxDecoration(
           color: isDarkMode
-          ? const Color(0xFF1F2937) // Dark capsule
-          : const Color(0xFFE5E7EB), // Light capsule
+              ? const Color(0xFF1F2937) // Dark capsule
+              : const Color(0xFFE5E7EB), // Light capsule
           borderRadius: BorderRadius.circular(40),
-
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -55,7 +52,7 @@ class HomeBottomNav extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: isActive
-              ?(isDarkMode ? const Color(0xFF374151) : Colors.white)
+              ? (isDarkMode ? const Color(0xFF374151) : Colors.white)
               : Colors.transparent,
         ),
         child: Icon(

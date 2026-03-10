@@ -10,8 +10,13 @@ import '../../../services/audio_service.dart';
 /// Gösterilen hücre sırasını aynı sırayla dokun.
 class SequenceMemoryGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const SequenceMemoryGame({super.key, required this.onComplete});
+  const SequenceMemoryGame({
+    super.key, 
+    required this.onComplete,
+    required this.isPaused,
+  });
 
   @override
   State<SequenceMemoryGame> createState() => _SequenceMemoryGameState();
@@ -43,16 +48,28 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   Timer? _gameTimer;
   final AudioService _audioService = AudioService();
 
-  @override
   void initState() {
     super.initState();
-    _startGame();
+    _resetState();
+    if (!widget.isPaused) {
+      _startTimer();
+      _startRound();
+    }
   }
 
-  void _startGame() {
-    _resetState();
-    _startTimer();
-    _startRound();
+  @override
+  void didUpdateWidget(covariant SequenceMemoryGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _gameTimer?.cancel();
+      } else if (!_isFinished && !_isPlaying) {
+        _startTimer();
+        if (_sequence.isEmpty) {
+          _startRound();
+        }
+      }
+    }
   }
 
   void _resetState() {
@@ -116,7 +133,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _handleTap(int index) {
-    if (_isFinished || _isPlaying || _timeRemaining <= 0) return;
+    if (_isFinished || _isPlaying || _timeRemaining <= 0 || widget.isPaused) return;
     HapticFeedback.selectionClick();
     _audioService.playTap(); // 👆 Dokunma sesi
 
@@ -221,7 +238,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -301,7 +318,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -339,7 +356,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
                         boxShadow: isActive
                             ? [
                                 BoxShadow(
-                                  color: highlight.withOpacity(0.45),
+                                  color: highlight.withValues(alpha: 0.45),
                                   blurRadius: 18,
                                   offset: const Offset(0, 8),
                                 ),
@@ -364,7 +381,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withOpacity(0.02)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -423,7 +440,7 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withOpacity(0.8)),
+              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,

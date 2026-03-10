@@ -43,36 +43,33 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     final s = AppStrings(lang);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final textColorPrimary = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final textColorSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+    final textColorPrimary =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColorSecondary =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
 
     // Kullanıcı yoksa local storage'dan veri oku
     if (user == null) {
       // _historyFuture null ise başlat
       _historyFuture ??= _initializeData();
-      
+
       return FutureBuilder<List<Map<String, dynamic>>>(
         future: _historyFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          
+
           final history = snapshot.data ?? [];
           // Eğer history boşsa sahte verileri göster
           final displayHistory = history.isNotEmpty ? history : _fakeHistory();
-          
-          return _buildStatsBody(
+
+          return _buildStatsBodyWrapper(
             history: displayHistory,
             isDark: isDark,
             textColorPrimary: textColorPrimary,
             textColorSecondary: textColorSecondary,
-            selectedFilter: _selectedFilter,
-            onFilterChanged: (filter) {
-              setState(() {
-                _selectedFilter = filter;
-              });
-            },
+            s: s,
           );
         },
       );
@@ -87,17 +84,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             : List.from(userData.history as List);
         final history = rawHistory.isNotEmpty ? rawHistory : _fakeHistory();
 
-        return _buildStatsBody(
+        return _buildStatsBodyWrapper(
           history: history,
           isDark: isDark,
           textColorPrimary: textColorPrimary,
           textColorSecondary: textColorSecondary,
-          selectedFilter: _selectedFilter,
-          onFilterChanged: (filter) {
-            setState(() {
-              _selectedFilter = filter;
-            });
-          },
+          s: s,
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -113,19 +105,38 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     );
   }
 
-  Widget _buildStatsBody({
+  // İçeriği saran ve saydamlığı/padding'i ayarlayan ana wrapper
+  Widget _buildStatsBodyWrapper({
     required List history,
     required bool isDark,
     required Color textColorPrimary,
     required Color textColorSecondary,
-    required TimeFilter selectedFilter,
-    required Function(TimeFilter) onFilterChanged,
+    required AppStrings s,
   }) {
-    final lang = ref.watch(languageProvider);
-    final s = AppStrings(lang);
+    return Scaffold(
+      backgroundColor: Colors.transparent, // Arka plan şeffaf
+      body: SafeArea(
+        bottom: false, // Menü arkasına inebilmesi için kapattık
+        child: _buildStatsBodyContent(
+          history: history,
+          isDark: isDark,
+          textColorPrimary: textColorPrimary,
+          textColorSecondary: textColorSecondary,
+          s: s,
+        ),
+      ),
+    );
+  }
 
+  Widget _buildStatsBodyContent({
+    required List history,
+    required bool isDark,
+    required Color textColorPrimary,
+    required Color textColorSecondary,
+    required AppStrings s,
+  }) {
     // Filtreye göre history'yi filtrele
-    final filteredHistory = _filterHistoryByTime(history, selectedFilter);
+    final filteredHistory = _filterHistoryByTime(history, _selectedFilter);
     final radarStats = MemoryBank.calculateRadarStats(filteredHistory);
     final categories = MemoryBank.categories;
 
@@ -145,7 +156,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     // Filtre başlığı
     String filterTitle;
     String filterSubtitle;
-    switch (selectedFilter) {
+    switch (_selectedFilter) {
       case TimeFilter.day:
         filterTitle = s.summaryToday;
         filterSubtitle = gamesCount > 0
@@ -168,6 +179,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
 
     return Container(
       decoration: BoxDecoration(
+        // Arka planı transparent yapmıyoruz çünkü kendi gradient'i var,
+        // ama bunu Scaffold seviyesinde ele aldığımız için burada kalabilir.
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -185,7 +198,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         ),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(
+            20, 20, 20, 120), // Alt padding eklendi (Menü boşluğu)
         child: Column(
           children: [
             // Başlık
@@ -273,8 +287,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       s.filterDay,
                       Icons.today,
                       TimeFilter.day,
-                      selectedFilter,
-                      onFilterChanged,
                       isDark,
                     ),
                   ),
@@ -284,8 +296,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       s.filterWeek,
                       Icons.date_range,
                       TimeFilter.week,
-                      selectedFilter,
-                      onFilterChanged,
                       isDark,
                     ),
                   ),
@@ -295,8 +305,6 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       s.filterMonth,
                       Icons.calendar_month,
                       TimeFilter.month,
-                      selectedFilter,
-                      onFilterChanged,
                       isDark,
                     ),
                   ),
@@ -310,13 +318,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 24),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF4F46E5),
-                    const Color(0xFF7C3AED),
-                    const Color(0xFF9333EA),
+                    Color(0xFF4F46E5),
+                    Color(0xFF7C3AED),
+                    Color(0xFF9333EA),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(24),
@@ -367,9 +375,9 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
-                          selectedFilter == TimeFilter.day
+                          _selectedFilter == TimeFilter.day
                               ? Icons.today
-                              : selectedFilter == TimeFilter.week
+                              : _selectedFilter == TimeFilter.week
                                   ? Icons.date_range
                                   : Icons.calendar_month,
                           size: 24,
@@ -380,7 +388,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
@@ -399,7 +408,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          _getFilterDateRange(selectedFilter),
+                          _getFilterDateRange(_selectedFilter),
                           style: GoogleFonts.robotoMono(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -436,69 +445,75 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   ),
                 ],
               ),
-            child: filteredHistory.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.bar_chart,
-                          size: 48,
-                          color: textColorSecondary,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          s.noDataForPeriod,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
+              child: filteredHistory.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.bar_chart,
+                            size: 48,
                             color: textColorSecondary,
                           ),
+                          const SizedBox(height: 12),
+                          Text(
+                            s.noDataForPeriod,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: textColorSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : RadarChart(
+                      RadarChartData(
+                        dataSets: [
+                          RadarDataSet(
+                            fillColor:
+                                const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                            borderColor: const Color(0xFF4F46E5),
+                            borderWidth: 3,
+                            dataEntries: categories.map((category) {
+                              final value = radarStats[category] ?? 0.0;
+                              // Normalize to 0-1 aralığı
+                              return RadarEntry(
+                                  value: (value / 100).clamp(0.0, 1.0));
+                            }).toList(),
+                          ),
+                        ],
+                        tickCount: 5,
+                        ticksTextStyle: GoogleFonts.poppins(
+                          fontSize: 10,
+                          color: textColorSecondary,
                         ),
-                      ],
-                    ),
-                  )
-                : RadarChart(
-                    RadarChartData(
-                      dataSets: [
-                        RadarDataSet(
-                          fillColor: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                          borderColor: const Color(0xFF4F46E5),
-                          borderWidth: 3,
-                          dataEntries: categories.map((category) {
-                            final value = radarStats[category] ?? 0.0;
-                            // Normalize to 0-1 aralığı
-                            return RadarEntry(value: (value / 100).clamp(0.0, 1.0));
-                          }).toList(),
+                        tickBorderData: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF374151)
+                              : const Color(0xFFE5E7EB),
+                          width: 1.5,
                         ),
-                      ],
-                      tickCount: 5,
-                      ticksTextStyle: GoogleFonts.poppins(
-                        fontSize: 10,
-                        color: textColorSecondary,
+                        borderData: FlBorderData(show: true),
+                        radarBackgroundColor: isDark
+                            ? const Color(0xFF111827)
+                            : const Color(0xFFF9FAFB),
+                        gridBorderData: BorderSide(
+                          color: isDark
+                              ? const Color(0xFF374151)
+                              : const Color(0xFFE5E7EB),
+                          width: 1.5,
+                        ),
+                        titlePositionPercentageOffset: 0.2,
+                        getTitle: (index, angle) {
+                          return RadarChartTitle(
+                            text: s.categoryLabel(categories[index]),
+                            angle: angle,
+                            positionPercentageOffset: 0.15,
+                          );
+                        },
                       ),
-                      tickBorderData: BorderSide(
-                        color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-                        width: 1.5,
-                      ),
-                      borderData: FlBorderData(show: true),
-                      radarBackgroundColor: isDark
-                          ? const Color(0xFF111827)
-                          : const Color(0xFFF9FAFB),
-                      gridBorderData: BorderSide(
-                        color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-                        width: 1.5,
-                      ),
-                      titlePositionPercentageOffset: 0.2,
-                      getTitle: (index, angle) {
-                        return RadarChartTitle(
-                          text: s.categoryLabel(categories[index]),
-                          angle: angle,
-                          positionPercentageOffset: 0.15,
-                        );
-                      },
                     ),
-                  ),
             ),
             const SizedBox(height: 24),
 
@@ -508,7 +523,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               final category = entry.value;
               final value = radarStats[category] ?? 0.0;
               final progress = (value / 100).clamp(0.0, 1.0);
-              
+
               // Her kategori için farklı renk
               final categoryColors = [
                 [const Color(0xFFEF4444), const Color(0xFFDC2626)], // Kırmızı
@@ -519,10 +534,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                 [const Color(0xFFEC4899), const Color(0xFFDB2777)], // Pembe
                 [const Color(0xFF06B6D4), const Color(0xFF0891B2)], // Cyan
               ];
-              
+
               final colors = categoryColors[index % categoryColors.length];
               final icon = _getCategoryIcon(category);
-              
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Container(
@@ -582,7 +597,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
@@ -638,13 +654,15 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     String label,
     IconData icon,
     TimeFilter filter,
-    TimeFilter selectedFilter,
-    ValueChanged<TimeFilter> onFilterChanged,
     bool isDark,
   ) {
-    final isSelected = filter == selectedFilter;
+    final isSelected = filter == _selectedFilter;
     return GestureDetector(
-      onTap: () => onFilterChanged(filter),
+      onTap: () {
+        setState(() {
+          _selectedFilter = filter;
+        });
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
@@ -808,7 +826,8 @@ List<Map<String, dynamic>> _fakeHistory() {
       "area": "Sayısal Zeka",
       "score": 76,
       "duration": 48,
-      "timestamp": now.subtract(const Duration(days: 2, hours: 2)).toIso8601String(),
+      "timestamp":
+          now.subtract(const Duration(days: 2, hours: 2)).toIso8601String(),
     },
     {
       "area": "Görsel Algı",
@@ -820,7 +839,8 @@ List<Map<String, dynamic>> _fakeHistory() {
       "area": "Dil",
       "score": 80,
       "duration": 42,
-      "timestamp": now.subtract(const Duration(days: 3, hours: 3)).toIso8601String(),
+      "timestamp":
+          now.subtract(const Duration(days: 3, hours: 3)).toIso8601String(),
     },
   ];
 }
