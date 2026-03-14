@@ -3,8 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/i18n/app_strings.dart';
+import '../../../services/local_storage_service.dart';
 import '../../settings/providers/language_provider.dart';
-import '../../auth/screens/auth_gate_screen.dart';
+import 'onboarding_screen.dart';
+import 'welcome_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -43,15 +45,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _controller.forward();
 
-    // 3 saniye sonra AuthGateScreen'e geç (Firebase bağlantısı aktif)
-    Timer(const Duration(milliseconds: 3000), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const AuthGateScreen(),
-          ),
-        );
-      }
+    // 2.5 saniye sonra onboarding kontrol et
+    Timer(const Duration(milliseconds: 2500), () async {
+      if (!mounted) return;
+      final hasSeen = await LocalStorageService.hasSeenOnboarding();
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) =>
+              hasSeen ? const WelcomeScreen() : const OnboardingScreen(),
+          transitionsBuilder: (_, anim, __, child) {
+            return FadeTransition(opacity: anim, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
+      );
     });
   }
 
@@ -204,4 +212,3 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     );
   }
 }
-

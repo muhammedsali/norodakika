@@ -84,7 +84,10 @@ Kısa teknik özet:
 - [x] WordSprintGame oluşturuldu (LANG02)
 
 ### 🎨 UI Ekranları
-- [x] AuthGateScreen - Giriş kontrolü
+- [x] SplashScreen - Logo animasyonlu açılış (onboarding görüldü mü kontrol eder)
+- [x] OnboardingScreen - 4 kartlı tanıtım ekranı (Devam Et + "Haydi Başlayalım")
+- [x] WelcomeScreen - Oyun kartları önizlemesi + "Giriş Yap / Üye Ol" CTA
+- [x] AuthGateScreen - Giriş kontrolü (Firebase Auth)
 - [x] LoginScreen - Giriş ekranı (Material 3 + Neumorphic tasarım)
 - [x] RegisterScreen - Kayıt ekranı
 - [x] HomeScreen - Ana ekran (3 ana kart)
@@ -92,6 +95,10 @@ Kısa teknik özet:
 - [x] StatsScreen - Radar grafik ile istatistikler
 - [x] GamePlayScreen - Flutter oyun oynama ekranı
 - [x] ProfileScreen - Kullanıcı profili
+
+### 📱 Uygulama Akışı (Güncel)
+Splash → (ilk açılış?) Onboarding [4 kart, "Devam Et"] → WelcomeScreen [oyun kartları] → "Giriş Yap/Üye Ol" → AuthGateScreen → Login / HomeScreen
+Splash → (daha önce görmüş?) WelcomeScreen → "Giriş Yap/Üye Ol" → AuthGateScreen → Login / HomeScreen
 
 ### 🌍 Dil (i18n) / Localization
 - [x] Dil yönetimi eklendi (Riverpod)

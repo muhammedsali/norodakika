@@ -21,43 +21,128 @@ class WelcomeScreen extends ConsumerWidget {
         .map((g) => GameModel.fromMap(g))
         .toList();
 
+    final bgColor =
+        isDarkMode ? const Color(0xFF0B1220) : const Color(0xFFF3F4F6);
+    final headingColor =
+        isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final subColor =
+        isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+
     return Scaffold(
-      backgroundColor:
-          isDarkMode ? const Color(0xFF111827) : const Color(0xFFF3F4F6),
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Header
+            // ── Header ──────────────────────────────────────────────
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-              child: Column(
+              padding: const EdgeInsets.fromLTRB(24, 28, 24, 4),
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    s.appName,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode
-                          ? const Color(0xFFF9FAFB)
-                          : const Color(0xFF111827),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                            ),
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'BİLİŞSEL EĞİTİM',
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          s.appName,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 34,
+                            fontWeight: FontWeight.bold,
+                            color: headingColor,
+                            letterSpacing: -1,
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          s.welcomeSubtitle,
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 15,
+                            color: subColor,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    s.welcomeSubtitle,
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 16,
-                      color: isDarkMode
-                          ? const Color(0xFF9CA3AF)
-                          : const Color(0xFF4B5563),
+                  // Brain icon
+                  Container(
+                    width: 68,
+                    height: 68,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                      ),
+                      borderRadius: BorderRadius.circular(22),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF4F46E5).withValues(alpha: 0.4),
+                          blurRadius: 16,
+                          spreadRadius: 0,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.psychology,
+                      size: 38,
+                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Game Cards Grid
+            // ── Stats Row ─────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+              child: Row(
+                children: [
+                  _StatChip(
+                    icon: Icons.games_rounded,
+                    label: '${games.length} Oyun',
+                    isDark: isDarkMode,
+                  ),
+                  const SizedBox(width: 10),
+                  _StatChip(
+                    icon: Icons.category_rounded,
+                    label: '7 Kategori',
+                    isDark: isDarkMode,
+                  ),
+                  const SizedBox(width: 10),
+                  _StatChip(
+                    icon: Icons.timer_rounded,
+                    label: '1-3 Dakika',
+                    isDark: isDarkMode,
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Games Grid ────────────────────────────────────────────
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -65,27 +150,27 @@ class WelcomeScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 10),
                       child: Text(
                         s.gamesTitle,
                         style: GoogleFonts.spaceGrotesk(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isDarkMode
-                              ? const Color(0xFFF9FAFB)
-                              : const Color(0xFF111827),
+                          color: headingColor,
+                          letterSpacing: -0.3,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        crossAxisSpacing: 16,
-                        mainAxisSpacing: 16,
-                        childAspectRatio: 0.8,
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 14,
+                        childAspectRatio: 0.82,
                       ),
                       itemCount: games.length,
                       itemBuilder: (context, index) {
@@ -96,7 +181,8 @@ class WelcomeScreen extends ConsumerWidget {
                           area: game.area,
                           isDarkMode: isDarkMode,
                           onTap: () {
-                            _showLoginPrompt(context, isDarkMode, s);
+                            // Oyun kartına tıklayınca giriş/kayıt ekranına yönlendir
+                            _navigateToAuth(context);
                           },
                         );
                       },
@@ -106,54 +192,80 @@ class WelcomeScreen extends ConsumerWidget {
               ),
             ),
 
-            // Bottom CTA Button
-            Padding(
+            // ── Bottom CTA Button ─────────────────────────────────────
+            Container(
+              decoration: BoxDecoration(
+                color: bgColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-              child: SizedBox(
-                width: double.infinity,
-                height: 64,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AuthGateScreen(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isDarkMode ? const Color(0xFF1F2937) : const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
-                    elevation: 8,
-                    shadowColor:
-                        (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5))
-                            .withValues(alpha: 0.35),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999),
-                      side: isDarkMode
-                          ? const BorderSide(
-                              color: Color(0xFF818CF8),
-                              width: 1.2,
-                            )
-                          : BorderSide.none,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Oynamak için giriş yapman gerekiyor',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 13,
+                      color: subColor,
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.play_arrow_rounded, size: 24),
-                      const SizedBox(width: 8),
-                      Text(
-                        s.letsPlay,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 62,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+                        ),
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                const Color(0xFF4F46E5).withValues(alpha: 0.4),
+                            blurRadius: 20,
+                            spreadRadius: 0,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () => _navigateToAuth(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.login_rounded, size: 22),
+                            const SizedBox(width: 10),
+                            Text(
+                              'Giriş Yap / Üye Ol',
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -162,125 +274,65 @@ class WelcomeScreen extends ConsumerWidget {
     );
   }
 
-  void _showLoginPrompt(BuildContext context, bool isDarkMode, AppStrings s) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        final themeBg = isDarkMode ? const Color(0xFF111827) : Colors.white;
-        final titleColor =
-            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-        final textColor =
-            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
+  void _navigateToAuth(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const AuthGateScreen(),
+        transitionsBuilder: (_, anim, __, child) {
+          return FadeTransition(opacity: anim, child: child);
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
+  }
+}
 
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                constraints: const BoxConstraints(
-                  maxWidth: 420,
-                  minHeight: 200,
-                ),
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: themeBg,
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x33000000),
-                      blurRadius: 32,
-                      offset: Offset(0, 16),
-                    ),
-                  ],
-                  border: Border.all(
-                    color: isDarkMode
-                        ? const Color(0xFF374151)
-                        : const Color(0xFFE5E7EB),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                s.loginRequiredTitle,
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                  color: titleColor,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                s.loginRequiredText,
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 14,
-                                  height: 1.4,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        IconButton(
-                          splashRadius: 20,
-                          onPressed: () {
-                            Navigator.of(ctx).pop();
-                          },
-                          icon: Icon(
-                            Icons.close_rounded,
-                            size: 22,
-                            color: textColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(ctx).pop();
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const AuthGateScreen(),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4F46E5),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          elevation: 2,
-                        ),
-                        child: Text(
-                          s.loginOrRegister,
-                          style: GoogleFonts.spaceGrotesk(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+class _StatChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isDark;
+
+  const _StatChip({
+    required this.icon,
+    required this.label,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark
+            ? Colors.white.withValues(alpha: 0.07)
+            : Colors.white.withValues(alpha: 0.8),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.1)
+              : const Color(0xFFE5E7EB),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: const Color(0xFF4F46E5),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isDark ? Colors.white.withValues(alpha: 0.8) : const Color(0xFF374151),
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }
