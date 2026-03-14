@@ -1,0 +1,14 @@
+{
+  "dart.flutterSdkPath": null,
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.completion.enabled": false,
+  "java.validate.enabled": false,
+  "java.project.sourcePaths": [],
+  "java.project.referencedLibraries": [],
+  "[java]": {
+    "editor.formatOnSave": false
+  },
+  "java.import.gradle.enabled": false,
+  "editor.formatOnSave": true,
+  "dart.runPubGetOnPubspecChanges": "always"
+}
