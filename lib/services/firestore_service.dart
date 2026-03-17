@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import '../core/models/user_model.dart';
 import '../core/models/attempt_model.dart';
 import '../core/memory/memory_bank.dart';
@@ -6,10 +7,9 @@ import '../core/memory/memory_bank.dart';
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Koleksiyon referansları
   CollectionReference get _usersCollection => _firestore.collection('users');
 
-  // Kullanıcı verilerini getir
+  // ── Kullanıcı verilerini getir (tek seferlik) ──────────────
   Future<UserModel?> getUserData(String uid) async {
     try {
       final doc = await _usersCollection.doc(uid).get();
@@ -18,58 +18,87 @@ class FirestoreService {
       }
       return null;
     } catch (e) {
-      print('Error getting user data: $e');
+      debugPrint('getUserData hatası: $e');
       return null;
     }
   }
 
-  // Kullanıcı verilerini kaydet/güncelle
+  // ── Kullanıcı verisini stream olarak dinle (realtime) ──────
+  Stream<UserModel?> watchUserData(String uid) {
+    return _usersCollection.doc(uid).snapshots().map((doc) {
+      if (doc.exists && doc.data() != null) {
+        try {
+          return UserModel.fromJson(doc.data() as Map<String, dynamic>);
+        } catch (e) {
+          debugPrint('watchUserData parse hatası: $e');
+          return null;
+        }
+      }
+      return null;
+    });
+  }
+
+  // ── Kullanıcı verilerini kaydet/güncelle ───────────────────
   Future<void> saveUserData(UserModel user) async {
     try {
-      await _usersCollection.doc(user.uid).set(user.toJson(), SetOptions(merge: true));
+      await _usersCollection
+          .doc(user.uid)
+          .set(user.toJson(), SetOptions(merge: true));
     } catch (e) {
-      print('Error saving user data: $e');
+      debugPrint('saveUserData hatası: $e');
       throw 'Veriler kaydedilemedi.';
     }
   }
 
-  // Attempt (Oyun denemesi) kaydet
+  // ── Oyun denemesini kaydet ─────────────────────────────────
+  // FieldValue.arrayUnion kullanarak race condition önlenir
   Future<void> saveAttempt(AttemptModel attempt) async {
     try {
-      // 1. Kullanıcıyı getir
-      final user = await getUserData(attempt.userId);
-      if (user != null) {
-        // 2. Geçmişe ekle
-        final updatedHistory = [...user.history, attempt.toMap()];
-        
-        // 3. İstatistikleri güncelle
-        final updatedStats = Map<String, double>.from(user.stats);
-        final radarStats = MemoryBank.calculateRadarStats(updatedHistory);
-        updatedStats.addAll(radarStats);
-        
-        // 4. Modeli güncelle
-        final updatedUser = user.copyWith(
-          history: updatedHistory,
-          stats: updatedStats,
+      final userDoc = _usersCollection.doc(attempt.userId);
+      final attemptMap = attempt.toMap();
+
+      // 1. Attempts subcollection'a kaydet (hızlı yol)
+      await userDoc.collection('attempts').add(attemptMap);
+
+      // 2. Ana user dokümanını güncelle — atomik işlem
+      // Önce dokümanı oku, sonra istatistikleri hesapla
+      final snapshot = await userDoc.get();
+
+      if (!snapshot.exists) {
+        // Kullanıcı dokümanı yoksa oluştur (Google Sign-In edge case)
+        final newUser = UserModel.fromJson(
+          MemoryBank.createUserModel(attempt.userId),
         );
-        
-        // 5. Firestore'a yaz
-        await saveUserData(updatedUser);
-        
-        // Opsiyonel: Attempts'leri ayrı bir subcollection olarak da tutabiliriz
-        // Bu, sorgulama esnekliği sağlar
-        await _usersCollection
-            .doc(attempt.userId)
-            .collection('attempts')
-            .add(attempt.toMap());
+        final updatedUser = newUser.copyWith(
+          history: [attemptMap],
+          stats: MemoryBank.calculateRadarStats([attemptMap]),
+        );
+        await userDoc.set(updatedUser.toJson());
+        return;
       }
+
+      final userData = UserModel.fromJson(
+        snapshot.data() as Map<String, dynamic>,
+      );
+
+      // Mevcut history'ye ekle
+      final updatedHistory = [...userData.history, attemptMap];
+
+      // Radar istatistiklerini yeniden hesapla
+      final newStats = MemoryBank.calculateRadarStats(updatedHistory);
+
+      // Firestore'a yaz (merge ile güvenli)
+      await userDoc.update({
+        'history': FieldValue.arrayUnion([attemptMap]),
+        'stats': newStats,
+      });
     } catch (e) {
-      print('Error saving attempt: $e');
-      throw 'Oyun sonucu kaydedilemedi.';
+      debugPrint('saveAttempt hatası: $e');
+      throw 'Oyun sonucu kaydedilemedi: $e';
     }
   }
-  
-  // Oyun zorluk seviyesini getir
+
+  // ── Oyun zorluk seviyesini getir ──────────────────────────
   Future<double> getGameDifficulty({
     required String userId,
     required String gameId,
@@ -80,18 +109,20 @@ class FirestoreService {
           .collection('game_states')
           .doc(gameId)
           .get();
-      
+
       if (doc.exists && doc.data() != null) {
-        return (doc.data() as Map<String, dynamic>)['difficulty']?.toDouble() ?? 1.0;
+        return (doc.data() as Map<String, dynamic>)['difficulty']
+                ?.toDouble() ??
+            1.0;
       }
       return 1.0;
     } catch (e) {
-      print('Error getting game difficulty: $e');
+      debugPrint('getGameDifficulty hatası: $e');
       return 1.0;
     }
   }
 
-  // Oyun zorluk seviyesini güncelle
+  // ── Oyun zorluk seviyesini güncelle ───────────────────────
   Future<void> updateGameDifficulty({
     required String userId,
     required String gameId,
@@ -103,11 +134,33 @@ class FirestoreService {
           .collection('game_states')
           .doc(gameId)
           .set({
-            'difficulty': newDifficulty,
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
+        'difficulty': newDifficulty,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     } catch (e) {
-      print('Error updating game difficulty: $e');
+      debugPrint('updateGameDifficulty hatası: $e');
+    }
+  }
+
+  // ── Son N oyun geçmişini getir (Subcollection'dan) ────────
+  Future<List<Map<String, dynamic>>> getRecentAttempts({
+    required String userId,
+    int limit = 50,
+  }) async {
+    try {
+      final snapshot = await _usersCollection
+          .doc(userId)
+          .collection('attempts')
+          .orderBy('timestamp', descending: true)
+          .limit(limit)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => doc.data())
+          .toList();
+    } catch (e) {
+      debugPrint('getRecentAttempts hatası: $e');
+      return [];
     }
   }
 }

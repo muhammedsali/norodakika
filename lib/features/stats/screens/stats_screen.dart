@@ -24,14 +24,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   @override
   void initState() {
     super.initState();
-    // Önce sahte verileri ekle, sonra history'yi yükle
-    _historyFuture = _initializeData();
+    _historyFuture = _loadLocalHistory();
   }
 
-  Future<List<Map<String, dynamic>>> _initializeData() async {
-    // Şuanlık her zaman sahte veriler ekle (test amaçlı)
-    await LocalStorageService.addMockData();
-    // Veriler eklendikten sonra history'yi döndür
+  Future<List<Map<String, dynamic>>> _loadLocalHistory() async {
     return await LocalStorageService.getGameHistory();
   }
 
@@ -48,24 +44,18 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     final textColorSecondary =
         isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563);
 
-    // Kullanıcı yoksa local storage'dan veri oku
+    // ── Giriş yapılmamış: Local storage'dan oku ────────────
     if (user == null) {
-      // _historyFuture null ise başlat
-      _historyFuture ??= _initializeData();
-
+      _historyFuture ??= _loadLocalHistory();
       return FutureBuilder<List<Map<String, dynamic>>>(
         future: _historyFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
           final history = snapshot.data ?? [];
-          // Eğer history boşsa sahte verileri göster
-          final displayHistory = history.isNotEmpty ? history : _fakeHistory();
-
           return _buildStatsBodyWrapper(
-            history: displayHistory,
+            history: history,
             isDark: isDark,
             textColorPrimary: textColorPrimary,
             textColorSecondary: textColorSecondary,
@@ -75,15 +65,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       );
     }
 
+    // ── Giriş yapılmış: Firestore stream'den oku ───────────
     final userDataAsync = ref.watch(userDataProvider);
 
     return userDataAsync.when(
       data: (userData) {
-        final rawHistory = (userData == null)
-            ? <dynamic>[]
-            : List.from(userData.history as List);
-        final history = rawHistory.isNotEmpty ? rawHistory : _fakeHistory();
-
+        final history = userData?.history ?? [];
         return _buildStatsBodyWrapper(
           history: history,
           isDark: isDark,
@@ -94,12 +81,29 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
-        child: Text(
-          s.errorPrefix(error),
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: textColorSecondary,
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error_outline, size: 48, color: Colors.red),
+            const SizedBox(height: 12),
+            Text(
+              'Veri yüklenemedi',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: textColorPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              error.toString(),
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: textColorSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );
@@ -795,52 +799,4 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   }
 }
 
-List<Map<String, dynamic>> _fakeHistory() {
-  final now = DateTime.now();
-  return [
-    {
-      "area": "Hafıza",
-      "score": 78,
-      "duration": 45,
-      "timestamp": now.toIso8601String(),
-    },
-    {
-      "area": "Dikkat",
-      "score": 82,
-      "duration": 50,
-      "timestamp": now.subtract(const Duration(hours: 1)).toIso8601String(),
-    },
-    {
-      "area": "Refleks",
-      "score": 74,
-      "duration": 35,
-      "timestamp": now.subtract(const Duration(days: 1)).toIso8601String(),
-    },
-    {
-      "area": "Mantık",
-      "score": 69,
-      "duration": 40,
-      "timestamp": now.subtract(const Duration(days: 2)).toIso8601String(),
-    },
-    {
-      "area": "Sayısal Zeka",
-      "score": 76,
-      "duration": 48,
-      "timestamp":
-          now.subtract(const Duration(days: 2, hours: 2)).toIso8601String(),
-    },
-    {
-      "area": "Görsel Algı",
-      "score": 71,
-      "duration": 38,
-      "timestamp": now.subtract(const Duration(days: 3)).toIso8601String(),
-    },
-    {
-      "area": "Dil",
-      "score": 80,
-      "duration": 42,
-      "timestamp":
-          now.subtract(const Duration(days: 3, hours: 3)).toIso8601String(),
-    },
-  ];
-}
+

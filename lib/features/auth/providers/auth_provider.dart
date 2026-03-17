@@ -8,20 +8,25 @@ import '../../../core/models/user_model.dart';
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 // Firestore servis sağlayıcısı
-final firestoreServiceProvider = Provider<FirestoreService>((ref) => FirestoreService());
+final firestoreServiceProvider =
+    Provider<FirestoreService>((ref) => FirestoreService());
 
-// Mevcut kullanıcı ID'si (Firebase Auth'dan gelir)
+// Mevcut kullanıcı (Firebase Auth stream)
 final currentUserProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });
 
-// Kullanıcı verileri (Firestore'dan gelir)
-final userDataProvider = FutureProvider<UserModel?>((ref) async {
-  final user = ref.watch(currentUserProvider).value;
-  if (user != null) {
-    return ref.watch(firestoreServiceProvider).getUserData(user.uid);
+// Kullanıcı verileri - Stream (Firestore realtime)
+// Kullanıcı giriş yaptığında otomatik güncellenecek
+final userDataProvider = StreamProvider<UserModel?>((ref) {
+  final userAsync = ref.watch(currentUserProvider);
+  final user = userAsync.value;
+
+  if (user == null) {
+    return Stream.value(null);
   }
-  return null;
+
+  return ref.watch(firestoreServiceProvider).watchUserData(user.uid);
 });
 
 class AuthNotifier extends StateNotifier<AsyncValue<void>> {
@@ -34,7 +39,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      await ref.read(authServiceProvider).register(email: email, password: password);
+      await ref.read(authServiceProvider).register(
+            email: email,
+            password: password,
+          );
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -47,7 +55,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }) async {
     state = const AsyncValue.loading();
     try {
-      await ref.read(authServiceProvider).login(email: email, password: password);
+      await ref.read(authServiceProvider).login(
+            email: email,
+            password: password,
+          );
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -80,7 +91,7 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }
 }
 
-final authNotifierProvider = StateNotifierProvider<AuthNotifier, AsyncValue<void>>((ref) {
+final authNotifierProvider =
+    StateNotifierProvider<AuthNotifier, AsyncValue<void>>((ref) {
   return AuthNotifier(ref);
 });
-
