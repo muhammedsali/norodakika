@@ -25,9 +25,20 @@ class UserModel {
       ),
       history: List<Map<String, dynamic>>.from(json['history'] ?? []),
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? _parseDateTime(json['createdAt'])
           : DateTime.now(),
     );
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    if (value.runtimeType.toString() == 'Timestamp') {
+      try {
+        return value.toDate();
+      } catch (_) {}
+    }
+    return DateTime.now();
   }
 
   Map<String, dynamic> toJson() {

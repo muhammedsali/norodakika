@@ -773,7 +773,18 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     return history.where((h) {
       if (h is Map && h['timestamp'] != null) {
         try {
-          final ts = DateTime.parse(h['timestamp'].toString());
+          DateTime ts;
+          final rawTime = h['timestamp'];
+          
+          if (rawTime is DateTime) {
+            ts = rawTime;
+          } else if (rawTime.runtimeType.toString() == 'Timestamp') {
+            // Firestore Timestamp objesi için toDate()
+            ts = rawTime.toDate();
+          } else {
+            ts = DateTime.parse(rawTime.toString());
+          }
+
           return ts.isAfter(startDate.subtract(const Duration(seconds: 1))) &&
               ts.isBefore(now.add(const Duration(days: 1)));
         } catch (_) {

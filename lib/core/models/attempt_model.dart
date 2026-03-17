@@ -28,10 +28,21 @@ class AttemptModel {
       difficulty: (map['difficulty'] as num?)?.toDouble() ?? 1.0,
       duration: map['duration'] ?? 0,
       timestamp: map['timestamp'] != null
-          ? DateTime.parse(map['timestamp'])
+          ? _parseDateTime(map['timestamp'])
           : DateTime.now(),
       area: map['area'] ?? '',
     );
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value is DateTime) return value;
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    if (value.runtimeType.toString() == 'Timestamp') {
+      try {
+        return value.toDate();
+      } catch (_) {}
+    }
+    return DateTime.now();
   }
 
   Map<String, dynamic> toMap() {
