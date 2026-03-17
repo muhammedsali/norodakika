@@ -13,7 +13,7 @@ class NBackMiniGame extends StatefulWidget {
   final bool isPaused;
 
   const NBackMiniGame({
-    super.key, 
+    super.key,
     required this.onComplete,
     required this.isPaused,
   });
@@ -54,6 +54,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   bool _answeredPosition = false;
   bool _answeredLetter = false;
 
+  @override
   void initState() {
     super.initState();
     _resetState();
@@ -93,7 +94,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
       }
     });
 
-    _beatTimer = Timer.periodic(Duration(milliseconds: beatMs), (_) {
+    _beatTimer = Timer.periodic(const Duration(milliseconds: beatMs), (_) {
       if (_isFinished) return;
       _evaluateMisses();
       _pushStimulus();
@@ -216,7 +217,8 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
     _gameTimer?.cancel();
     _beatTimer?.cancel();
 
-    final duration = DateTime.now().difference(_startTime ?? DateTime.now()).inSeconds;
+    final duration =
+        DateTime.now().difference(_startTime ?? DateTime.now()).inSeconds;
     final successRate = _totalAttempts == 0 ? 0.0 : _correct / _totalAttempts;
 
     widget.onComplete({
@@ -271,7 +273,8 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
 
   Widget _buildHeader(bool isDark, Color panel) {
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -343,16 +346,19 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
       child: LinearProgressIndicator(
         value: progress.clamp(0, 1),
         minHeight: 12,
-        backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+        backgroundColor:
+            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
         valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+          Color.lerp(
+              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
         ),
       ),
     );
   }
 
   Widget _buildArena(bool isDark, Color panel) {
-    final highlight = isDark ? const Color(0xFF4F46E5) : const Color(0xFF2563EB);
+    final highlight =
+        isDark ? const Color(0xFF4F46E5) : const Color(0xFF2563EB);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -388,7 +394,8 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
                     height: cellSize * 3 + 24,
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 12,
@@ -481,7 +488,8 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   }
 
   Widget _buildStats(Color panel, bool isDark) {
-    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
     final accuracy = _totalAttempts == 0 ? 0.0 : _correct / _totalAttempts;
 
     return Container(
@@ -610,7 +618,8 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
+              style: GoogleFonts.spaceGrotesk(
+                  fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,
@@ -626,7 +635,6 @@ class _StatChip extends StatelessWidget {
     );
   }
 }
-
 
 class _Stimulus {
   final int position; // 0-8

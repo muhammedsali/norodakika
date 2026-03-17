@@ -59,7 +59,8 @@ class LocalStorageService {
   }
 
   // Oyun geçmişini kaydet
-  static Future<void> saveGameHistory(List<Map<String, dynamic>> history) async {
+  static Future<void> saveGameHistory(
+      List<Map<String, dynamic>> history) async {
     final prefs = await SharedPreferences.getInstance();
     final historyJson = jsonEncode(history);
     await prefs.setString(_gameHistoryKey, historyJson);
@@ -97,7 +98,8 @@ class LocalStorageService {
   // Oyun istatistiklerini kaydet
   static Future<void> saveGameStats(Map<String, double> stats) async {
     final prefs = await SharedPreferences.getInstance();
-    final statsJson = jsonEncode(stats.map((k, v) => MapEntry(k, v.toString())));
+    final statsJson =
+        jsonEncode(stats.map((k, v) => MapEntry(k, v.toString())));
     await prefs.setString(_gameStatsKey, statsJson);
   }
 
@@ -134,16 +136,17 @@ class LocalStorageService {
   }
 
   // Oyun zorluk seviyesini kaydet
-  static Future<void> saveGameDifficulty(String gameId, double difficulty) async {
+  static Future<void> saveGameDifficulty(
+      String gameId, double difficulty) async {
     final prefs = await SharedPreferences.getInstance();
-    final key = '$_gameDifficultyKey\_$gameId';
+    final key = '${_gameDifficultyKey}_$gameId';
     await prefs.setDouble(key, difficulty);
   }
 
   // Oyun zorluk seviyesini getir
   static Future<double> getGameDifficulty(String gameId) async {
     final prefs = await SharedPreferences.getInstance();
-    final key = '$_gameDifficultyKey\_$gameId';
+    final key = '${_gameDifficultyKey}_$gameId';
     return prefs.getDouble(key) ?? 1.0;
   }
 
@@ -155,32 +158,48 @@ class LocalStorageService {
     // Son 7 gün için çeşitli oyunlardan attempt'ler
     for (int day = 0; day < 7; day++) {
       final date = now.subtract(Duration(days: day));
-      
+
       // Her gün 2-4 oyun oynanmış gibi göster
       final gamesPerDay = [2, 3, 4, 2, 3, 4, 3][day];
-      
+
       for (int i = 0; i < gamesPerDay; i++) {
         // Her seferinde farklı timestamp için milisaniye ekle
         final hour = 10 + (i * 3); // 10:00, 13:00, 16:00, 19:00 gibi
         final minute = (day * 7 + i * 3) % 60; // Farklı dakikalar
         final second = (day * 11 + i * 5) % 60; // Farklı saniyeler
-        final gameTime = DateTime(date.year, date.month, date.day, hour, minute, second);
-        
+        final gameTime =
+            DateTime(date.year, date.month, date.day, hour, minute, second);
+
         // Farklı oyunlar ve skorlar
         final gameIndex = (day * 2 + i) % MemoryBank.games.length;
         final game = MemoryBank.games[gameIndex];
-        
+
         // Rastgele ama gerçekçi skorlar
-        final baseScore = [450, 680, 320, 890, 550, 720, 380, 650, 420, 750, 580, 690][gameIndex];
+        final baseScore = [
+          450,
+          680,
+          320,
+          890,
+          550,
+          720,
+          380,
+          650,
+          420,
+          750,
+          580,
+          690
+        ][gameIndex];
         final scoreVariation = (day * 10 + i * 5) % 200;
         final score = (baseScore + scoreVariation).toDouble();
-        
-        final successRate = 0.5 + (day * 0.05) + (i * 0.03); // Gün geçtikçe iyileşiyor
+
+        final successRate =
+            0.5 + (day * 0.05) + (i * 0.03); // Gün geçtikçe iyileşiyor
         final clampedSuccessRate = successRate.clamp(0.4, 0.95);
-        
-        final duration = [45, 60, 90, 75, 50, 80, 65, 55, 70, 85, 40, 95][gameIndex];
+
+        final duration =
+            [45, 60, 90, 75, 50, 80, 65, 55, 70, 85, 40, 95][gameIndex];
         final difficulty = 1.0 + (day * 0.1) + (i * 0.05);
-        
+
         mockAttempts.add(AttemptModel(
           gameId: game['id'] as String,
           userId: 'guest',
@@ -196,7 +215,7 @@ class LocalStorageService {
 
     // Mevcut history'yi al ve sahte verileri ekle
     final existingHistory = await getGameHistory();
-    
+
     // Tüm yeni attempt'leri ekle (duplicate kontrolü yok, her seferinde yeni veriler)
     for (final attempt in mockAttempts) {
       existingHistory.add(attempt.toMap());
@@ -209,7 +228,8 @@ class LocalStorageService {
     final stats = MemoryBank.calculateRadarStats(existingHistory);
     await saveGameStats(stats);
 
-    print('✅ Sahte veriler eklendi: ${mockAttempts.length} yeni attempt (toplam: ${existingHistory.length})');
+    print(
+        '✅ Sahte veriler eklendi: ${mockAttempts.length} yeni attempt (toplam: ${existingHistory.length})');
   }
 
   // Tüm oyun geçmişini temizle
@@ -220,4 +240,3 @@ class LocalStorageService {
     print('✅ Oyun geçmişi temizlendi');
   }
 }
-

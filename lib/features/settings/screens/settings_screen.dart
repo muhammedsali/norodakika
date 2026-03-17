@@ -107,7 +107,7 @@ class SettingsScreen extends ConsumerWidget {
                       onChanged: (value) {
                         // TODO: Implement sound toggle
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Coming soon')),
+                          const SnackBar(content: Text('Coming soon')),
                         );
                       },
                       titleColor: titleColor,
@@ -123,7 +123,7 @@ class SettingsScreen extends ConsumerWidget {
                       onChanged: (value) {
                         // TODO: Implement notification toggle
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Coming soon')),
+                          const SnackBar(content: Text('Coming soon')),
                         );
                       },
                       titleColor: titleColor,

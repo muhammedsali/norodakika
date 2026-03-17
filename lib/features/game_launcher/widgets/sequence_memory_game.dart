@@ -13,7 +13,7 @@ class SequenceMemoryGame extends StatefulWidget {
   final bool isPaused;
 
   const SequenceMemoryGame({
-    super.key, 
+    super.key,
     required this.onComplete,
     required this.isPaused,
   });
@@ -48,6 +48,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   Timer? _gameTimer;
   final AudioService _audioService = AudioService();
 
+  @override
   void initState() {
     super.initState();
     _resetState();
@@ -133,7 +134,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _handleTap(int index) {
-    if (_isFinished || _isPlaying || _timeRemaining <= 0 || widget.isPaused) return;
+    if (_isFinished || _isPlaying || _timeRemaining <= 0 || widget.isPaused)
+      return;
     HapticFeedback.selectionClick();
     _audioService.playTap(); // 👆 Dokunma sesi
 
@@ -229,7 +231,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
   Widget _buildHeader(bool isDark, Color panel) {
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -301,16 +304,19 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
       child: LinearProgressIndicator(
         value: progress.clamp(0, 1),
         minHeight: 12,
-        backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+        backgroundColor:
+            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
         valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+          Color.lerp(
+              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
         ),
       ),
     );
   }
 
   Widget _buildGrid(bool isDark, Color panel) {
-    final highlight = isDark ? const Color(0xFF4F46E5) : const Color(0xFF2563EB);
+    final highlight =
+        isDark ? const Color(0xFF4F46E5) : const Color(0xFF2563EB);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -375,7 +381,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   Widget _buildStats(Color panel, bool isDark) {
-    final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -440,7 +447,8 @@ class _StatChip extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.spaceGrotesk(fontSize: 11, color: color.withValues(alpha: 0.8)),
+              style: GoogleFonts.spaceGrotesk(
+                  fontSize: 11, color: color.withValues(alpha: 0.8)),
             ),
             Text(
               value,
@@ -456,5 +464,3 @@ class _StatChip extends StatelessWidget {
     );
   }
 }
-
-

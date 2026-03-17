@@ -49,8 +49,8 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
   }
 
   _Puzzle _newPuzzle() {
-    final start = const Point<int>(0, 0);
-    final end = const Point<int>(grid - 1, grid - 1);
+    const start = Point<int>(0, 0);
+    const end = Point<int>(grid - 1, grid - 1);
 
     while (true) {
       final blocked = <Point<int>>{};
@@ -65,7 +65,12 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
       if (dist == null) continue;
 
       final options = _buildOptions(dist);
-      return _Puzzle(blocked: blocked, start: start, end: end, answer: dist, options: options);
+      return _Puzzle(
+          blocked: blocked,
+          start: start,
+          end: end,
+          answer: dist,
+          options: options);
     }
   }
 
@@ -143,8 +148,10 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return SafeArea(
       child: Padding(
@@ -181,7 +188,9 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
                 color: isDark ? const Color(0xFF1F2937) : Colors.white,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                  color: isDark
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
                 ),
               ),
               child: Column(
@@ -189,7 +198,8 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
                 children: [
                   Text(
                     'Round ${_round + 1}/$rounds   Skor: $_score',
-                    style: GoogleFonts.robotoMono(fontSize: 12, color: textColor),
+                    style:
+                        GoogleFonts.robotoMono(fontSize: 12, color: textColor),
                   ),
                   const SizedBox(height: 12),
                   AspectRatio(
@@ -335,7 +345,8 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(

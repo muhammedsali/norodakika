@@ -138,7 +138,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     // Filtreye göre history'yi filtrele
     final filteredHistory = _filterHistoryByTime(history, _selectedFilter);
     final radarStats = MemoryBank.calculateRadarStats(filteredHistory);
-    final categories = MemoryBank.categories;
+    const categories = MemoryBank.categories;
 
     // Seçilen filtreye göre özet hesaplamaları
     final filteredAttempts = filteredHistory;
@@ -643,7 +643,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

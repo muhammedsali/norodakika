@@ -94,10 +94,12 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
-    final centerX = 0.5;
+    const centerX = 0.5;
     final dotX = (centerX + (_offset / (maxOffset * 2))).clamp(0.0, 1.0);
 
     return SafeArea(
@@ -135,7 +137,9 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                 color: isDark ? const Color(0xFF1F2937) : Colors.white,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                  color: isDark
+                      ? const Color(0xFF374151)
+                      : const Color(0xFFE5E7EB),
                 ),
               ),
               child: Column(
@@ -152,13 +156,18 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                               left: width / 2 - 2,
                               top: 10,
                               bottom: 10,
-                              child: Container(width: 4, color: const Color(0xFF4F46E5)),
+                              child: Container(
+                                  width: 4, color: const Color(0xFF4F46E5)),
                             ),
                             Positioned(
                               left: 0,
                               right: 0,
                               top: 34,
-                              child: Container(height: 4, color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB)),
+                              child: Container(
+                                  height: 4,
+                                  color: isDark
+                                      ? const Color(0xFF374151)
+                                      : const Color(0xFFE5E7EB)),
                             ),
                             Positioned(
                               left: x - 12,
@@ -173,7 +182,8 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.15),
+                                      color:
+                                          Colors.black.withValues(alpha: 0.15),
                                       blurRadius: 12,
                                       offset: const Offset(0, 6),
                                     )
@@ -189,7 +199,8 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                   const SizedBox(height: 8),
                   Text(
                     'Skor: $_score',
-                    style: GoogleFonts.robotoMono(fontSize: 12, color: textColor),
+                    style:
+                        GoogleFonts.robotoMono(fontSize: 12, color: textColor),
                   ),
                 ],
               ),
@@ -231,7 +242,8 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(

@@ -18,7 +18,8 @@ class ReflexTapGame extends StatefulWidget {
   State<ReflexTapGame> createState() => _ReflexTapGameState();
 }
 
-class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateMixin {
+class _ReflexTapGameState extends State<ReflexTapGame>
+    with TickerProviderStateMixin {
   static const int gameDuration = 30;
   static const int minDelayMs = 500;
   static const int maxDelayMs = 2500;
@@ -160,7 +161,7 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
       _isTargetVisible = false;
     });
 
-    final durationSeconds = gameDuration;
+    const durationSeconds = gameDuration;
     final successRate = _totalTaps == 0 ? 0.0 : _correctTaps / _totalTaps;
 
     widget.onComplete({
@@ -168,7 +169,7 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
       'successRate': successRate,
       'duration': durationSeconds,
     });
-    }
+  }
 
   void _scheduleNextTarget() {
     if (_timeRemaining <= 0 || _isPaused || !mounted) return;
@@ -209,7 +210,8 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
       return;
     }
 
-    final reactionTime = DateTime.now().difference(_tapStartTime!).inMilliseconds;
+    final reactionTime =
+        DateTime.now().difference(_tapStartTime!).inMilliseconds;
 
     HapticFeedback.lightImpact();
 
@@ -268,12 +270,15 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
     final isDark = theme.brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
     final panelColor = isDark ? const Color(0xFF1F2937) : Colors.white;
-    final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-    final textSecondary = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+    final titleColor =
+        isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
+    final textSecondary =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     final int? averageReaction = _reactionTimes.isEmpty
         ? null
-        : (_reactionTimes.reduce((a, b) => a + b) / _reactionTimes.length).round();
+        : (_reactionTimes.reduce((a, b) => a + b) / _reactionTimes.length)
+            .round();
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -287,82 +292,86 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
               Stack(
                 alignment: Alignment.center,
                 children: [
-                  if (_gameState == GameState.finished) _buildEndScreen(isDark, panelColor, titleColor, textSecondary),
-                  if (_gameState == GameState.playing) _buildGameButton(isDark, textSecondary),
+                  if (_gameState == GameState.finished)
+                    _buildEndScreen(
+                        isDark, panelColor, titleColor, textSecondary),
+                  if (_gameState == GameState.playing)
+                    _buildGameButton(isDark, textSecondary),
                 ],
               ),
               const Spacer(),
               AnimatedSize(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeOut,
-                child: _gameState == GameState.playing && _lastReactionTime != null
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            "$_lastReactionTime ms",
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 48,
-                              fontWeight: FontWeight.w900,
-                              color: titleColor,
-                              height: 1,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _feedbackText,
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: _feedbackColor,
-                              letterSpacing: 1.5,
-                            ),
-                          ),
-                          if (averageReaction != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Ortalama: ',
-                                    style: GoogleFonts.spaceGrotesk(
-                                      fontSize: 13,
-                                      color: textSecondary,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${averageReaction} ms',
-                                    style: GoogleFonts.spaceGrotesk(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: titleColor,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  if (_combo > 0) ...[
-                                    Text(
-                                      'Seri: ',
-                                      style: GoogleFonts.spaceGrotesk(
-                                        fontSize: 13,
-                                        color: textSecondary,
-                                      ),
-                                    ),
-                                    Text(
-                                      'x$_combo',
-                                      style: GoogleFonts.spaceGrotesk(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.orange,
-                                      ),
-                                    ),
-                                  ],
-                                ],
+                child:
+                    _gameState == GameState.playing && _lastReactionTime != null
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "$_lastReactionTime ms",
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w900,
+                                  color: titleColor,
+                                  height: 1,
+                                ),
                               ),
-                            ),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
+                              const SizedBox(height: 4),
+                              Text(
+                                _feedbackText,
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: _feedbackColor,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              if (averageReaction != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Ortalama: ',
+                                        style: GoogleFonts.spaceGrotesk(
+                                          fontSize: 13,
+                                          color: textSecondary,
+                                        ),
+                                      ),
+                                      Text(
+                                        '$averageReaction ms',
+                                        style: GoogleFonts.spaceGrotesk(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: titleColor,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      if (_combo > 0) ...[
+                                        Text(
+                                          'Seri: ',
+                                          style: GoogleFonts.spaceGrotesk(
+                                            fontSize: 13,
+                                            color: textSecondary,
+                                          ),
+                                        ),
+                                        Text(
+                                          'x$_combo',
+                                          style: GoogleFonts.spaceGrotesk(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
               ),
             ],
           ),
@@ -371,7 +380,8 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
     );
   }
 
-  Widget _buildHUD(bool isDark, Color panelColor, Color titleColor, Color textSecondary) {
+  Widget _buildHUD(
+      bool isDark, Color panelColor, Color titleColor, Color textSecondary) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -385,30 +395,44 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
           )
         ],
         border: Border.all(
-          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.1),
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.1)
+              : Colors.black.withValues(alpha: 0.1),
         ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildStatItem("SÜRE", "$_timeRemaining", Icons.timer, titleColor, textSecondary),
+          _buildStatItem("SÜRE", "$_timeRemaining", Icons.timer, titleColor,
+              textSecondary),
           AnimatedOpacity(
             duration: const Duration(milliseconds: 300),
             opacity: _combo > 1 ? 1.0 : 0.0,
             child: Column(
               children: [
-                Text("COMBO", style: GoogleFonts.spaceGrotesk(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange)),
-                Text("x$_multiplier", style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.orangeAccent, fontStyle: FontStyle.italic)),
+                Text("COMBO",
+                    style: GoogleFonts.spaceGrotesk(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange)),
+                Text("x$_multiplier",
+                    style: GoogleFonts.spaceGrotesk(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.orangeAccent,
+                        fontStyle: FontStyle.italic)),
               ],
             ),
           ),
-          _buildStatItem("SKOR", "$_score", Icons.emoji_events, titleColor, textSecondary),
+          _buildStatItem(
+              "SKOR", "$_score", Icons.emoji_events, titleColor, textSecondary),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon, Color titleColor, Color textSecondary) {
+  Widget _buildStatItem(String label, String value, IconData icon,
+      Color titleColor, Color textSecondary) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -416,7 +440,11 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
           children: [
             Icon(icon, size: 14, color: textSecondary),
             const SizedBox(width: 4),
-            Text(label, style: GoogleFonts.spaceGrotesk(fontSize: 10, fontWeight: FontWeight.bold, color: textSecondary)),
+            Text(label,
+                style: GoogleFonts.spaceGrotesk(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: textSecondary)),
           ],
         ),
         Text(
@@ -436,7 +464,8 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
       animation: Listenable.merge([_shakeAnimation, _glowAnimation]),
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(sin(_shakeController.value * pi * 8) * _shakeAnimation.value, 0),
+          offset: Offset(
+              sin(_shakeController.value * pi * 8) * _shakeAnimation.value, 0),
           child: GestureDetector(
             onTapDown: (_) => _handleTap(),
             child: AnimatedContainer(
@@ -446,10 +475,10 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: _isTargetVisible
-                    ? LinearGradient(
+                    ? const LinearGradient(
                         colors: [
-                          const Color(0xFF10B981),
-                          const Color(0xFF059669),
+                          Color(0xFF10B981),
+                          Color(0xFF059669),
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -457,14 +486,18 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
                     : LinearGradient(
                         colors: isDark
                             ? [const Color(0xFF374151), const Color(0xFF1F2937)]
-                            : [const Color(0xFFF3F4F6), const Color(0xFFE5E7EB)],
+                            : [
+                                const Color(0xFFF3F4F6),
+                                const Color(0xFFE5E7EB)
+                              ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                 boxShadow: _isTargetVisible
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF10B981).withValues(alpha: _glowAnimation.value),
+                          color: const Color(0xFF10B981)
+                              .withValues(alpha: _glowAnimation.value),
                           blurRadius: 50,
                           spreadRadius: 10,
                         )
@@ -505,9 +538,13 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
     );
   }
 
-  Widget _buildEndScreen(bool isDark, Color panelColor, Color titleColor, Color textSecondary) {
-    int avgSpeed = _reactionTimes.isEmpty ? 0 : (_reactionTimes.reduce((a, b) => a + b) / _reactionTimes.length).round();
-    
+  Widget _buildEndScreen(
+      bool isDark, Color panelColor, Color titleColor, Color textSecondary) {
+    int avgSpeed = _reactionTimes.isEmpty
+        ? 0
+        : (_reactionTimes.reduce((a, b) => a + b) / _reactionTimes.length)
+            .round();
+
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
@@ -523,24 +560,50 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("OYUN BİTTİ", style: GoogleFonts.spaceGrotesk(fontSize: 24, fontWeight: FontWeight.bold, color: titleColor)),
+          Text("OYUN BİTTİ",
+              style: GoogleFonts.spaceGrotesk(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: titleColor)),
           const SizedBox(height: 16),
-          Text("$_score", style: GoogleFonts.spaceGrotesk(fontSize: 64, fontWeight: FontWeight.w900, color: Colors.indigo, height: 1)),
-          Text("PUAN", style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.bold, color: textSecondary, letterSpacing: 2)),
+          Text("$_score",
+              style: GoogleFonts.spaceGrotesk(
+                  fontSize: 64,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.indigo,
+                  height: 1)),
+          Text("PUAN",
+              style: GoogleFonts.spaceGrotesk(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: textSecondary,
+                  letterSpacing: 2)),
           const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _statBox("En İyi", "${_bestReactionTime == 9999 ? 0 : _bestReactionTime}ms", isDark, titleColor, textSecondary),
-              _statBox("Ortalama", "${avgSpeed}ms", isDark, titleColor, textSecondary),
+              _statBox(
+                  "En İyi",
+                  "${_bestReactionTime == 9999 ? 0 : _bestReactionTime}ms",
+                  isDark,
+                  titleColor,
+                  textSecondary),
+              _statBox("Ortalama", "${avgSpeed}ms", isDark, titleColor,
+                  textSecondary),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _statBox("Kombo", "x$_maxCombo", isDark, titleColor, textSecondary),
-              _statBox("İsabet", "${_totalTaps == 0 ? 0 : ((_correctTaps / _totalTaps) * 100).round()}%", isDark, titleColor, textSecondary),
+              _statBox(
+                  "Kombo", "x$_maxCombo", isDark, titleColor, textSecondary),
+              _statBox(
+                  "İsabet",
+                  "${_totalTaps == 0 ? 0 : ((_correctTaps / _totalTaps) * 100).round()}%",
+                  isDark,
+                  titleColor,
+                  textSecondary),
             ],
           ),
         ],
@@ -548,11 +611,16 @@ class _ReflexTapGameState extends State<ReflexTapGame> with TickerProviderStateM
     );
   }
 
-  Widget _statBox(String label, String value, bool isDark, Color titleColor, Color textSecondary) {
+  Widget _statBox(String label, String value, bool isDark, Color titleColor,
+      Color textSecondary) {
     return Column(
       children: [
-        Text(label, style: GoogleFonts.spaceGrotesk(fontSize: 12, color: textSecondary)),
-        Text(value, style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.bold, color: titleColor)),
+        Text(label,
+            style:
+                GoogleFonts.spaceGrotesk(fontSize: 12, color: textSecondary)),
+        Text(value,
+            style: GoogleFonts.spaceGrotesk(
+                fontSize: 18, fontWeight: FontWeight.bold, color: titleColor)),
       ],
     );
   }

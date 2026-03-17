@@ -688,7 +688,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '${widget.game.name}',
+                widget.game.name,
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -714,115 +714,115 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
       case 'REF01':
         return {
           'icon': Icons.touch_app,
-          'gradient': [Color(0xFFEF4444), Color(0xFFDC2626)],
+          'gradient': [const Color(0xFFEF4444), const Color(0xFFDC2626)],
           'emoji': '⚡',
         };
       case 'REF02':
         return {
           'icon': Icons.directions_run,
-          'gradient': [Color(0xFF10B981), Color(0xFF059669)],
+          'gradient': [const Color(0xFF10B981), const Color(0xFF059669)],
           'emoji': '🏃',
         };
       case 'ATT01':
         return {
           'icon': Icons.palette,
-          'gradient': [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+          'gradient': [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)],
           'emoji': '🎨',
         };
       case 'ATT02':
         return {
           'icon': Icons.remove,
-          'gradient': [Color(0xFF06B6D4), Color(0xFF0891B2)],
+          'gradient': [const Color(0xFF06B6D4), const Color(0xFF0891B2)],
           'emoji': '➖',
         };
       case 'MEM01':
         return {
           'icon': Icons.psychology,
-          'gradient': [Color(0xFFEC4899), Color(0xFFDB2777)],
+          'gradient': [const Color(0xFFEC4899), const Color(0xFFDB2777)],
           'emoji': '🧠',
         };
       case 'LOG01':
         return {
           'icon': Icons.extension,
-          'gradient': [Color(0xFFF59E0B), Color(0xFFD97706)],
+          'gradient': [const Color(0xFFF59E0B), const Color(0xFFD97706)],
           'emoji': '🧩',
         };
       case 'NUM01':
         return {
           'icon': Icons.calculate,
-          'gradient': [Color(0xFF3B82F6), Color(0xFF2563EB)],
+          'gradient': [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
           'emoji': '🔢',
         };
       case 'MEM02':
         return {
           'icon': Icons.grid_view,
-          'gradient': [Color(0xFF14B8A6), Color(0xFF0D9488)],
+          'gradient': [const Color(0xFF14B8A6), const Color(0xFF0D9488)],
           'emoji': '🎴',
         };
       case 'MEM03':
         return {
           'icon': Icons.text_fields,
-          'gradient': [Color(0xFF6366F1), Color(0xFF4F46E5)],
+          'gradient': [const Color(0xFF6366F1), const Color(0xFF4F46E5)],
           'emoji': '📝',
         };
       case 'MEM04':
         return {
           'icon': Icons.repeat,
-          'gradient': [Color(0xFFA855F7), Color(0xFF9333EA)],
+          'gradient': [const Color(0xFFA855F7), const Color(0xFF9333EA)],
           'emoji': '🔁',
         };
       case 'VIS02':
         return {
           'icon': Icons.find_in_page,
-          'gradient': [Color(0xFFF97316), Color(0xFFEA580C)],
+          'gradient': [const Color(0xFFF97316), const Color(0xFFEA580C)],
           'emoji': '🔍',
         };
       case 'LANG02':
         return {
           'icon': Icons.speed,
-          'gradient': [Color(0xFF06B6D4), Color(0xFF0891B2)],
+          'gradient': [const Color(0xFF06B6D4), const Color(0xFF0891B2)],
           'emoji': '💨',
         };
       case 'MUS01':
         return {
           'icon': Icons.music_note,
-          'gradient': [Color(0xFFF59E0B), Color(0xFFD97706)],
+          'gradient': [const Color(0xFFF59E0B), const Color(0xFFD97706)],
           'emoji': '🎵',
         };
       case 'SOC01':
         return {
           'icon': Icons.emoji_emotions,
-          'gradient': [Color(0xFFEC4899), Color(0xFFDB2777)],
+          'gradient': [const Color(0xFFEC4899), const Color(0xFFDB2777)],
           'emoji': '🙂',
         };
       case 'NAT01':
         return {
           'icon': Icons.nature,
-          'gradient': [Color(0xFF10B981), Color(0xFF059669)],
+          'gradient': [const Color(0xFF10B981), const Color(0xFF059669)],
           'emoji': '🌿',
         };
       case 'KIN01':
         return {
           'icon': Icons.sports_martial_arts,
-          'gradient': [Color(0xFF3B82F6), Color(0xFF2563EB)],
+          'gradient': [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
           'emoji': '⚖️',
         };
       case 'SPA01':
         return {
           'icon': Icons.route,
-          'gradient': [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+          'gradient': [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)],
           'emoji': '🧭',
         };
       case 'INT01':
         return {
           'icon': Icons.self_improvement,
-          'gradient': [Color(0xFF06B6D4), Color(0xFF0891B2)],
+          'gradient': [const Color(0xFF06B6D4), const Color(0xFF0891B2)],
           'emoji': '🧘',
         };
       default:
         return {
           'icon': Icons.sports_esports,
-          'gradient': [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+          'gradient': [const Color(0xFF4F46E5), const Color(0xFF7C3AED)],
           'emoji': '🎮',
         };
     }

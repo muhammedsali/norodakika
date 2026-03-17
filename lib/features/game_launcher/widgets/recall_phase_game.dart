@@ -149,7 +149,6 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
     _wordPool = _wordPool.take(poolSize).toList();
   }
 
-
   void _resetState() {
     _startTime = DateTime.now();
     _selected.clear();
@@ -533,7 +532,7 @@ class _WordCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final baseColor =
         isDark ? const Color(0xFF1F2937) : const Color(0xFFF4F5F7);
-    final selectedColor = const Color(0xFF22C55E);
+    const selectedColor = Color(0xFF22C55E);
     final textColor = isDark
         ? (selected ? Colors.white : const Color(0xFFE5E7EB))
         : (selected ? Colors.white : const Color(0xFF0F172A));

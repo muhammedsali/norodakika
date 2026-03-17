@@ -170,7 +170,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                           letterSpacing: -1.5,
                           shadows: [
                             Shadow(
-                              color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                              color: const Color(0xFF4F46E5)
+                                  .withValues(alpha: 0.3),
                               blurRadius: 25,
                             ),
                           ],
@@ -191,13 +192,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       ),
                       const SizedBox(height: 64),
                       // Yükleniyor göstergesi
-                      SizedBox(
+                      const SizedBox(
                         width: 50,
                         height: 50,
                         child: CircularProgressIndicator(
                           strokeWidth: 4,
                           valueColor: AlwaysStoppedAnimation<Color>(
-                            const Color(0xFF4F46E5),
+                            Color(0xFF4F46E5),
                           ),
                         ),
                       ),

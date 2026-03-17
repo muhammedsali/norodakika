@@ -40,20 +40,24 @@ class UnifiedGameCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  gradientColors.first.withValues(alpha: isDarkMode ? 0.15 : 0.08),
-                  gradientColors.last.withValues(alpha: isDarkMode ? 0.1 : 0.05),
+                  gradientColors.first
+                      .withValues(alpha: isDarkMode ? 0.15 : 0.08),
+                  gradientColors.last
+                      .withValues(alpha: isDarkMode ? 0.1 : 0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: gradientColors.first.withValues(alpha: isDarkMode ? 0.3 : 0.2),
+                color: gradientColors.first
+                    .withValues(alpha: isDarkMode ? 0.3 : 0.2),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: gradientColors.first.withValues(alpha: isDarkMode ? 0.2 : 0.15),
+                  color: gradientColors.first
+                      .withValues(alpha: isDarkMode ? 0.2 : 0.15),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                   spreadRadius: -4,
@@ -121,7 +125,9 @@ class UnifiedGameCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          color: isDarkMode ? Colors.white : const Color(0xFF1F2937),
+                          color: isDarkMode
+                              ? Colors.white
+                              : const Color(0xFF1F2937),
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -172,8 +178,10 @@ class UnifiedGameCard extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
-                                      gradientColors.first.withValues(alpha: 0.2),
-                                      gradientColors.last.withValues(alpha: 0.2),
+                                      gradientColors.first
+                                          .withValues(alpha: 0.2),
+                                      gradientColors.last
+                                          .withValues(alpha: 0.2),
                                     ],
                                   ),
                                   borderRadius: BorderRadius.circular(8),
@@ -227,7 +235,7 @@ class UnifiedGameCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.arrow_forward_rounded,
                     color: Colors.white,
                     size: 24,
@@ -321,7 +329,8 @@ class GridGameCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                gradientColors.first.withValues(alpha: isDarkMode ? 0.15 : 0.08),
+                gradientColors.first
+                    .withValues(alpha: isDarkMode ? 0.15 : 0.08),
                 gradientColors.last.withValues(alpha: isDarkMode ? 0.1 : 0.05),
               ],
               begin: Alignment.topLeft,
@@ -329,12 +338,14 @@ class GridGameCard extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: gradientColors.first.withValues(alpha: isDarkMode ? 0.3 : 0.2),
+              color: gradientColors.first
+                  .withValues(alpha: isDarkMode ? 0.3 : 0.2),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: gradientColors.first.withValues(alpha: isDarkMode ? 0.2 : 0.15),
+                color: gradientColors.first
+                    .withValues(alpha: isDarkMode ? 0.2 : 0.15),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
                 spreadRadius: -4,

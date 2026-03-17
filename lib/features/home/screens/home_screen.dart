@@ -292,7 +292,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     const completedToday = 2;
     const plannedToday = 3;
-    final dailyProgress =
+    const dailyProgress =
         plannedToday == 0 ? 0.0 : completedToday / plannedToday;
 
     return SingleChildScrollView(
@@ -794,7 +794,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isActive = _gamesFilter == filterKey;
     final activeBg = accentColor;
     final inactiveBg = isDarkMode ? const Color(0xFF1F2937) : stitchBgLight;
-    final activeText = Colors.white;
+    const activeText = Colors.white;
     final inactiveText = accentColor;
 
     return Padding(

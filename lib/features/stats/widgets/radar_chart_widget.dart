@@ -88,8 +88,9 @@ class RadarChartWidget extends StatelessWidget {
                   width: 1,
                 ),
                 getTitle: (index, angle) {
-                  if (index >= areasTr.length)
+                  if (index >= areasTr.length) {
                     return const RadarChartTitle(text: '');
+                  }
                   return RadarChartTitle(
                     text: s.categoryLabel(areasTr[index]),
                     angle: angle,

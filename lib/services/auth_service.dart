@@ -1,24 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../core/models/user_model.dart';
 import '../core/memory/memory_bank.dart';
-import '../main.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  // google_sign_in 7.x: singleton + initialize() gerekiyor
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-  bool _googleInitialized = false;
 
-  Future<void> _ensureGoogleInitialized() async {
-    if (_googleInitialized) return;
-    if (googleServerClientId.isNotEmpty) {
-      await _googleSignIn.initialize(serverClientId: googleServerClientId);
-    }
-    _googleInitialized = true;
-  }
+  // google_sign_in v6.x: normal constructor, clientId gerekmez Android'de
+  // Android için SHA-1/SHA-256 Firebase Console'da kayıtlı olmalı
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   // Mevcut kullanıcıyı al
   User? get currentUser => _auth.currentUser;
@@ -26,13 +21,12 @@ class AuthService {
   // Stream: Kullanıcı durumu değişikliklerini dinle
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Kayıt Ol
+  // ── Kayıt Ol ──────────────────────────────────────────────
   Future<void> register({
     required String email,
     required String password,
   }) async {
     try {
-      // 1. Auth ile kullanıcı oluştur
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -40,36 +34,26 @@ class AuthService {
 
       final user = userCredential.user;
       if (user != null) {
-        // 2. Firestore'da kullanıcı dokümanı oluştur
-        // Not: Firestore yazma işlemi başarısız olsa bile kayıt (Auth) başarılı sayılmalı.
-        // Bu yüzden burayı ayrı bir try-catch bloğuna alıyoruz.
         try {
-          final userModel = UserModel.fromJson(MemoryBank.createUserModel(user.uid));
-          await _firestore.collection('users').doc(user.uid).set(userModel.toJson());
+          final userModel =
+              UserModel.fromJson(MemoryBank.createUserModel(user.uid));
+          await _firestore
+              .collection('users')
+              .doc(user.uid)
+              .set(userModel.toJson());
         } catch (e) {
-          // Firestore hatası kritik değil, kullanıcı giriş yapabilir.
-          // Sadece logluyoruz.
-          print('Uyarı: Profil veritabanına yazılamadı: $e');
+          debugPrint('Uyarı: Profil veritabanına yazılamadı: $e');
         }
       }
     } on FirebaseAuthException catch (e) {
-      // Eğer hata "email-already-in-use" ise ve kullanıcı aslında giriş yapmış durumdaysa
-      // hatayı görmezden gelebiliriz ama bu durumda giriş yapmış olması beklenmez.
-      // Sadece genel hata durumunda kullanıcı kontrolü yapmak daha güvenli.
       throw _handleAuthException(e);
     } catch (e) {
-      // Kritik Hata Kontrolü:
-      // Eğer bir hata oluştuysa (örn: network timeout) ama kullanıcı aslında oluşturulduysa,
-      // işlemi başarısız saymak yerine başarılı kabul et.
-      if (_auth.currentUser != null) {
-        print('Register sırasında hata fırlatıldı ancak kullanıcı başarıyla oluşturulmuş: $e');
-        return;
-      }
+      if (_auth.currentUser != null) return;
       throw 'Bir hata oluştu: $e';
     }
   }
 
-  // Giriş Yap
+  // ── Giriş Yap ─────────────────────────────────────────────
   Future<void> login({
     required String email,
     required String password,
@@ -86,22 +70,32 @@ class AuthService {
     }
   }
 
-  // Google ile giriş / kayıt
+  // ── Google ile Giriş / Kayıt ──────────────────────────────
   Future<void> signInWithGoogle() async {
     try {
-      await _ensureGoogleInitialized();
+      // Google hesap seçici aç
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      final googleUser = await _googleSignIn.authenticate();
-      final googleAuth = googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
+      // Kullanıcı iptal etti
+      if (googleUser == null) return;
+
+      // Token'ları al
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      // Firebase credential oluştur
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final userCredential = await _auth.signInWithCredential(credential);
-      final user = userCredential.user;
+      // Firebase'e giriş yap
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      final User? user = userCredential.user;
       if (user == null) return;
 
-      // Firestore'da kullanıcı dokümanı yoksa oluştur
+      // Firestore'da yoksa profil oluştur
       try {
         final docRef = _firestore.collection('users').doc(user.uid);
         final snapshot = await docRef.get();
@@ -111,49 +105,44 @@ class AuthService {
           await docRef.set(userModel.toJson());
         }
       } catch (e) {
-        // Kritik değil: kullanıcı Auth ile giriş yapmış olabilir
-        print('Uyarı: Google profil veritabanına yazılamadı: $e');
+        debugPrint('Uyarı: Google profil veritabanına yazılamadı: $e');
       }
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
-    } on GoogleSignInException catch (e) {
-      if (e.code == GoogleSignInExceptionCode.canceled) {
+    } catch (e) {
+      final msg = e.toString();
+      // Kullanıcı kendi iptal ettiyse sessizce geç
+      if (msg.contains('sign_in_canceled') ||
+          msg.contains('canceled') ||
+          msg.contains('cancel')) {
         return;
       }
-      throw 'Google ile giriş yapılamadı: $e';
-    } catch (e) {
       throw 'Google ile giriş yapılamadı: $e';
     }
   }
 
-  // Çıkış Yap
+  // ── Çıkış Yap ─────────────────────────────────────────────
   Future<void> logout() async {
-    // Google ile giriş yapıldıysa oturumu da kapat
     try {
-      await _ensureGoogleInitialized();
       await _googleSignIn.signOut();
     } catch (_) {}
     await _auth.signOut();
   }
 
-  // Hesap Sil
+  // ── Hesap Sil ─────────────────────────────────────────────
   Future<void> deleteAccount() async {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        // First delete from Firestore
         try {
           await _firestore.collection('users').doc(user.uid).delete();
-        } catch(e) {
-          print('Uyarı: Firestore veri silinemedi: $e');
+        } catch (e) {
+          debugPrint('Uyarı: Firestore veri silinemedi: $e');
         }
-        
-        // Then delete the Firebase Auth user
+
         await user.delete();
-        
-        // Sign out from Google if needed
+
         try {
-          await _ensureGoogleInitialized();
           await _googleSignIn.signOut();
         } catch (_) {}
       }
@@ -167,11 +156,11 @@ class AuthService {
     }
   }
 
-  // Hata Mesajları
+  // ── Hata Mesajları ────────────────────────────────────────
   String _handleAuthException(FirebaseAuthException e) {
     switch (e.code) {
       case 'weak-password':
-        return 'Şifre çok zayıf.';
+        return 'Şifre çok zayıf. En az 6 karakter kullanın.';
       case 'email-already-in-use':
         return 'Bu e-posta adresi zaten kullanımda.';
       case 'user-not-found':
@@ -180,8 +169,16 @@ class AuthService {
         return 'Hatalı şifre.';
       case 'invalid-email':
         return 'Geçersiz e-posta formatı.';
+      case 'invalid-credential':
+        return 'Geçersiz e-posta veya şifre.';
+      case 'too-many-requests':
+        return 'Çok fazla hatalı deneme. Lütfen bir süre bekleyin.';
+      case 'network-request-failed':
+        return 'İnternet bağlantısı yok. Bağlantınızı kontrol edin.';
+      case 'account-exists-with-different-credential':
+        return 'Bu e-posta başka bir yöntemle kayıtlı.';
       default:
-        return 'Bir hata oluştu: ${e.message}';
+        return 'Hata: ${e.message ?? e.code}';
     }
   }
 }
