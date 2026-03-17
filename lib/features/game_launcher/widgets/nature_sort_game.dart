@@ -7,8 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class NatureSortGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const NatureSortGame({super.key, required this.onComplete});
+  const NatureSortGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<NatureSortGame> createState() => _NatureSortGameState();
@@ -65,11 +70,28 @@ class _NatureSortGameState extends State<NatureSortGame> {
   void initState() {
     super.initState();
     _card = _nextCard();
+    if (!widget.isPaused) _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _timeRemaining--);
       if (_timeRemaining <= 0) _finish();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant NatureSortGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+      } else {
+        _startTimer();
+      }
+    }
   }
 
   @override
@@ -85,7 +107,7 @@ class _NatureSortGameState extends State<NatureSortGame> {
   }
 
   void _answer(_NatureType selectedType) {
-    if (_timeRemaining <= 0) return;
+    if (_timeRemaining <= 0 || widget.isPaused) return;
 
     final isCorrect = selectedType == _card.type;
 

@@ -651,36 +651,43 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         return OddOneOutGame(
           key: ValueKey('oddone_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'MUS01':
         return RhythmMatchGame(
           key: ValueKey('rhythm_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'SOC01':
         return EmotionMirrorGame(
           key: ValueKey('emotion_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'NAT01':
         return NatureSortGame(
           key: ValueKey('nature_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'KIN01':
         return BalanceTapGame(
           key: ValueKey('balance_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'SPA01':
         return RouteBuilderGame(
           key: ValueKey('route_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       case 'INT01':
         return FocusCheckInGame(
           key: ValueKey('checkin_$_runId'),
           onComplete: _onGameComplete,
+          isPaused: _isPaused,
         );
       default:
         return Center(

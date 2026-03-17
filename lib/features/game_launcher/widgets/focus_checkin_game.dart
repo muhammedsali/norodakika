@@ -6,8 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class FocusCheckInGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const FocusCheckInGame({super.key, required this.onComplete});
+  const FocusCheckInGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<FocusCheckInGame> createState() => _FocusCheckInGameState();
@@ -35,14 +40,29 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
   @override
   void initState() {
     super.initState();
+    if (!widget.isPaused) _startTimer();
+    _nextTrial();
+  }
 
+  void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _timeRemaining--);
       if (_timeRemaining <= 0) _finish();
     });
+  }
 
-    _nextTrial();
+  @override
+  void didUpdateWidget(covariant FocusCheckInGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+      } else {
+        _startTimer();
+      }
+    }
   }
 
   @override
@@ -95,7 +115,7 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
   }
 
   void _tap() {
-    if (_locked || _stimulusAt == null) return;
+    if (_locked || _stimulusAt == null || widget.isPaused) return;
 
     final rt = DateTime.now().difference(_stimulusAt!).inMilliseconds;
 

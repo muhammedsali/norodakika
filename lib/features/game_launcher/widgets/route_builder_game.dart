@@ -7,8 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class RouteBuilderGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const RouteBuilderGame({super.key, required this.onComplete});
+  const RouteBuilderGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<RouteBuilderGame> createState() => _RouteBuilderGameState();
@@ -34,12 +39,28 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
   void initState() {
     super.initState();
     _puzzle = _newPuzzle();
+    if (!widget.isPaused) _startTimer();
+  }
 
+  void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _timeRemaining--);
       if (_timeRemaining <= 0) _finish();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant RouteBuilderGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+      } else {
+        _startTimer();
+      }
+    }
   }
 
   @override
@@ -116,6 +137,7 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
   }
 
   void _answer(int value) {
+    if (widget.isPaused) return;
     final ok = value == _puzzle.answer;
     setState(() {
       if (ok) {

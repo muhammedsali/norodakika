@@ -6,8 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class RhythmMatchGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const RhythmMatchGame({super.key, required this.onComplete});
+  const RhythmMatchGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<RhythmMatchGame> createState() => _RhythmMatchGameState();
@@ -38,15 +43,30 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
   void initState() {
     super.initState();
     _resetRound();
+    if (!widget.isPaused) {
+      _startTimer();
+    }
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
-        _finish();
-      }
+      setState(() => _timeRemaining--);
+      if (_timeRemaining <= 0) _finish();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant RhythmMatchGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+      } else {
+        _startTimer();
+      }
+    }
   }
 
   @override
@@ -83,7 +103,7 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
   }
 
   void _onTapPad(int index) {
-    if (_showingSequence) return;
+    if (_showingSequence || widget.isPaused) return;
 
     final expected = _sequence[_inputStep];
     if (index == expected) {

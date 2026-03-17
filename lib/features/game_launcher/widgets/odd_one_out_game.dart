@@ -9,8 +9,13 @@ import '../../../services/audio_service.dart';
 /// Görsel algı oyunu: 4 karttan farklı olanı hızlıca bul.
 class OddOneOutGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const OddOneOutGame({super.key, required this.onComplete});
+  const OddOneOutGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<OddOneOutGame> createState() => _OddOneOutGameState();
@@ -45,6 +50,19 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   void initState() {
     super.initState();
     _startGame();
+  }
+
+  @override
+  void didUpdateWidget(covariant OddOneOutGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused && !_isFinished) {
+      if (widget.isPaused) {
+        _gameTimer?.cancel();
+        _roundTimer?.cancel();
+      } else {
+        _startTimers();
+      }
+    }
   }
 
   void _startGame() {
@@ -139,7 +157,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   }
 
   void _onSelect(int index) {
-    if (_isFinished) return;
+    if (_isFinished || widget.isPaused) return;
     HapticFeedback.selectionClick();
     _audioService.playTap(); // 👆 Dokunma sesi
 

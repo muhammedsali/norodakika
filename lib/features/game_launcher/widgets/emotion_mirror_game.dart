@@ -6,8 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class EmotionMirrorGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const EmotionMirrorGame({super.key, required this.onComplete});
+  const EmotionMirrorGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<EmotionMirrorGame> createState() => _EmotionMirrorGameState();
@@ -38,13 +43,28 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
   void initState() {
     super.initState();
     _prompt = _nextPrompt();
+    if (!widget.isPaused) _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _timeRemaining--);
-      if (_timeRemaining <= 0) {
-        _finish();
-      }
+      if (_timeRemaining <= 0) _finish();
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant EmotionMirrorGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+      } else {
+        _startTimer();
+      }
+    }
   }
 
   @override
@@ -65,6 +85,7 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
   }
 
   void _answer(bool yes) {
+    if (widget.isPaused) return;
     final isCorrect = (yes == _prompt.isMatch);
 
     setState(() {

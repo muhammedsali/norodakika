@@ -226,7 +226,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
 
     widget.onComplete({
       'score': _score.toDouble(),
-      'accuracy': accuracy,
+      'successRate': accuracy,
       'duration': gameDuration,
       'goodHits': _goodHits,
       'badHits': _badHits,

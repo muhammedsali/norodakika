@@ -6,8 +6,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class BalanceTapGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
+  final bool isPaused;
 
-  const BalanceTapGame({super.key, required this.onComplete});
+  const BalanceTapGame({
+    super.key,
+    required this.onComplete,
+    this.isPaused = false,
+  });
 
   @override
   State<BalanceTapGame> createState() => _BalanceTapGameState();
@@ -33,21 +38,24 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
   @override
   void initState() {
     super.initState();
+    if (!widget.isPaused) _startTimers();
+  }
 
+  void _startTimers() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() => _timeRemaining--);
       if (_timeRemaining <= 0) _finish();
     });
 
+    _tick?.cancel();
     _tick = Timer.periodic(const Duration(milliseconds: 70), (_) {
       if (!mounted) return;
       setState(() {
         _ticksTotal++;
-
         final drift = (_rng.nextDouble() - 0.5) * 2 * driftPerTick;
         _offset = (_offset + drift).clamp(-maxOffset, maxOffset);
-
         final inZone = _offset.abs() <= 0.25;
         if (inZone) {
           _ticksInZone++;
@@ -60,6 +68,19 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
   }
 
   @override
+  void didUpdateWidget(covariant BalanceTapGame oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isPaused != widget.isPaused) {
+      if (widget.isPaused) {
+        _timer?.cancel();
+        _tick?.cancel();
+      } else {
+        _startTimers();
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
     _tick?.cancel();
@@ -67,12 +88,14 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
   }
 
   void _tapLeft() {
+    if (widget.isPaused) return;
     setState(() {
       _offset = (_offset - 0.18).clamp(-maxOffset, maxOffset);
     });
   }
 
   void _tapRight() {
+    if (widget.isPaused) return;
     setState(() {
       _offset = (_offset + 0.18).clamp(-maxOffset, maxOffset);
     });
