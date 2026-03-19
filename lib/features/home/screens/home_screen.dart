@@ -6,7 +6,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../stats/screens/stats_screen.dart';
 import '../../stats/providers/user_stats_provider.dart';
-import '../../notifications/screens/notifications_sheet.dart';
 import '../../leaderboard/screens/leaderboard_sheet.dart';
 import '../../game_launcher/screens/game_play_screen.dart';
 import '../../../core/memory/memory_bank.dart';
@@ -275,16 +274,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: IconButton(
                   onPressed: () => showLeaderboardSheet(context, ref),
                   icon: Icon(Icons.emoji_events_outlined, color: titleColor, size: 22),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
-                child: IconButton(
-                  onPressed: () => showNotificationsSheet(context, ref),
-                  icon: Icon(Icons.notifications_outlined, color: titleColor, size: 22),
                 ),
               ),
             ],

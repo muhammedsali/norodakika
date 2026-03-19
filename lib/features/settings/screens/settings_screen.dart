@@ -7,6 +7,8 @@ import '../../profile/screens/profile_screen.dart';
 
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
+import '../providers/notification_provider.dart';
+import '../../../services/notification_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -15,6 +17,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
     final language = ref.watch(languageProvider);
+    final notificationsEnabled = ref.watch(notificationProvider);
     final s = AppStrings(language);
 
     final cardColor = isDarkMode ? const Color(0xFF111827) : Colors.white;
@@ -102,12 +105,15 @@ class SettingsScreen extends ConsumerWidget {
                       iconColor: const Color(0xFFF59E0B),
                       title: s.notificationTitle,
                       subtitle: s.notificationSubtitle,
-                      value: false, // TODO: Add notification provider
-                      onChanged: (value) {
-                        // TODO: Implement notification toggle
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Coming soon')),
-                        );
+                      value: notificationsEnabled,
+                      onChanged: (value) async {
+                        await ref.read(notificationProvider.notifier).toggle();
+                        if (value) {
+                          NotificationService.showLocalNotification(
+                            title: 'Bildirimler Aktif!',
+                            body: 'NöroDakika bildirimlerini artık alacaksınız.',
+                          );
+                        }
                       },
                       titleColor: titleColor,
                       subtitleColor: subtitleColor,

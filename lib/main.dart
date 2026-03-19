@@ -5,6 +5,7 @@ import 'features/welcome/screens/splash_screen.dart';
 import 'features/settings/providers/language_provider.dart';
 import 'features/settings/providers/theme_provider.dart';
 import 'firebase_options.dart';
+import 'services/notification_service.dart';
 
 // Google Sign-In 7.x için Android'de serverClientId gerekiyor.
 const String googleServerClientId =
@@ -17,6 +18,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Bildirim servisini başlat
+  await NotificationService.init();
 
   runApp(
     const ProviderScope(
