@@ -24,7 +24,7 @@ class _NatureSortGameState extends State<NatureSortGame> {
 
   final Random _rng = Random();
   Timer? _timer;
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
 
   int _correct = 0;
   int _wrong = 0;
@@ -77,8 +77,8 @@ class _NatureSortGameState extends State<NatureSortGame> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() => _timeRemaining--);
-      if (_timeRemaining <= 0) _finish();
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) _finish();
     });
   }
 
@@ -97,6 +97,7 @@ class _NatureSortGameState extends State<NatureSortGame> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -107,7 +108,7 @@ class _NatureSortGameState extends State<NatureSortGame> {
   }
 
   void _answer(_NatureType selectedType) {
-    if (_timeRemaining <= 0 || widget.isPaused) return;
+    if (_timeRemainingNotifier.value <= 0 || widget.isPaused) return;
 
     final isCorrect = selectedType == _card.type;
 
@@ -135,7 +136,7 @@ class _NatureSortGameState extends State<NatureSortGame> {
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': _correct / total,
-      'duration': (totalSeconds - _timeRemaining),
+      'duration': (totalSeconds - _timeRemainingNotifier.value),
       'goodHits': _correct,
       'badHits': _wrong,
     });
@@ -165,7 +166,12 @@ class _NatureSortGameState extends State<NatureSortGame> {
                     color: titleColor,
                   ),
                 ),
-                _Pill(text: '$_timeRemaining s', isDark: isDark),
+                ValueListenableBuilder<int>(
+                  valueListenable: _timeRemainingNotifier,
+                  builder: (context, time, child) {
+                    return _Pill(text: '$time s', isDark: isDark);
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 8),

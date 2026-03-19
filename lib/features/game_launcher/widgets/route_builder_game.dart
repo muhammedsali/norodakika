@@ -26,7 +26,7 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
 
   final Random _rng = Random();
   Timer? _timer;
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
 
   int _round = 0;
   int _score = 0;
@@ -46,8 +46,8 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() => _timeRemaining--);
-      if (_timeRemaining <= 0) _finish();
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) _finish();
     });
   }
 
@@ -66,6 +66,7 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -163,7 +164,7 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': _correct / total,
-      'duration': (totalSeconds - _timeRemaining),
+      'duration': (totalSeconds - _timeRemainingNotifier.value),
     });
   }
 
@@ -191,7 +192,12 @@ class _RouteBuilderGameState extends State<RouteBuilderGame> {
                     color: titleColor,
                   ),
                 ),
-                _Pill(text: '$_timeRemaining s', isDark: isDark),
+                ValueListenableBuilder<int>(
+                  valueListenable: _timeRemainingNotifier,
+                  builder: (context, time, child) {
+                    return _Pill(text: '$time s', isDark: isDark);
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -284,7 +290,7 @@ class _GridView extends StatelessWidget {
                       border: Border.all(color: border),
                     ),
                     child: Center(
-                      child: _cellContent(x, y),
+                      child: _cellContent(x, y, isDark),
                     ),
                   ),
                 ),
@@ -294,16 +300,36 @@ class _GridView extends StatelessWidget {
     );
   }
 
-  Widget _cellContent(int x, int y) {
+  Widget _cellContent(int x, int y, bool isDark) {
     final p = Point<int>(x, y);
     if (p == puzzle.start) {
-      return const Text('S', style: TextStyle(fontWeight: FontWeight.bold));
+      return Container(
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.blue.withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(Icons.play_arrow_rounded, color: Colors.blue, size: 24),
+      );
     }
     if (p == puzzle.end) {
-      return const Text('E', style: TextStyle(fontWeight: FontWeight.bold));
+      return Container(
+        margin: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.red.withValues(alpha: 0.2),
+          shape: BoxShape.circle,
+        ),
+        child: const Icon(Icons.sports_score_rounded, color: Colors.red, size: 24),
+      );
     }
     if (puzzle.blocked.contains(p)) {
-      return const Text('■');
+      return Container(
+        margin: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF374151) : const Color(0xFFD1D5DB),
+          borderRadius: BorderRadius.circular(8),
+        ),
+      );
     }
     return const SizedBox.shrink();
   }

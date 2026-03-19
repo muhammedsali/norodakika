@@ -76,30 +76,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  // YENİ TASARIM: Neumorphic Gölge Yardımcısı
+  // YENİ TASARIM: Premium Card Yardımcısı
   BoxDecoration _getNeuDecoration(
       {required bool isDarkMode, bool isCircle = false}) {
-    final bgColor = isDarkMode ? const Color(0xFF1E293B) : stitchBgLight;
-    final shadowDark = isDarkMode
-        ? Colors.black.withValues(alpha: 0.3)
-        : const Color(0xFFD1D9E6);
-    final shadowLight =
-        isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.white;
+    final bgColor = isDarkMode 
+        ? const Color(0xFF1E293B).withValues(alpha: 0.7) 
+        : Colors.white.withValues(alpha: 0.9);
+    final borderColor = isDarkMode
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.05);
 
     return BoxDecoration(
       color: bgColor,
       shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
-      borderRadius: isCircle ? null : BorderRadius.circular(16),
+      borderRadius: isCircle ? null : BorderRadius.circular(24),
+      border: Border.all(color: borderColor, width: 1.5),
       boxShadow: [
         BoxShadow(
-          color: shadowDark,
-          offset: const Offset(8, 8),
-          blurRadius: 16,
-        ),
-        BoxShadow(
-          color: shadowLight,
-          offset: const Offset(-8, -8),
-          blurRadius: 16,
+          color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+          offset: const Offset(0, 8),
+          blurRadius: 24,
         ),
       ],
     );

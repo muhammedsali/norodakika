@@ -330,68 +330,69 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame>
                         sin(_shakeController.value * 2 * pi) *
                             _shakeAnimation.value,
                         0),
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: panelColor,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: accentColor.withValues(
-                                alpha: isDark ? 0.2 : 0.1),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ..._sequence.map((shape) => Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  shape,
-                                  style: GoogleFonts.spaceGrotesk(
-                                    fontSize: 48,
-                                    fontWeight: FontWeight.bold,
-                                    color: titleColor,
-                                  ),
-                                ),
-                              )),
-                          AnimatedBuilder(
-                            animation: _pulseController,
-                            builder: (context, child) {
-                              return Container(
-                                width: 56,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: accentColor.withValues(
-                                        alpha:
-                                            0.5 + _pulseController.value * 0.3),
-                                    width: 3,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '?',
-                                    style: GoogleFonts.spaceGrotesk(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.bold,
-                                      color: accentColor,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: child,
                   );
                 },
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: panelColor,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withValues(
+                            alpha: isDark ? 0.2 : 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ..._sequence.map((shape) => Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8),
+                            child: Text(
+                              shape,
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                color: titleColor,
+                              ),
+                            ),
+                          )),
+                      AnimatedBuilder(
+                        animation: _pulseController,
+                        builder: (context, child) {
+                          return Container(
+                            width: 56,
+                            height: 56,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: accentColor.withValues(
+                                    alpha:
+                                        0.5 + _pulseController.value * 0.3),
+                                width: 3,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '?',
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold,
+                                  color: accentColor,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const Spacer(flex: 2),
               // Answer Choices
