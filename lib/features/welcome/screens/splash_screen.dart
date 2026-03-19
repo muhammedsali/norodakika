@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../../../services/local_storage_service.dart';
 import '../../settings/providers/language_provider.dart';
+import '../../auth/screens/auth_gate_screen.dart';
 import 'onboarding_screen.dart';
-import 'welcome_screen.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -50,14 +50,27 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       if (!mounted) return;
       final hasSeen = await LocalStorageService.hasSeenOnboarding();
       if (!mounted) return;
+      const transitionDuration = Duration(milliseconds: 600);
+      if (!hasSeen) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const OnboardingScreen(),
+            transitionsBuilder: (_, anim, __, child) =>
+                FadeTransition(opacity: anim, child: child),
+            transitionDuration: transitionDuration,
+          ),
+        );
+        return;
+      }
+
+      // Onboarding görüldüyse kontrolü tamamen AuthGate'e bırakalım.
+      // AuthGate, kullanıcı giriş yapmışsa direkt Home'u, yapmamışsa WelcomeScreen'i gösterecektir.
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) =>
-              hasSeen ? const WelcomeScreen() : const OnboardingScreen(),
-          transitionsBuilder: (_, anim, __, child) {
-            return FadeTransition(opacity: anim, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 600),
+          pageBuilder: (_, __, ___) => const AuthGateScreen(),
+          transitionsBuilder: (_, anim, __, child) =>
+              FadeTransition(opacity: anim, child: child),
+          transitionDuration: transitionDuration,
         ),
       );
     });

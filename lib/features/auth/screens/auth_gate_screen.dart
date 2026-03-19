@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../../home/screens/home_screen.dart';
-import 'login_screen.dart';
 import 'verify_email_screen.dart';
+import '../../welcome/screens/welcome_screen.dart';
 
 class AuthGateScreen extends ConsumerStatefulWidget {
   const AuthGateScreen({super.key});
@@ -20,28 +20,18 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
     return authState.when(
       data: (user) {
         if (user == null) {
-          return const LoginScreen();
+          return const WelcomeScreen();
         } else {
+          // İsmi Firestore ile senkronize et (Eski kullanıcılar için bir kerelik)
+          final authService = ref.read(authServiceProvider);
+          authService.syncDisplayName(user);
+
           // E-posta doğrulamasını kontrol et
           if (!user.emailVerified) {
             return const VerifyEmailScreen();
           }
           
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
-                ),
-              );
-            }
-          });
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return const HomeScreen();
         }
       },
       loading: () => const Scaffold(

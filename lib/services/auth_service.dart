@@ -43,7 +43,7 @@ class AuthService {
 
         try {
           final userModel =
-              UserModel.fromJson(MemoryBank.createUserModel(user.uid));
+              UserModel.fromJson(MemoryBank.createUserModel(user.uid, displayName: name));
           await _firestore
               .collection('users')
               .doc(user.uid)
@@ -79,7 +79,14 @@ class AuthService {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        await user.reload();
+        // user.reload() bazen PigeonUserInfo hatası verebiliyor (Kütüphane hatası)
+        // Bunun yerine hem reload() hem de token yenilemeyi deniyoruz
+        await user.getIdToken(true);
+        try {
+          await user.reload();
+        } catch (e) {
+          debugPrint('Sessiz reload hatası (PigeonUserInfo bypass): $e');
+        }
       }
     } catch (e) {
       debugPrint('Kullanıcı yenileme hatası: $e');
@@ -134,7 +141,7 @@ class AuthService {
         final snapshot = await docRef.get();
         if (!snapshot.exists) {
           final userModel =
-              UserModel.fromJson(MemoryBank.createUserModel(user.uid));
+              UserModel.fromJson(MemoryBank.createUserModel(user.uid, displayName: user.displayName));
           await docRef.set(userModel.toJson());
         }
       } catch (e) {
@@ -154,40 +161,35 @@ class AuthService {
     }
   }
 
+  // ── İsmi Senkronize Et ───────────────────────────────────
+  Future<void> syncDisplayName(User user) async {
+    try {
+      final docRef = _firestore.collection('users').doc(user.uid);
+      final snapshot = await docRef.get();
+      if (snapshot.exists) {
+        final data = snapshot.data();
+        if (data != null &&
+            (data['displayName'] == null || data['displayName'] == '')) {
+          await docRef.update({'displayName': user.displayName});
+        }
+      }
+    } catch (e) {
+      debugPrint('syncDisplayName hatası: $e');
+    }
+  }
+
   // ── Çıkış Yap ─────────────────────────────────────────────
   Future<void> logout() async {
     try {
-      await _googleSignIn.signOut();
+      // Google çıkış işlemini timeout ile sınırla ki uygulama asılı kalmasın
+      await _googleSignIn.signOut().timeout(
+            const Duration(seconds: 1),
+            onTimeout: () => null,
+          );
     } catch (_) {}
     await _auth.signOut();
   }
 
-  // ── Hesap Sil ─────────────────────────────────────────────
-  Future<void> deleteAccount() async {
-    try {
-      final user = _auth.currentUser;
-      if (user != null) {
-        try {
-          await _firestore.collection('users').doc(user.uid).delete();
-        } catch (e) {
-          debugPrint('Uyarı: Firestore veri silinemedi: $e');
-        }
-
-        await user.delete();
-
-        try {
-          await _googleSignIn.signOut();
-        } catch (_) {}
-      }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
-        throw 'Hesabınızı silmek için güvenlik nedeniyle yeniden giriş yapmalısınız.';
-      }
-      throw _handleAuthException(e);
-    } catch (e) {
-      throw 'Hesap silinemedi: $e';
-    }
-  }
 
   // ── Hata Mesajları ────────────────────────────────────────
   String _handleAuthException(FirebaseAuthException e) {

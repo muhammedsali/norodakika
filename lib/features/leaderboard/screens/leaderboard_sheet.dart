@@ -34,7 +34,9 @@ final globalLeaderboardProvider = FutureProvider.autoDispose<List<LeaderboardUse
   List<LeaderboardUser> users = [];
   for (var data in usersData) {
     final uid = data['uid'] ?? 'guest';
-    final name = data['displayName'] ?? (data['email'] != null ? data['email'].split('@')[0] : 'Kullanıcı');
+    final name = data['displayName'] ??
+        (data['name'] ??
+            (data['email'] != null ? data['email'].split('@')[0] : 'Kullanıcı'));
     final avatar = data['photoURL'] ?? 'assets/icons/app_icon.png';
 
     // Stats tabanlı skor hesaplaması
@@ -83,8 +85,6 @@ void showLeaderboardSheet(BuildContext context, WidgetRef ref) {
   final firebaseUser = ref.read(currentUserProvider).value;
   final myUid = firebaseUser?.uid ?? 'me';
 
-  final dbUsersAsync = ref.watch(globalLeaderboardProvider);
-
   final titleText = isEn ? 'Global Leaderboard' : 'Küresel Sıralama';
   final rankText = isEn ? 'Your Rank: #' : 'Sıran: #';
   final pointsText = isEn ? 'pts' : 'puan';
@@ -112,34 +112,38 @@ void showLeaderboardSheet(BuildContext context, WidgetRef ref) {
           minChildSize: 0.6,
           maxChildSize: 0.95,
           builder: (_, controller) {
-             return ClipRRect(
-               borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-               child: BackdropFilter(
-                 filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                 child: dbUsersAsync.when(
-                   loading: () => Container(color: sheetColor.withValues(alpha: isDarkMode ? 0.85 : 0.90), child: const Center(child: CircularProgressIndicator())),
-                   error: (err, stack) => Container(color: sheetColor.withValues(alpha: isDarkMode ? 0.85 : 0.90), child: Center(child: Text('Veritabanına bağlanılamadı. / Connection failed.', style: TextStyle(color: textColor)))),
-                   data: (users) {
-                     final userRank = users.indexWhere((u) => u.id == myUid) + 1;
-                     
-                     return Container(
-                       decoration: BoxDecoration(
-                         color: sheetColor.withValues(alpha: isDarkMode ? 0.85 : 0.90),
-                         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                         border: Border.all(
-                           color: Colors.white.withValues(alpha: isDarkMode ? 0.1 : 0.3),
-                           width: 1.5,
-                         ),
-                         boxShadow: [
-                           BoxShadow(
-                             color: Colors.black.withValues(alpha: 0.1),
-                             blurRadius: 20,
-                             offset: const Offset(0, -5),
+             return Consumer(
+               builder: (context, ref, child) {
+                 final dbUsersAsync = ref.watch(globalLeaderboardProvider);
+                 
+                 return ClipRRect(
+                   borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                   child: BackdropFilter(
+                     filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                     child: dbUsersAsync.when(
+                       loading: () => Container(color: sheetColor.withValues(alpha: isDarkMode ? 0.85 : 0.90), child: const Center(child: CircularProgressIndicator())),
+                       error: (err, stack) => Container(color: sheetColor.withValues(alpha: isDarkMode ? 0.85 : 0.90), child: Center(child: Text('Veritabanına bağlanılamadı. / Connection failed.\n\n$err', textAlign: TextAlign.center, style: TextStyle(color: textColor)))),
+                       data: (users) {
+                         final userRank = users.indexWhere((u) => u.id == myUid) + 1;
+                         
+                         return Container(
+                           decoration: BoxDecoration(
+                             color: sheetColor.withValues(alpha: isDarkMode ? 0.85 : 0.90),
+                             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                             border: Border.all(
+                               color: Colors.white.withValues(alpha: isDarkMode ? 0.1 : 0.3),
+                               width: 1.5,
+                             ),
+                             boxShadow: [
+                               BoxShadow(
+                                 color: Colors.black.withValues(alpha: 0.1),
+                                 blurRadius: 20,
+                                 offset: const Offset(0, -5),
+                               ),
+                             ]
                            ),
-                         ]
-                       ),
-                       child: Column(
-                         children: [
+                           child: Column(
+                             children: [
                            // Drag handle
                            Container(
                              margin: const EdgeInsets.only(top: 12, bottom: 8),
@@ -309,16 +313,18 @@ void showLeaderboardSheet(BuildContext context, WidgetRef ref) {
                                  },
                                ),
                              ),
-                         ],
-                       ),
-                     );
-                   }
-                 )
-               ),
-             );
-          },
-        ),
-      );
-    },
-  );
-}
+                             ],
+                           ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }

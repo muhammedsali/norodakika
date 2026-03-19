@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../auth/screens/auth_gate_screen.dart';
 import '../../profile/screens/profile_screen.dart';
 
 import '../providers/language_provider.dart';
@@ -177,17 +176,6 @@ class SettingsScreen extends ConsumerWidget {
                       titleColor: titleColor,
                       subtitleColor: subtitleColor,
                       isDestructive: false,
-                    ),
-                    Divider(height: 1, color: dividerColor, indent: 56),
-                    _buildActionTile(
-                      icon: Icons.person_remove_rounded,
-                      iconColor: const Color(0xFFEF4444),
-                      title: s.deleteAccountTitle,
-                      subtitle: s.deleteAccountSubtitle,
-                      onTap: () => _showDeleteAccountDialog(context, ref, s),
-                      titleColor: titleColor,
-                      subtitleColor: subtitleColor,
-                      isDestructive: true,
                     ),
                   ],
                 ),
@@ -746,81 +734,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              final authState = ref.read(authNotifierProvider);
+              if (authState.isLoading) return;
+
+              Navigator.pop(context); // Dialogu kapat
               await ref.read(authNotifierProvider.notifier).logout();
-              if (context.mounted) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const AuthGateScreen()),
-                  (route) => false,
-                );
-              }
             },
             child: Text(
               s.logout,
-              style: GoogleFonts.spaceGrotesk(
-                color: const Color(0xFFEF4444),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteAccountDialog(
-      BuildContext context, WidgetRef ref, AppStrings s) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF1F2937) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          s.deleteAccountTitle,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFFEF4444),
-          ),
-        ),
-        content: Text(
-          s.deleteAccountConfirm,
-          style: GoogleFonts.spaceGrotesk(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'İptal',
-              style: GoogleFonts.spaceGrotesk(),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              try {
-                await ref.read(authNotifierProvider.notifier).deleteAccount();
-                if (context.mounted) {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const AuthGateScreen()),
-                    (route) => false,
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.toString()),
-                      backgroundColor: const Color(0xFFEF4444),
-                    ),
-                  );
-                }
-              }
-            },
-            child: Text(
-              s.deleteAccountTitle,
               style: GoogleFonts.spaceGrotesk(
                 color: const Color(0xFFEF4444),
                 fontWeight: FontWeight.w600,

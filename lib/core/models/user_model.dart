@@ -2,6 +2,7 @@ import '../memory/memory_bank.dart';
 
 class UserModel {
   final String uid;
+  final String? displayName;
   final List<Map<String, dynamic>> dailyPlan;
   final Map<String, double> stats;
   final List<Map<String, dynamic>> history;
@@ -9,6 +10,7 @@ class UserModel {
 
   UserModel({
     required this.uid,
+    this.displayName,
     required this.dailyPlan,
     required this.stats,
     required this.history,
@@ -18,6 +20,7 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       uid: json['uid'] ?? '',
+      displayName: json['displayName'],
       dailyPlan: List<Map<String, dynamic>>.from(json['dailyPlan'] ?? []),
       stats: Map<String, double>.from(
         (json['stats'] ?? MemoryBank.createUserModel(json['uid'] ?? '')['stats'])
@@ -44,6 +47,7 @@ class UserModel {
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,
+      'displayName': displayName,
       'dailyPlan': dailyPlan,
       'stats': stats.map((key, value) => MapEntry(key, value)),
       'history': history,
@@ -53,6 +57,7 @@ class UserModel {
 
   UserModel copyWith({
     String? uid,
+    String? displayName,
     List<Map<String, dynamic>>? dailyPlan,
     Map<String, double>? stats,
     List<Map<String, dynamic>>? history,
@@ -60,6 +65,7 @@ class UserModel {
   }) {
     return UserModel(
       uid: uid ?? this.uid,
+      displayName: displayName ?? this.displayName,
       dailyPlan: dailyPlan ?? this.dailyPlan,
       stats: stats ?? this.stats,
       history: history ?? this.history,

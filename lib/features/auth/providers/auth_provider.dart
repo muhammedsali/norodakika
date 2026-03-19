@@ -59,6 +59,12 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
             email: email,
             password: password,
           );
+      
+      final user = ref.read(authServiceProvider).currentUser;
+      if (user != null) {
+        await ref.read(authServiceProvider).syncDisplayName(user);
+      }
+      
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -75,6 +81,12 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
             email: email,
             password: password,
           );
+      
+      final user = ref.read(authServiceProvider).currentUser;
+      if (user != null) {
+        await ref.read(authServiceProvider).syncDisplayName(user);
+      }
+
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -85,6 +97,12 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
     state = const AsyncValue.loading();
     try {
       await ref.read(authServiceProvider).signInWithGoogle();
+      
+      final user = ref.read(authServiceProvider).currentUser;
+      if (user != null) {
+        await ref.read(authServiceProvider).syncDisplayName(user);
+      }
+
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -92,19 +110,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
   }
 
   Future<void> logout() async {
-    await ref.read(authServiceProvider).logout();
-  }
-
-  Future<void> deleteAccount() async {
     state = const AsyncValue.loading();
     try {
-      await ref.read(authServiceProvider).deleteAccount();
+      await ref.read(authServiceProvider).logout();
       state = const AsyncValue.data(null);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
-      rethrow;
     }
   }
+
 }
 
 final authNotifierProvider =

@@ -143,9 +143,10 @@ class MemoryBank {
   ];
 
   // 3) Kullanıcı Data Modelleri
-  static Map<String, dynamic> createUserModel(String uid) {
+  static Map<String, dynamic> createUserModel(String uid, {String? displayName}) {
     return {
       "uid": uid,
+      "displayName": displayName,
       "dailyPlan": [],
       "stats": {
         "Hafıza": 0,

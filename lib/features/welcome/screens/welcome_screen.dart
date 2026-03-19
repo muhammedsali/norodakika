@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../settings/providers/theme_provider.dart';
-import '../../auth/screens/auth_gate_screen.dart';
+import '../../auth/screens/login_screen.dart';
 
 // ─── Oyun Kartı Veri Modeli ───────────────────────────────
 class _GameCardData {
@@ -529,10 +529,10 @@ class WelcomeScreen extends ConsumerWidget {
   }
 
   void _navigateToAuth(BuildContext context) {
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const AuthGateScreen(),
+        pageBuilder: (_, __, ___) => const LoginScreen(),
         transitionsBuilder: (_, anim, __, child) =>
             FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 400),
