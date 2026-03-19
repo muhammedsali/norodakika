@@ -31,7 +31,8 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   Timer? _gameTimer;
   Timer? _roundTimer;
 
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
+  final ValueNotifier<double> _roundProgressNotifier = ValueNotifier<double>(1.0);
   int _hearts = maxHearts;
   int _score = 0;
   int _streak = 0;
@@ -39,7 +40,6 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   int _correct = 0;
   int _wrong = 0;
   int _rounds = 0;
-  double _roundProgress = 1.0;
 
   late List<_CardFace> _options;
   late int _oddIndex;
@@ -72,7 +72,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   }
 
   void _resetState() {
-    _timeRemaining = totalSeconds;
+    _timeRemainingNotifier.value = totalSeconds;
     _hearts = maxHearts;
     _score = 0;
     _streak = 0;
@@ -80,7 +80,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
     _correct = 0;
     _wrong = 0;
     _rounds = 0;
-    _roundProgress = 1.0;
+    _roundProgressNotifier.value = 1.0;
     _isFinished = false;
   }
 
@@ -88,19 +88,15 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
     _gameTimer?.cancel();
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) _finish();
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) _finish();
     });
 
     _roundTimer?.cancel();
     _roundTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (!mounted || _isFinished) return;
-      setState(() {
-        _roundProgress -= 0.1 / (roundMs / 1000);
-      });
-      if (_roundProgress <= 0) {
+      _roundProgressNotifier.value -= 0.1 / (roundMs / 1000);
+      if (_roundProgressNotifier.value <= 0) {
         _handleTimeout();
       }
     });
@@ -121,38 +117,45 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   void _buildRound() {
     if (_isFinished) return;
     _rounds++;
-    _roundProgress = 1.0;
+    _roundProgressNotifier.value = 1.0;
 
-    final shapes = ['▲', '●', '■', '◆', '✦', '⬟'];
+    final icons = [
+      Icons.rocket_launch_rounded,
+      Icons.diamond_rounded,
+      Icons.anchor_rounded,
+      Icons.favorite_rounded,
+      Icons.ac_unit_rounded,
+      Icons.local_fire_department_rounded,
+    ];
     final colors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.teal,
+      Colors.redAccent,
+      Colors.blueAccent,
+      Colors.greenAccent,
+      Colors.orangeAccent,
+      Colors.purpleAccent,
+      Colors.tealAccent,
     ];
 
-    final baseShape = shapes[_rng.nextInt(shapes.length)];
+    final baseIcon = icons[_rng.nextInt(icons.length)];
     final baseColor = colors[_rng.nextInt(colors.length)];
 
     _options = List.generate(
       4,
-      (_) => _CardFace(shape: baseShape, color: baseColor),
+      (_) => _CardFace(icon: baseIcon, color: baseColor),
     );
 
     _oddIndex = _rng.nextInt(4);
-    String oddShape = baseShape;
+    IconData oddIcon = baseIcon;
     Color oddColor = baseColor;
-    // Değişimi garanti et
-    while (oddShape == baseShape && oddColor == baseColor) {
+    
+    while (oddIcon == baseIcon && oddColor == baseColor) {
       if (_rng.nextBool()) {
-        oddShape = shapes[_rng.nextInt(shapes.length)];
+        oddIcon = icons[_rng.nextInt(icons.length)];
       } else {
         oddColor = colors[_rng.nextInt(colors.length)];
       }
     }
-    _options[_oddIndex] = _CardFace(shape: oddShape, color: oddColor);
+    _options[_oddIndex] = _CardFace(icon: oddIcon, color: oddColor);
     setState(() {});
   }
 
@@ -193,7 +196,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
     _roundTimer?.cancel();
 
     final successRate = _rounds == 0 ? 0.0 : _correct / _rounds;
-    final duration = totalSeconds - max(0, _timeRemaining);
+    final duration = totalSeconds - max(0, _timeRemainingNotifier.value);
 
     _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
 
@@ -213,6 +216,8 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   void dispose() {
     _gameTimer?.cancel();
     _roundTimer?.cancel();
+    _timeRemainingNotifier.dispose();
+    _roundProgressNotifier.dispose();
     super.dispose();
   }
 
@@ -290,13 +295,18 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '$_timeRemaining s',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _timeRemainingNotifier,
+                builder: (context, time, child) {
+                  return Text(
+                    '$time s',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               Text(
@@ -314,31 +324,41 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   }
 
   Widget _buildTimerBar(bool isDark) {
-    final progress = _timeRemaining / totalSeconds;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: LinearProgressIndicator(
-        value: progress.clamp(0, 1),
-        minHeight: 12,
-        backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
-        ),
-      ),
+    return ValueListenableBuilder<int>(
+      valueListenable: _timeRemainingNotifier,
+      builder: (context, timeRemaining, child) {
+        final progress = timeRemaining / totalSeconds;
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: LinearProgressIndicator(
+            value: progress.clamp(0, 1),
+            minHeight: 12,
+            backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color.lerp(const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+            ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildRoundBar(bool isDark) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: LinearProgressIndicator(
-        value: _roundProgress.clamp(0, 1),
-        minHeight: 10,
-        backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(const Color(0xFF60A5FA), const Color(0xFFF59E0B), 1 - _roundProgress)!,
-        ),
-      ),
+    return ValueListenableBuilder<double>(
+      valueListenable: _roundProgressNotifier,
+      builder: (context, roundProgress, child) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: LinearProgressIndicator(
+            value: roundProgress.clamp(0, 1),
+            minHeight: 10,
+            backgroundColor: isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color.lerp(const Color(0xFF60A5FA), const Color(0xFFF59E0B), 1 - roundProgress)!,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -372,13 +392,10 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        _options[i].shape,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 44,
-                          fontWeight: FontWeight.w800,
-                          color: _options[i].color,
-                        ),
+                      Icon(
+                        _options[i].icon,
+                        size: 44,
+                        color: _options[i].color,
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -442,10 +459,10 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
 }
 
 class _CardFace {
-  final String shape;
+  final IconData icon;
   final Color color;
 
-  _CardFace({required this.shape, required this.color});
+  _CardFace({required this.icon, required this.color});
 }
 
 class _StatChip extends StatelessWidget {

@@ -163,4 +163,19 @@ class FirestoreService {
       return [];
     }
   }
+
+  // ── Tüm Kullanıcıları Küresel Sıralama İçin Getir ────────
+  Future<List<Map<String, dynamic>>> getLeaderboardUsers() async {
+    try {
+      final snapshot = await _usersCollection.get();
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>? ?? {};
+        data['uid'] = doc.id;
+        return data;
+      }).toList();
+    } catch (e) {
+      debugPrint('getLeaderboardUsers hatası: $e');
+      return [];
+    }
+  }
 }

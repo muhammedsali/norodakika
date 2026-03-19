@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../stats/screens/stats_screen.dart';
 import '../../stats/providers/user_stats_provider.dart';
+import '../../notifications/screens/notifications_sheet.dart';
+import '../../leaderboard/screens/leaderboard_sheet.dart';
 import '../../game_launcher/screens/game_play_screen.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../../core/models/game_model.dart';
@@ -108,8 +110,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final appLanguage = ref.watch(languageProvider);
     final s = AppStrings(appLanguage);
     final isDarkMode = ref.watch(themeProvider);
+    final customName = ref.watch(customNameProvider).value;
     final userName =
-        user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
+        customName ?? user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
 
     final overlayStyle = isDarkMode
         ? const SystemUiOverlayStyle(
@@ -187,16 +190,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String bottomText = "";
 
     if (_selectedTab == 0) {
-      topText = s.homeWelcomeBack.toUpperCase();
+      topText = "MERHABA,";
       bottomText = userName;
     } else if (_selectedTab == 1) {
       topText = s.appName.toUpperCase(); // Veya "NORODAKIKA"
       bottomText = "${s.dailyGoal}: 85%";
     } else if (_selectedTab == 2) {
-      topText = "İLERLEME";
-      bottomText = "İstatistiklerin";
+      topText = s.statsTitle.toUpperCase();
+      bottomText = s.statsSubtitle;
     } else {
-      bottomText = "Hesap ve Uygulama";
+      bottomText = s.settingsTitle;
     }
 
     return Padding(
@@ -263,16 +266,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ),
-          Container(
-            width: 44,
-            height: 44,
-            decoration:
-                _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
-            child: IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.notifications_outlined,
-                  color: titleColor, size: 22),
-            ),
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
+                child: IconButton(
+                  onPressed: () => showLeaderboardSheet(context, ref),
+                  icon: Icon(Icons.emoji_events_outlined, color: titleColor, size: 22),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                width: 44,
+                height: 44,
+                decoration: _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
+                child: IconButton(
+                  onPressed: () => showNotificationsSheet(context, ref),
+                  icon: Icon(Icons.notifications_outlined, color: titleColor, size: 22),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -281,28 +296,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildHomeTabBody(BuildContext context, List<GameModel> games) {
     final isDarkMode = ref.watch(themeProvider);
+    final appLanguage = ref.watch(languageProvider);
+    final s = AppStrings(appLanguage);
 
     final quickMath = games.where((g) => g.id == 'NUM01').isNotEmpty
         ? games.firstWhere((g) => g.id == 'NUM01')
         : games.first;
 
-    const completedToday = 2;
-    const plannedToday = 3;
-    const dailyProgress =
-        plannedToday == 0 ? 0.0 : completedToday / plannedToday;
+    final completedTodayAsync = ref.watch(todayGameCountProvider);
+    final completedToday = completedTodayAsync.value ?? 0;
+    
+    // Günde en az 5 oyun oynamasını hedefleyelim
+    const plannedToday = 5;
+    
+    // Progress en fazla 1.0 (yani %100) olabilir, sınırlandıralım
+    double dailyProgress = completedToday / plannedToday;
+    if (dailyProgress > 1.0) dailyProgress = 1.0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionLabel('DAILY PROGRESS', isDarkMode),
+          _buildSectionLabel(s.homeDailyProgress.toUpperCase(), isDarkMode),
           const SizedBox(height: 12),
           _buildDailyProgressCard(
             isDarkMode: isDarkMode,
             completedToday: completedToday,
             plannedToday: plannedToday,
             progress: dailyProgress,
+            s: s,
             onViewDetails: () {
               setState(() {
                 _selectedTab = 2;
@@ -310,17 +333,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           const SizedBox(height: 32),
-          _buildSectionLabel('UP NEXT', isDarkMode),
+          _buildSectionLabel(s.homeUpNext.toUpperCase(), isDarkMode),
           const SizedBox(height: 12),
           _buildUpNextCard(
             context: context,
             isDarkMode: isDarkMode,
             game: quickMath,
+            s: s,
           ),
           const SizedBox(height: 32),
-          _buildSectionLabel('INSIGHTS', isDarkMode),
+          _buildSectionLabel(s.homeInsights.toUpperCase(), isDarkMode),
           const SizedBox(height: 12),
-          _buildCognitiveScoreCard(isDarkMode: isDarkMode),
+          _buildCognitiveScoreCard(isDarkMode: isDarkMode, s: s),
         ],
       ),
     );
@@ -347,6 +371,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required int completedToday,
     required int plannedToday,
     required double progress,
+    required AppStrings s,
     required VoidCallback onViewDetails,
   }) {
     final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
@@ -363,7 +388,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Daily Goal',
+                s.homeDailyGoalTitle,
                 style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -371,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                '$completedToday of $plannedToday games completed today',
+                s.dailyGoalCompleted(completedToday, plannedToday),
                 style: GoogleFonts.inter(fontSize: 12, color: subtitleColor),
               ),
               const SizedBox(height: 16),
@@ -386,7 +411,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'VIEW DETAILS',
+                    s.homeViewDetails.toUpperCase(),
                     style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -430,6 +455,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required BuildContext context,
     required bool isDarkMode,
     required GameModel game,
+    required AppStrings s,
   }) {
     final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
     final subtitleColor =
@@ -476,7 +502,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Text(
                             game.description.isNotEmpty
                                 ? game.description
-                                : 'Boost your mental arithmetic speed.',
+                                : game.area,
                             style: GoogleFonts.inter(
                                 fontSize: 12, color: subtitleColor),
                           ),
@@ -497,7 +523,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const Icon(Icons.timer_outlined,
                               size: 12, color: stitchPrimary),
                           const SizedBox(width: 4),
-                          Text('2 MIN',
+                          Text('2 ${s.homeMinutesShort}',
                               style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -524,7 +550,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       );
                     },
                     icon: const Icon(Icons.play_arrow_rounded, size: 20),
-                    label: Text('Start Training',
+                    label: Text(s.homeStartTraining,
                         style: GoogleFonts.inter(
                             fontSize: 14, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
@@ -545,7 +571,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildCognitiveScoreCard({required bool isDarkMode}) {
+  Widget _buildCognitiveScoreCard({required bool isDarkMode, required AppStrings s}) {
     final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
     final statsAsync = ref.watch(userStatsProvider);
 
@@ -565,7 +591,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Cognitive Score',
+                  Text(s.cognitiveScore,
                       style: GoogleFonts.inter(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -612,7 +638,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 fontSize: 28,
                                 fontWeight: FontWeight.w900,
                                 color: titleColor)),
-                        Text('Global Pts',
+                        Text(s.globalPts,
                             style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -624,13 +650,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   Expanded(
                     child: Column(
                       children: [
-                        _buildMiniInsightBar('Memory', memory.round(),
+                        _buildMiniInsightBar(s.memoryArea, memory.round(),
                             stitchPrimary, isDarkMode),
                         const SizedBox(height: 12),
-                        _buildMiniInsightBar('Focus', focus.round(),
+                        _buildMiniInsightBar(s.focusArea, focus.round(),
                             const Color(0xFF60A5FA), isDarkMode),
                         const SizedBox(height: 12),
-                        _buildMiniInsightBar('Speed', speed.round(),
+                        _buildMiniInsightBar(s.speedArea, speed.round(),
                             const Color(0xFF818CF8), isDarkMode),
                       ],
                     ),

@@ -24,7 +24,7 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
 
   final Random _rng = Random();
   Timer? _timer;
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
 
   int _trial = 0;
   bool _isTarget = false;
@@ -48,8 +48,8 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() => _timeRemaining--);
-      if (_timeRemaining <= 0) _finish();
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) _finish();
     });
   }
 
@@ -68,6 +68,7 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -140,7 +141,7 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': _correct / total,
-      'duration': (totalSeconds - _timeRemaining),
+      'duration': (totalSeconds - _timeRemainingNotifier.value),
     });
   }
 
@@ -170,7 +171,10 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
                     color: titleColor,
                   ),
                 ),
-                _Pill(text: '$_timeRemaining s', isDark: isDark),
+                ValueListenableBuilder<int>(
+                  valueListenable: _timeRemainingNotifier,
+                  builder: (context, time, _) => _Pill(text: '$time s', isDark: isDark),
+                ),
               ],
             ),
             const SizedBox(height: 8),

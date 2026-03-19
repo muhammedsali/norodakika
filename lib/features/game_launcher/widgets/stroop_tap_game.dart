@@ -39,7 +39,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
   DateTime? _questionStartTime;
   DateTime? _gameStartTime;
 
-  int _timeRemaining = gameDuration;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(gameDuration);
   int _score = 0;
   int _streak = 0;
   int _bestStreak = 0;
@@ -83,10 +83,8 @@ class _StroopTapGameState extends State<StroopTapGame> {
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_isFinished) return;
       if (!mounted) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) {
         _finishGame();
       }
     });
@@ -94,7 +92,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
 
   void _resetState() {
     _gameStartTime = DateTime.now();
-    _timeRemaining = gameDuration;
+    _timeRemainingNotifier.value = gameDuration;
     _score = 0;
     _streak = 0;
     _bestStreak = 0;
@@ -192,6 +190,7 @@ class _StroopTapGameState extends State<StroopTapGame> {
   @override
   void dispose() {
     _gameTimer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -270,13 +269,18 @@ class _StroopTapGameState extends State<StroopTapGame> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '$_timeRemaining s',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _timeRemainingNotifier,
+                builder: (context, time, _) {
+                  return Text(
+                    '$time s',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               Text(
@@ -294,18 +298,23 @@ class _StroopTapGameState extends State<StroopTapGame> {
   }
 
   Widget _buildTimerBar(bool isDark) {
-    final progress = _timeRemaining / gameDuration;
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: LinearProgressIndicator(
-        value: progress.clamp(0, 1),
-        minHeight: 12,
-        backgroundColor:
-            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(
-              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
-        ),
+      child: ValueListenableBuilder<int>(
+        valueListenable: _timeRemainingNotifier,
+        builder: (context, time, child) {
+          final progress = time / gameDuration;
+          return LinearProgressIndicator(
+            value: progress.clamp(0, 1),
+            minHeight: 12,
+            backgroundColor:
+                isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color.lerp(
+                  const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+            ),
+          );
+        },
       ),
     );
   }

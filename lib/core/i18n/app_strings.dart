@@ -59,7 +59,9 @@ class AppStrings {
   String get platformTitle =>
       isEn ? 'Cognitive Training Platform' : 'Bilişsel Eğitim Platformu';
   String get emailLabel => isEn ? 'Email' : 'E-posta';
+  String get nameLabel => isEn ? 'Full Name' : 'Ad Soyad';
   String get passwordLabel => isEn ? 'Password' : 'Şifre';
+  String get nameRequired => isEn ? 'Name is required' : 'Ad Soyad gerekli';
   String get emailRequired => isEn ? 'Email is required' : 'E-posta gerekli';
   String get emailInvalid =>
       isEn ? 'Enter a valid email' : 'Geçerli bir e-posta girin';
@@ -279,6 +281,9 @@ class AppStrings {
   // Insights card
   String get cognitiveScore => isEn ? 'Cognitive Score' : 'Bilişsel Skor';
   String get globalPts => isEn ? 'GLOBAL PTS' : 'GLOBAL PUAN';
+  String get memoryArea => isEn ? 'Memory' : 'Hafıza';
+  String get focusArea => isEn ? 'Focus' : 'Dikkat';
+  String get speedArea => isEn ? 'Speed' : 'Refleks';
 
   String avatarLabel(String avatarNameTr) {
     if (!isEn) return avatarNameTr;

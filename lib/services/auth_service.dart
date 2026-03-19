@@ -23,6 +23,7 @@ class AuthService {
 
   // ── Kayıt Ol ──────────────────────────────────────────────
   Future<void> register({
+    required String name,
     required String email,
     required String password,
   }) async {
@@ -34,6 +35,12 @@ class AuthService {
 
       final user = userCredential.user;
       if (user != null) {
+        // İsmi Firebase Auth profiline ekle
+        await user.updateDisplayName(name);
+        
+        // E-posta doğrulama gönder
+        await user.sendEmailVerification();
+
         try {
           final userModel =
               UserModel.fromJson(MemoryBank.createUserModel(user.uid));
@@ -50,6 +57,32 @@ class AuthService {
     } catch (e) {
       if (_auth.currentUser != null) return;
       throw 'Bir hata oluştu: $e';
+    }
+  }
+
+  // ── Doğrulama E-postası Gönder ────────────────────────────
+  Future<void> sendVerificationEmail() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+      }
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthException(e);
+    } catch (e) {
+      throw 'Doğrulama e-postası gönderilemedi: $e';
+    }
+  }
+
+  // ── Kullanıcıyı Yeniden Yükle (Doğrulama Kontrolü İçin) ──
+  Future<void> reloadUser() async {
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        await user.reload();
+      }
+    } catch (e) {
+      debugPrint('Kullanıcı yenileme hatası: $e');
     }
   }
 

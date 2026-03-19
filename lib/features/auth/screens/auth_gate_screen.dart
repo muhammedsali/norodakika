@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../../home/screens/home_screen.dart';
 import 'login_screen.dart';
+import 'verify_email_screen.dart';
 
 class AuthGateScreen extends ConsumerStatefulWidget {
   const AuthGateScreen({super.key});
@@ -21,6 +22,11 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
         if (user == null) {
           return const LoginScreen();
         } else {
+          // E-posta doğrulamasını kontrol et
+          if (!user.emailVerified) {
+            return const VerifyEmailScreen();
+          }
+          
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
               Navigator.pushReplacement(

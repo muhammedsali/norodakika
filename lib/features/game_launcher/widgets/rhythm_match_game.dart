@@ -26,7 +26,7 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
   final Random _rng = Random();
 
   Timer? _timer;
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
 
   int _roundIndex = 0;
   bool _showingSequence = true;
@@ -52,8 +52,8 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() => _timeRemaining--);
-      if (_timeRemaining <= 0) _finish();
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) _finish();
     });
   }
 
@@ -72,6 +72,7 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -138,7 +139,7 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
-      'duration': (totalSeconds - _timeRemaining),
+      'duration': (totalSeconds - _timeRemainingNotifier.value),
     });
   }
 
@@ -181,13 +182,18 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
                       color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
                     ),
                   ),
-                  child: Text(
-                    '$_timeRemaining s',
-                    style: GoogleFonts.robotoMono(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: titleColor,
-                    ),
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _timeRemainingNotifier,
+                    builder: (context, time, _) {
+                      return Text(
+                        '$time s',
+                        style: GoogleFonts.robotoMono(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: titleColor,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

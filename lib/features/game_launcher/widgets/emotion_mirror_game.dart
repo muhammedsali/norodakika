@@ -23,7 +23,7 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
 
   final Random _rng = Random();
   Timer? _timer;
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
 
   int _correct = 0;
   int _wrong = 0;
@@ -50,8 +50,8 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
-      setState(() => _timeRemaining--);
-      if (_timeRemaining <= 0) _finish();
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) _finish();
     });
   }
 
@@ -70,6 +70,7 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
   @override
   void dispose() {
     _timer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -106,7 +107,7 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': _correct / total,
-      'duration': (totalSeconds - _timeRemaining),
+      'duration': (totalSeconds - _timeRemainingNotifier.value),
     });
   }
 
@@ -141,12 +142,15 @@ class _EmotionMirrorGameState extends State<EmotionMirrorGame> {
                       color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
                     ),
                   ),
-                  child: Text(
-                    '$_timeRemaining s',
-                    style: GoogleFonts.robotoMono(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: titleColor,
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: _timeRemainingNotifier,
+                    builder: (context, time, _) => Text(
+                      '$time s',
+                      style: GoogleFonts.robotoMono(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: titleColor,
+                      ),
                     ),
                   ),
                 ),

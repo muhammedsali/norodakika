@@ -26,7 +26,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
 
   GameState _gameState = GameState.idle;
   int _score = 0;
-  int _timeRemaining = gameDuration;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(gameDuration);
   int _combo = 0;
   double _multiplier = 1.0;
   int _totalTaps = 0;
@@ -57,8 +57,8 @@ class _ReflexTapGameState extends State<ReflexTapGame>
 
     _gameLoopTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_isPaused || !mounted) return;
-      if (_timeRemaining > 0) {
-        setState(() => _timeRemaining--);
+      if (_timeRemainingNotifier.value > 0) {
+        _timeRemainingNotifier.value--;
       } else {
         _endGame();
       }
@@ -123,6 +123,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
     _shakeController.dispose();
     _pulseController.dispose();
     _glowController.dispose();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -130,7 +131,6 @@ class _ReflexTapGameState extends State<ReflexTapGame>
     setState(() {
       _gameState = GameState.playing;
       _score = 0;
-      _timeRemaining = gameDuration;
       _combo = 0;
       _multiplier = 1.0;
       _feedbackText = "";
@@ -140,11 +140,13 @@ class _ReflexTapGameState extends State<ReflexTapGame>
       _reactionTimes = [];
       _bestReactionTime = 9999;
     });
+    
+    _timeRemainingNotifier.value = gameDuration;
 
     _gameLoopTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_isPaused || !mounted) return;
-      if (_timeRemaining > 0) {
-        setState(() => _timeRemaining--);
+      if (_timeRemainingNotifier.value > 0) {
+        _timeRemainingNotifier.value--;
       } else {
         _endGame();
       }
@@ -172,7 +174,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
   }
 
   void _scheduleNextTarget() {
-    if (_timeRemaining <= 0 || _isPaused || !mounted) return;
+    if (_timeRemainingNotifier.value <= 0 || _isPaused || !mounted) return;
 
     final randomDelay = minDelayMs + Random().nextInt(maxDelayMs - minDelayMs);
 
@@ -403,8 +405,13 @@ class _ReflexTapGameState extends State<ReflexTapGame>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildStatItem("SÜRE", "$_timeRemaining", Icons.timer, titleColor,
-              textSecondary),
+          ValueListenableBuilder<int>(
+            valueListenable: _timeRemainingNotifier,
+            builder: (context, timeRemaining, child) {
+              return _buildStatItem("SÜRE", "$timeRemaining", Icons.timer, titleColor,
+                  textSecondary);
+            },
+          ),
           AnimatedOpacity(
             duration: const Duration(milliseconds: 300),
             opacity: _combo > 1 ? 1.0 : 0.0,

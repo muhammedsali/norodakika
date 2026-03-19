@@ -32,7 +32,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   Timer? _timer;
   Timer? _spawnTimer;
 
-  int _timeRemaining = gameDuration;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(gameDuration);
   int _level = 1;
   int _score = 0;
   int _lives = maxLives;
@@ -77,7 +77,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
       if (widget.isPaused) {
         _timer?.cancel();
         _spawnTimer?.cancel();
-      } else if (_timeRemaining > 0) {
+      } else if (_timeRemainingNotifier.value > 0) {
         _startTimers();
       }
     }
@@ -89,7 +89,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   }
 
   void _resetState() {
-    _timeRemaining = gameDuration;
+    _timeRemainingNotifier.value = gameDuration;
     _score = 0;
     _level = 1;
     _lives = maxLives;
@@ -108,26 +108,26 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
 
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) return;
-      setState(() {
-        _timeRemaining--;
-        // Her 10 saniyede bir level artışı
-        if ((gameDuration - _timeRemaining) % 10 == 0 && _timeRemaining < gameDuration) {
+      _timeRemainingNotifier.value--;
+      // Her 10 saniyede bir level artışı
+      if ((gameDuration - _timeRemainingNotifier.value) % 10 == 0 && _timeRemainingNotifier.value < gameDuration) {
+        setState(() {
           _level++;
           _spawnInterval = (baseSpawnInterval * (1 - (_level - 1) * 0.1)).clamp(600, baseSpawnInterval).toInt();
           _resetTargetColor();
-          
-          // Güncellenmiş spawnInterval ile spawn timer'ı yeniden başlat
-          _spawnTimer?.cancel();
-          _spawnTimer = Timer.periodic(
-            Duration(milliseconds: _spawnInterval),
-            (t) {
-              if (!mounted || _timeRemaining <= 0) return;
-              _spawnDot();
-            },
-          );
-        }
-      });
-      if (_timeRemaining <= 0) {
+        });
+        
+        // Güncellenmiş spawnInterval ile spawn timer'ı yeniden başlat
+        _spawnTimer?.cancel();
+        _spawnTimer = Timer.periodic(
+          Duration(milliseconds: _spawnInterval),
+          (t) {
+            if (!mounted || _timeRemainingNotifier.value <= 0) return;
+            _spawnDot();
+          },
+        );
+      }
+      if (_timeRemainingNotifier.value <= 0) {
         _finishGame();
       }
     });
@@ -135,14 +135,14 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     _spawnTimer = Timer.periodic(
       Duration(milliseconds: _spawnInterval),
       (t) {
-        if (!mounted || _timeRemaining <= 0) return;
+        if (!mounted || _timeRemainingNotifier.value <= 0) return;
         _spawnDot();
       },
     );
   }
 
   void _spawnDot() {
-    if (_timeRemaining <= 0) return;
+    if (_timeRemainingNotifier.value <= 0) return;
 
     final isTarget = _rng.nextDouble() < 0.4; // %40 hedef, %60 yanlış
     final color = isTarget ? _targetColor : _randomOtherColor(_targetColor);
@@ -174,7 +174,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   }
 
   void _onDotTap(_FocusDot dot) {
-    if (_timeRemaining <= 0 || widget.isPaused) return;
+    if (_timeRemainingNotifier.value <= 0 || widget.isPaused) return;
     HapticFeedback.lightImpact();
 
     setState(() {
@@ -212,7 +212,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
-      'duration': gameDuration - _timeRemaining,
+      'duration': gameDuration - max(0, _timeRemainingNotifier.value),
       'missedTargets': _missedTargets,
     });
   }
@@ -223,6 +223,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     _spawnTimer?.cancel();
     _pulseController.dispose();
     _shakeController.dispose();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -313,38 +314,47 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                       ],
                     ),
                     const SizedBox(height: 12),
-                    // Timer bar
-                    Container(
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: _timeRemaining / gameDuration,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                _targetColor,
-                                _targetColor.withValues(alpha: 0.7),
+                    // Timer bar & Stats
+                    ValueListenableBuilder<int>(
+                      valueListenable: _timeRemainingNotifier,
+                      builder: (context, timeRemaining, child) {
+                        return Column(
+                          children: [
+                            Container(
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                              child: FractionallySizedBox(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: (timeRemaining / gameDuration).clamp(0.0, 1.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        _targetColor,
+                                        _targetColor.withValues(alpha: 0.7),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildStat('$timeRemaining s', Icons.timer_outlined, subtitleColor),
+                                _buildStat('Skor: $_score', Icons.star, Colors.amber),
+                                if (_combo > 0)
+                                  _buildStat('Seri: $_combo', Icons.local_fire_department, Colors.orange),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildStat('$_timeRemaining s', Icons.timer_outlined, subtitleColor),
-                        _buildStat('Skor: $_score', Icons.star, Colors.amber),
-                        if (_combo > 0)
-                          _buildStat('Seri: $_combo', Icons.local_fire_department, Colors.orange),
-                      ],
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),

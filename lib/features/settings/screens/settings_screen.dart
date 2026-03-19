@@ -5,7 +5,7 @@ import '../../../core/i18n/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../auth/screens/auth_gate_screen.dart';
 import '../../profile/screens/profile_screen.dart';
-import '../../stats/screens/stats_screen.dart';
+
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 
@@ -28,22 +28,6 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.transparent, // 1. Değişiklik: Arka plan şeffaf
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: titleColor),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          s.settingsTitle,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: titleColor,
-          ),
-        ),
-      ),
       body: SafeArea(
         bottom: false, // SafeArea'nın alttan menüyü itmesini engelledik
         child: SingleChildScrollView(
@@ -159,22 +143,7 @@ class SettingsScreen extends ConsumerWidget {
                       titleColor: titleColor,
                       subtitleColor: subtitleColor,
                     ),
-                    Divider(height: 1, color: dividerColor, indent: 56),
-                    _buildNavigationTile(
-                      icon: Icons.show_chart_rounded,
-                      iconColor: const Color(0xFFEC4899),
-                      title: s.progressAndStatsTitle,
-                      subtitle: s.progressAndStatsSubtitle,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const StatsScreen()),
-                        );
-                      },
-                      titleColor: titleColor,
-                      subtitleColor: subtitleColor,
-                    ),
+
                   ],
                 ),
               ),

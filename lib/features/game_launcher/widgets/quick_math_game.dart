@@ -31,7 +31,7 @@ class _QuickMathGameState extends State<QuickMathGame>
   int _totalQuestions = 0;
   int _combo = 0;
   int _bestCombo = 0;
-  double _timeProgress = 1.0;
+  final ValueNotifier<double> _timeProgressNotifier = ValueNotifier<double>(1.0);
   int _num1 = 0;
   int _num2 = 0;
   String _operator = '+';
@@ -39,7 +39,7 @@ class _QuickMathGameState extends State<QuickMathGame>
   List<int> _options = [];
   Timer? _gameTimer;
   Timer? _progressTimer;
-  int _elapsedSeconds = 0;
+  final ValueNotifier<int> _elapsedSecondsNotifier = ValueNotifier<int>(0);
   bool _isFinished = false;
 
   // Feedback renkleri
@@ -102,8 +102,8 @@ class _QuickMathGameState extends State<QuickMathGame>
     _gameTimer?.cancel();
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted || _isFinished) return;
-      _elapsedSeconds++;
-      if (_elapsedSeconds >= gameDuration) {
+      _elapsedSecondsNotifier.value++;
+      if (_elapsedSecondsNotifier.value >= gameDuration) {
         _endGame();
       }
     });
@@ -117,10 +117,8 @@ class _QuickMathGameState extends State<QuickMathGame>
     _progressTimer =
         Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (!mounted || _isFinished) return;
-      if (_timeProgress > 0) {
-        setState(() {
-          _timeProgress -= 0.05 / timePerQuestion;
-        });
+      if (_timeProgressNotifier.value > 0) {
+        _timeProgressNotifier.value -= 0.05 / timePerQuestion;
       } else {
         _handleTimeOut();
       }
@@ -164,9 +162,7 @@ class _QuickMathGameState extends State<QuickMathGame>
     }
     _options.shuffle();
 
-    setState(() {
-      _timeProgress = 1.0;
-    });
+    _timeProgressNotifier.value = 1.0;
 
     // Sadece pause değilse zamanlayıcıları başlat
     if (startTimers && !widget.isPaused && !_isFinished) {
@@ -204,7 +200,7 @@ class _QuickMathGameState extends State<QuickMathGame>
 
       final baseScore = 10 + (_level * 2);
       final comboBonus = _combo > 1 ? (_combo - 1) * 5 : 0;
-      final timeBonus = (_timeProgress * 20).toInt();
+      final timeBonus = (_timeProgressNotifier.value * 20).toInt();
 
       setState(() {
         _score += baseScore + comboBonus + timeBonus;
@@ -253,7 +249,7 @@ class _QuickMathGameState extends State<QuickMathGame>
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
-      'duration': _elapsedSeconds,
+      'duration': _elapsedSecondsNotifier.value,
     });
   }
 
@@ -264,6 +260,8 @@ class _QuickMathGameState extends State<QuickMathGame>
     _shakeController.dispose();
     _pulseController.dispose();
     _feedbackController.dispose();
+    _timeProgressNotifier.dispose();
+    _elapsedSecondsNotifier.dispose();
     super.dispose();
   }
 
@@ -386,12 +384,17 @@ class _QuickMathGameState extends State<QuickMathGame>
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
-                'Süre: ${gameDuration - _elapsedSeconds}s',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 12,
-                  color: subtitleColor,
-                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _elapsedSecondsNotifier,
+                builder: (context, elapsed, _) {
+                  return Text(
+                    'Süre: ${gameDuration - elapsed}s',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 12,
+                      color: subtitleColor,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -460,19 +463,24 @@ class _QuickMathGameState extends State<QuickMathGame>
       child: AnimatedBuilder(
         animation: _pulseController,
         builder: (context, child) {
-          return LinearProgressIndicator(
-            value: _timeProgress.clamp(0.0, 1.0),
-            minHeight: 10,
-            backgroundColor: isDark
-                ? const Color(0xFF374151)
-                : const Color(0xFFE5E7EB),
-            valueColor: AlwaysStoppedAnimation<Color>(
-              Color.lerp(
-                const Color(0xFFEF4444),
-                const Color(0xFF22C55E),
-                _timeProgress,
-              )!,
-            ),
+          return ValueListenableBuilder<double>(
+            valueListenable: _timeProgressNotifier,
+            builder: (context, progressValue, child) {
+              return LinearProgressIndicator(
+                value: progressValue.clamp(0.0, 1.0),
+                minHeight: 10,
+                backgroundColor: isDark
+                    ? const Color(0xFF374151)
+                    : const Color(0xFFE5E7EB),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Color.lerp(
+                    const Color(0xFFEF4444),
+                    const Color(0xFF22C55E),
+                    progressValue,
+                  )!,
+                ),
+              );
+            },
           );
         },
       ),

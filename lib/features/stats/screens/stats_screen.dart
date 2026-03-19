@@ -80,32 +80,26 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.red),
-            const SizedBox(height: 12),
-            Text(
-              'Veri yüklenemedi',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textColorPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error.toString(),
-              style: GoogleFonts.poppins(
-                fontSize: 13,
-                color: textColorSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+      error: (error, stack) {
+        debugPrint('Firestore verisi okunamadı: $error. Yerel veriye dönülüyor.');
+        _historyFuture ??= _loadLocalHistory();
+        return FutureBuilder<List<Map<String, dynamic>>>(
+          future: _historyFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            final history = snapshot.data ?? [];
+            return _buildStatsBodyWrapper(
+              history: history,
+              isDark: isDark,
+              textColorPrimary: textColorPrimary,
+              textColorSecondary: textColorSecondary,
+              s: s,
+            );
+          },
+        );
+      },
     );
   }
 
@@ -206,58 +200,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             20, 20, 20, 120), // Alt padding eklendi (Menü boşluğu)
         child: Column(
           children: [
-            // Başlık
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.insights,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        s.statsTitle,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: textColorPrimary,
-                        ),
-                      ),
-                      Text(
-                        s.statsSubtitle,
-                        style: GoogleFonts.spaceGrotesk(
-                          fontSize: 13,
-                          color: textColorSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+
 
             // Filtre Butonları
             Container(

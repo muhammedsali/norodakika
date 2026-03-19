@@ -35,7 +35,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   Timer? _beatTimer;
   DateTime? _startTime;
 
-  int _timeRemaining = gameDuration;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(gameDuration);
   int _score = 0;
   int _hearts = maxHearts;
   int _streak = 0;
@@ -86,10 +86,8 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
 
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) {
         _finishGame();
       }
     });
@@ -103,7 +101,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
 
   void _resetState() {
     _startTime = DateTime.now();
-    _timeRemaining = gameDuration;
+    _timeRemainingNotifier.value = gameDuration;
     _score = 0;
     _hearts = maxHearts;
     _streak = 0;
@@ -238,6 +236,7 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   void dispose() {
     _gameTimer?.cancel();
     _beatTimer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -316,13 +315,18 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '$_timeRemaining s',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _timeRemainingNotifier,
+                builder: (context, timeRemaining, child) {
+                  return Text(
+                    '$timeRemaining s',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               Text(
@@ -340,19 +344,24 @@ class _NBackMiniGameState extends State<NBackMiniGame> {
   }
 
   Widget _buildTimerBar(bool isDark) {
-    final progress = _timeRemaining / gameDuration;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: LinearProgressIndicator(
-        value: progress.clamp(0, 1),
-        minHeight: 12,
-        backgroundColor:
-            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(
-              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
-        ),
-      ),
+    return ValueListenableBuilder<int>(
+      valueListenable: _timeRemainingNotifier,
+      builder: (context, timeRemaining, child) {
+        final progress = timeRemaining / gameDuration;
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: LinearProgressIndicator(
+            value: progress.clamp(0, 1),
+            minHeight: 12,
+            backgroundColor:
+                isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color.lerp(
+                  const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+            ),
+          ),
+        );
+      },
     );
   }
 

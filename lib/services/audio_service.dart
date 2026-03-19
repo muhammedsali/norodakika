@@ -1,5 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
-
+import 'package:flutter/foundation.dart';
 /// Ses efektleri servisi
 /// Oyunlarda kullanılacak ses efektlerini yönetir
 class AudioService {
@@ -19,9 +19,9 @@ class AudioService {
       await _player.play(AssetSource('sounds/$soundName'));
     } catch (e) {
       // Ses dosyası bulunamazsa uyarı ver (debug için)
-      print('⚠️ Ses çalınamadı: $soundName');
-      print('   Hata: $e');
-      print('   Çözüm: assets/sounds/ klasörüne $soundName dosyasını ekleyin');
+      debugPrint('⚠️ Ses çalınamadı: $soundName');
+      debugPrint('   Hata: $e');
+      debugPrint('   Çözüm: assets/sounds/ klasörüne $soundName dosyasını ekleyin');
     }
   }
 

@@ -22,7 +22,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   int _moves = 0;
   int _matches = 0;
   Timer? _timer;
-  int _elapsedSeconds = 0;
+  final ValueNotifier<int> _elapsedSecondsNotifier = ValueNotifier<int>(0);
   
   int? _firstCardIndex;
   bool _isProcessing = false; 
@@ -62,6 +62,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
   @override
   void dispose() {
     _timer?.cancel();
+    _elapsedSecondsNotifier.dispose();
     super.dispose();
   }
 
@@ -78,19 +79,17 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
       _score = 0;
       _moves = 0;
       _matches = 0;
-      _elapsedSeconds = 0;
       _firstCardIndex = null;
       _isProcessing = false;
     });
+    _elapsedSecondsNotifier.value = 0;
   }
 
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        setState(() {
-          _elapsedSeconds++;
-        });
+        _elapsedSecondsNotifier.value++;
       }
     });
   }
@@ -147,7 +146,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate, 
-      'duration': _elapsedSeconds,
+      'duration': _elapsedSecondsNotifier.value,
       'moves': _moves,
     });
   }
@@ -227,13 +226,18 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
                         children: [
                           Icon(Icons.timer_outlined, size: 18, color: accentColor),
                           const SizedBox(width: 6),
-                          Text(
-                            _formatTime(_elapsedSeconds),
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: accentColor,
-                            ),
+                          ValueListenableBuilder<int>(
+                            valueListenable: _elapsedSecondsNotifier,
+                            builder: (context, seconds, child) {
+                              return Text(
+                                _formatTime(seconds),
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: accentColor,
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),

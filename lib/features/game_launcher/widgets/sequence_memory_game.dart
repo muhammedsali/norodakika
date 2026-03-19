@@ -32,7 +32,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   late List<int> _sequence;
   final List<int> _input = [];
 
-  int _timeRemaining = totalSeconds;
+  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
+  final ValueNotifier<int> _activeIndexNotifier = ValueNotifier<int>(-1);
   int _hearts = maxHearts;
   int _score = 0;
   int _round = 1;
@@ -40,7 +41,6 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   int _attempts = 0;
   int _streak = 0;
   int _bestStreak = 0;
-  int _activeIndex = -1;
 
   bool _isPlaying = false;
   bool _isFinished = false;
@@ -74,7 +74,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _resetState() {
-    _timeRemaining = totalSeconds;
+    _timeRemainingNotifier.value = totalSeconds;
     _hearts = maxHearts;
     _score = 0;
     _round = 1;
@@ -84,7 +84,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     _bestStreak = 0;
     _isFinished = false;
     _isPlaying = false;
-    _activeIndex = -1;
+    _activeIndexNotifier.value = -1;
     _input.clear();
     _sequence = [];
   }
@@ -93,10 +93,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     _gameTimer?.cancel();
     _gameTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) {
         _finish();
       }
     });
@@ -118,14 +116,10 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
       if (_isFinished) return;
       await Future.delayed(const Duration(milliseconds: 220));
       if (!mounted || _isFinished) return;
-      setState(() {
-        _activeIndex = _sequence[i];
-      });
+      _activeIndexNotifier.value = _sequence[i];
       await Future.delayed(const Duration(milliseconds: 520));
       if (!mounted || _isFinished) return;
-      setState(() {
-        _activeIndex = -1;
-      });
+      _activeIndexNotifier.value = -1;
     }
     if (!mounted || _isFinished) return;
     setState(() {
@@ -134,8 +128,9 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _handleTap(int index) {
-    if (_isFinished || _isPlaying || _timeRemaining <= 0 || widget.isPaused)
+    if (_isFinished || _isPlaying || _timeRemainingNotifier.value <= 0 || widget.isPaused) {
       return;
+    }
     HapticFeedback.selectionClick();
     _audioService.playTap(); // 👆 Dokunma sesi
 
@@ -178,7 +173,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     _gameTimer?.cancel();
 
     final successRate = _attempts == 0 ? 0.0 : _completed / _attempts;
-    final duration = totalSeconds - max(0, _timeRemaining);
+    final duration = totalSeconds - max(0, _timeRemainingNotifier.value);
     final wrongAttempts = _attempts - _completed;
 
     _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
@@ -198,6 +193,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   @override
   void dispose() {
     _gameTimer?.cancel();
+    _timeRemainingNotifier.dispose();
+    _activeIndexNotifier.dispose();
     super.dispose();
   }
 
@@ -274,13 +271,18 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '$_timeRemaining s',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _timeRemainingNotifier,
+                builder: (context, time, child) {
+                  return Text(
+                    '$time s',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               Text(
@@ -298,19 +300,24 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   Widget _buildTimerBar(bool isDark) {
-    final progress = _timeRemaining / totalSeconds;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: LinearProgressIndicator(
-        value: progress.clamp(0, 1),
-        minHeight: 12,
-        backgroundColor:
-            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(
-              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
-        ),
-      ),
+    return ValueListenableBuilder<int>(
+      valueListenable: _timeRemainingNotifier,
+      builder: (context, timeRemaining, child) {
+        final progress = timeRemaining / totalSeconds;
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: LinearProgressIndicator(
+            value: progress.clamp(0, 1),
+            minHeight: 12,
+            backgroundColor:
+                isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color.lerp(
+                  const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -347,29 +354,34 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
                 ),
                 itemCount: 9,
                 itemBuilder: (context, index) {
-                  final isActive = index == _activeIndex;
-                  return GestureDetector(
-                    onTap: () => _handleTap(index),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 160),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        color: isActive
-                            ? highlight
-                            : isDark
-                                ? const Color(0xFF0F172A)
-                                : const Color(0xFFF4F5F7),
-                        boxShadow: isActive
-                            ? [
-                                BoxShadow(
-                                  color: highlight.withValues(alpha: 0.45),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ]
-                            : null,
-                      ),
-                    ),
+                  return ValueListenableBuilder<int>(
+                    valueListenable: _activeIndexNotifier,
+                    builder: (context, activeIndex, child) {
+                      final isActive = index == activeIndex;
+                      return GestureDetector(
+                        onTap: () => _handleTap(index),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            color: isActive
+                                ? highlight
+                                : isDark
+                                    ? const Color(0xFF0F172A)
+                                    : const Color(0xFFF4F5F7),
+                            boxShadow: isActive
+                                ? [
+                                    BoxShadow(
+                                      color: highlight.withValues(alpha: 0.45),
+                                      blurRadius: 18,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

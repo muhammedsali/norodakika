@@ -20,6 +20,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -29,6 +30,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -38,6 +40,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
       await ref.read(authNotifierProvider.notifier).register(
+            name: _nameController.text.trim(),
             email: _emailController.text.trim(),
             password: _passwordController.text,
           );
@@ -236,6 +239,41 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 24),
+                                    TextFormField(
+                                      controller: _nameController,
+                                      keyboardType: TextInputType.name,
+                                      autofillHints: const [AutofillHints.name],
+                                      decoration: InputDecoration(
+                                        labelText: s.nameLabel,
+                                        labelStyle: GoogleFonts.poppins(
+                                          color: Colors.white70,
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFFABA4AD),
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: const BorderSide(
+                                            color: Color(0xFF9C3FE4),
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(0xFF544A56),
+                                      ),
+                                      style: GoogleFonts.poppins(color: Colors.white),
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return s.nameRequired;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 16),
                                     TextFormField(
                                       controller: _emailController,
                                       keyboardType: TextInputType.emailAddress,

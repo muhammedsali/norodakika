@@ -39,7 +39,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
   final Set<String> _selected = {};
 
   Timer? _phaseTimer;
-  int _timeRemaining = memorizeSeconds;
+  late final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(memorizeSeconds);
   bool _isMemorize = true;
   bool _isFinished = false;
 
@@ -90,10 +90,8 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
     _phaseTimer?.cancel();
     _phaseTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
+      _timeRemainingNotifier.value--;
+      if (_timeRemainingNotifier.value <= 0) {
         if (_isMemorize) {
           _startRecallPhase();
         } else {
@@ -164,7 +162,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
 
   void _startMemorizePhase() {
     _isMemorize = true;
-    _timeRemaining = memorizeSeconds;
+    _timeRemainingNotifier.value = memorizeSeconds;
     _shownWords = List<String>.from(_wordPool)..shuffle(_rng);
     _shownWords = _shownWords.take(shownCount).toList();
     _choices = List<String>.from(_wordPool)..shuffle(_rng);
@@ -176,7 +174,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
 
   void _startRecallPhase() {
     _isMemorize = false;
-    _timeRemaining = recallSeconds;
+    _timeRemainingNotifier.value = recallSeconds;
     if (!widget.isPaused) {
       _startPhaseTimer();
     }
@@ -269,6 +267,7 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
   @override
   void dispose() {
     _phaseTimer?.cancel();
+    _timeRemainingNotifier.dispose();
     super.dispose();
   }
 
@@ -351,13 +350,18 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '${_timeRemaining}s',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _timeRemainingNotifier,
+                builder: (context, time, _) {
+                  return Text(
+                    '${time}s',
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: titleColor,
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 4),
               Text(
@@ -376,18 +380,23 @@ class _RecallPhaseGameState extends State<RecallPhaseGame> {
 
   Widget _buildTimerBar(bool isDark) {
     final total = _isMemorize ? memorizeSeconds : recallSeconds;
-    final progress = _timeRemaining / total;
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: LinearProgressIndicator(
-        value: progress.clamp(0, 1),
-        minHeight: 12,
-        backgroundColor:
-            isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
-        valueColor: AlwaysStoppedAnimation<Color>(
-          Color.lerp(
-              const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
-        ),
+      child: ValueListenableBuilder<int>(
+        valueListenable: _timeRemainingNotifier,
+        builder: (context, time, child) {
+          final progress = time / total;
+          return LinearProgressIndicator(
+            value: progress.clamp(0, 1),
+            minHeight: 12,
+            backgroundColor:
+                isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            valueColor: AlwaysStoppedAnimation<Color>(
+              Color.lerp(
+                  const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+            ),
+          );
+        },
       ),
     );
   }

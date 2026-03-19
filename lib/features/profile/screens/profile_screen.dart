@@ -6,7 +6,7 @@ import '../../../core/i18n/app_strings.dart';
 import '../../settings/providers/language_provider.dart';
 import '../../auth/screens/auth_gate_screen.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   final bool isDarkMode;
 
   const ProfileScreen({
@@ -15,20 +15,26 @@ class ProfileScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  @override
+  Widget build(BuildContext context) {
     final userAsync = ref.watch(currentUserProvider);
     final user = userAsync.value;
     final lang = ref.watch(languageProvider);
     final s = AppStrings(lang);
-    final bool isDark = isDarkMode;
+    final bool isDark = widget.isDarkMode;
     final bgColor = isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F6);
     final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
     final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final subtitleColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     final displayEmail = user?.email ?? 'kullanici@ornek.com';
-    final displayName = user?.displayName ?? s.userFallback;
-    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : (displayEmail.isNotEmpty ? displayEmail[0].toUpperCase() : 'U');
+    final customName = ref.watch(customNameProvider).value;
+    final displayName = customName ?? user?.displayName ?? displayEmail.split('@').first;
+    final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -101,13 +107,26 @@ class ProfileScreen extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            displayName,
-                            style: GoogleFonts.spaceGrotesk(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: titleColor,
-                            ),
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  displayName,
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: titleColor,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              GestureDetector(
+                                onTap: () => _showNameEditDialog(context, displayName),
+                                child: Icon(Icons.edit_rounded, size: 16, color: subtitleColor),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -252,6 +271,81 @@ class ProfileScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _showNameEditDialog(BuildContext context, String currentName) async {
+    final s = AppStrings(ref.read(languageProvider));
+    final user = ref.read(currentUserProvider).value;
+    if (user == null) return;
+
+    final controller = TextEditingController(text: currentName == s.userFallback || currentName.contains('@') ? '' : currentName);
+    final isDark = widget.isDarkMode;
+    const primaryColor = Color(0xFF4F46E5);
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: isDark ? const Color(0xFF1F2937) : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            'İsim Değiştir',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'Yeni adınızı girin',
+              hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.black54),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: primaryColor.withValues(alpha: 0.5)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: primaryColor, width: 2),
+              ),
+            ),
+            style: TextStyle(color: isDark ? Colors.white : Colors.black),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('İptal', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final newName = controller.text.trim();
+                if (newName.isNotEmpty) {
+                  // Her durumda SharedPreferences'a kaydedelim
+                  await ref.read(authNotifierProvider.notifier).updateCustomName(newName);
+                  
+                  // Firebase Auth güncellemesi isteğe bağlı, hata atarsa diye Try Catch ekliyoruz
+                  // Çünkü eski firebase_auth eklentisi Pigeon decoding hatası veriyor
+                  try {
+                    await user.updateDisplayName(newName);
+                    await user.reload();
+                  } catch (e) {
+                    debugPrint('Firebase profile sync error (ignored): $e');
+                  }
+                }
+                if (context.mounted) Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: const Text('Kaydet', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+    setState(() {});
   }
 }
 

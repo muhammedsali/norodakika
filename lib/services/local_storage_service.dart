@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/models/attempt_model.dart';
 import '../core/memory/memory_bank.dart';
@@ -75,7 +76,7 @@ class LocalStorageService {
       final decoded = jsonDecode(historyJson) as List;
       return decoded.map((e) => Map<String, dynamic>.from(e)).toList();
     } catch (e) {
-      print('Error reading game history: $e');
+      debugPrint('Error reading game history: $e');
       return [];
     }
   }
@@ -91,7 +92,7 @@ class LocalStorageService {
       final stats = MemoryBank.calculateRadarStats(history);
       await saveGameStats(stats);
     } catch (e) {
-      print('Error saving attempt to local storage: $e');
+      debugPrint('Error saving attempt to local storage: $e');
     }
   }
 
@@ -122,7 +123,7 @@ class LocalStorageService {
       final decoded = jsonDecode(statsJson) as Map<String, dynamic>;
       return decoded.map((k, v) => MapEntry(k, double.parse(v.toString())));
     } catch (e) {
-      print('Error reading game stats: $e');
+      debugPrint('Error reading game stats: $e');
       return {
         'Hafıza': 0.0,
         'Dikkat': 0.0,
@@ -228,7 +229,7 @@ class LocalStorageService {
     final stats = MemoryBank.calculateRadarStats(existingHistory);
     await saveGameStats(stats);
 
-    print(
+    debugPrint(
         '✅ Sahte veriler eklendi: ${mockAttempts.length} yeni attempt (toplam: ${existingHistory.length})');
   }
 
@@ -237,6 +238,6 @@ class LocalStorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_gameHistoryKey);
     await prefs.remove(_gameStatsKey);
-    print('✅ Oyun geçmişi temizlendi');
+    debugPrint('✅ Oyun geçmişi temizlendi');
   }
 }

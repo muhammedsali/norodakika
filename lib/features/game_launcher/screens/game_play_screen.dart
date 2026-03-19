@@ -160,7 +160,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         try {
           await ref.read(firestoreServiceProvider).saveAttempt(attempt);
         } catch (e) {
-          print('Firestore kaydetme hatası: $e');
+          debugPrint('Firestore kaydetme hatası: $e');
         }
 
         // API'ye gönder (opsiyonel)
@@ -168,7 +168,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
           await ApiService.submitAttempt(attempt);
         } catch (e) {
           // API hatası kritik değil
-          print('API gönderim hatası: $e');
+          debugPrint('API gönderim hatası: $e');
         }
 
         // Zorluk seviyesini güncelle (Firestore)
@@ -184,7 +184,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                 newDifficulty: newDifficulty,
               );
         } catch (e) {
-          print('Firestore zorluk güncelleme hatası: $e');
+          debugPrint('Firestore zorluk güncelleme hatası: $e');
         }
       }
 
@@ -196,7 +196,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
       await LocalStorageService.saveGameDifficulty(
           widget.game.id, newDifficulty);
     } catch (e) {
-      print('Attempt kaydetme hatası: $e');
+      debugPrint('Attempt kaydetme hatası: $e');
     }
   }
 
