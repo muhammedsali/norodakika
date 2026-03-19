@@ -318,6 +318,13 @@ class AppStrings {
       : 'İlerleyişin kaydedildi (varsa) fakat bu oyunu şimdi sonlandıracaksın.';
   String get comingSoon =>
       isEn ? 'This game will be added soon!' : 'Bu oyun yakında eklenecek!';
+  String get continueText => isEn ? 'Continue' : 'Devam et';
+  String get playAgain => isEn ? 'Play again' : 'Tekrar oyna';
+  String get yes => isEn ? 'Yes' : 'Evet';
+  String get no => isEn ? 'No' : 'Hayır';
+  String get emotionQuestion => isEn
+      ? 'Does the emoji match the word?'
+      : 'Emoji ile kelime aynı duyguyu anlatıyor mu?';
 
   // Generic
   String errorPrefix(Object error) => isEn ? 'Error: $error' : 'Hata: $error';

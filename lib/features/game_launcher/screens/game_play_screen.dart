@@ -279,7 +279,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Skor',
+                                s.metaScore,
                                 style: GoogleFonts.spaceGrotesk(
                                   fontSize: 13,
                                   color: textColor,
@@ -359,7 +359,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
-                              'Tekrar oyna',
+                              s.playAgain,
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -512,7 +512,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
-                              'Devam et',
+                              s.continueText,
                               style: GoogleFonts.spaceGrotesk(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
