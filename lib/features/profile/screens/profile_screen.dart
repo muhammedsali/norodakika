@@ -324,8 +324,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   // Her durumda SharedPreferences'a kaydedelim
                   await ref.read(authNotifierProvider.notifier).updateCustomName(newName);
                   
-                  // Firebase Auth güncellemesi isteğe bağlı, hata atarsa diye Try Catch ekliyoruz
-                  // Çünkü eski firebase_auth eklentisi Pigeon decoding hatası veriyor
+                  // Firebase Auth güncellendi, ancak yine de tedbir amaçlı try-catch
                   try {
                     await user.updateDisplayName(newName);
                     await user.reload();

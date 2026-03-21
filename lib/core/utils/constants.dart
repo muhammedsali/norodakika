@@ -4,5 +4,8 @@ class AppConstants {
   static const accentColor = 0xFF00E0FF;
 
   // API
-  static const apiBaseUrl = 'https://api.norodakika.com'; // TODO: Gerçek URL
+  static const apiBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://api.norodakika.com',
+  );
 }

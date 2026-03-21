@@ -79,10 +79,10 @@ class AuthService {
     try {
       final user = _auth.currentUser;
       if (user != null) {
-        // user.reload() bazen PigeonUserInfo hatası verebiliyor (Kütüphane hatası)
-        // Bunun yerine hem reload() hem de token yenilemeyi deniyoruz
-        await user.getIdToken(true);
+        // user.reload() bazen Pigeon hatası verebiliyordu, güncel versiyonla düzeldi
         try {
+          // Token yenileme ve reload
+          await user.getIdToken(true);
           await user.reload();
         } catch (e) {
           debugPrint('Sessiz reload hatası (PigeonUserInfo bypass): $e');

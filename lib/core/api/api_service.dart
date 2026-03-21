@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../utils/constants.dart';
 import '../memory/memory_bank.dart';
 import '../models/attempt_model.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://api.norodakika.com'; // TODO: Gerçek API URL'i
+  static const String baseUrl = AppConstants.apiBaseUrl;
 
   static Future<Map<String, dynamic>> register({
     required String email,
