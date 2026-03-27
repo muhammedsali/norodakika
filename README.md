@@ -1,166 +1,190 @@
-# NöroDakika - Bilişsel Eğitim Mobil Uygulaması
+# 🧠 NöroDakika
+### Cognitive Training Mobile Application
 
-Flutter tabanlı bilişsel eğitim platformu. 12 farklı mini oyun ile 7 bilişsel alanda gelişim sağlar.
+> **Flutter · Firebase · Riverpod · Material 3**
+> 12 Mini Games · 7 Cognitive Domains · Adaptive Difficulty
 
-## Özellikler
+---
 
-- 🧠 7 Bilişsel Kategori (Hafıza, Dikkat, Refleks, Mantık, Sayısal Zeka, Görsel Algı, Dil)
-- 🎮 12 Flutter Mini Oyun (Reflex Tap, Reflex Dash, Stroop Tap, Focus Line, N-Back Mini, Logic Puzzle, Quick Math, Memory Board, Recall Phase, Sequence Echo, Odd One Out, Word Sprint)
-- 📊 Adaptif Zorluk Sistemi (ELO benzeri)
-- 📈 Radar Grafik ile İlerleme Takibi (fl_chart)
-- 📅 Günlük Plan Sistemi
-- 🔥 Firebase Entegrasyonu (Authentication, Cloud Firestore)
-- 🎨 Modern Material 3 UI (Google Fonts)
-- 🔐 Kimlik Doğrulama (Email/Şifre)
-- 💾 Local Storage (SharedPreferences)
+## 📖 Overview
 
-## Proje Yapısı
+**NöroDakika** is a Flutter-based mobile application designed to train and develop cognitive skills through engaging mini-games. The app targets 7 distinct cognitive domains — Memory, Attention, Reflex, Logic, Numerical Intelligence, Visual Perception, and Language — with 12 unique Flutter-powered games.
+
+The platform features an **ELO-style adaptive difficulty system** that adjusts to each player's performance, ensuring a consistently challenging and personalized training experience. Progress is visualized through a **radar chart**, giving users a clear picture of their cognitive profile over time.
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🧠 **7 Cognitive Categories** | Memory, Attention, Reflex, Logic, Numerical Intelligence, Visual Perception, Language |
+| 🎮 **12 Mini Games** | All games built natively in Flutter as widgets — no WebView, no plugins |
+| 📊 **Adaptive Difficulty** | ELO-based scoring system adjusts difficulty based on user performance |
+| 📈 **Radar Chart Progress** | Visual cognitive profile tracking with `fl_chart` |
+| 📅 **Daily Plan System** | Personalized daily training plans targeting weak areas |
+| 🔥 **Firebase Backend** | Authentication (Email/Password) + Cloud Firestore for data persistence |
+| 🎨 **Material 3 UI** | Modern design system with Google Fonts integration |
+| 💾 **Local Storage** | Offline-capable session storage via SharedPreferences |
+| 👤 **User Profiles** | Custom avatars and per-user statistics |
+| 🌐 **Multi-language Support** | Language and theme providers via Riverpod |
+
+---
+
+## 🎮 Games
+
+| ID | Game | Category | Description |
+|---|---|---|---|
+| REF01 | **Reflex Tap** | Reflex | Measures raw reaction time to on-screen stimuli |
+| REF02 | **Reflex Dash** | Reflex | Tap moving targets on horizontal lanes |
+| ATT01 | **Stroop Tap** | Attention | Color-word interference — tap by color, not word |
+| ATT02 | **Focus Line** | Attention | Track and tap colored dots on a moving line |
+| MEM01 | **N-Back Mini** | Memory | Working memory test — match stimuli from N steps back |
+| MEM02 | **Memory Board** | Memory | Classic card-matching memory game |
+| MEM03 | **Recall Phase** | Memory | Memorize and recall a list of words |
+| MEM04 | **Sequence Echo** | Memory | Repeat a displayed cell sequence from memory |
+| LOG01 | **Logic Puzzle** | Logic | Identify and complete logical sequences |
+| NUM01 | **Quick Math** | Numerical | Time-pressured mental arithmetic challenges |
+| VIS02 | **Odd One Out** | Visual | Find the card that does not match the group |
+| LANG02 | **Word Sprint** | Language | Distinguish real words from made-up words rapidly |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Details |
+|---|---|---|
+| Framework | Flutter | 3.0+ |
+| Language | Dart | Latest stable |
+| State Management | Riverpod | `flutter_riverpod ^2.5.1` |
+| Auth | Firebase Authentication | Email / Password |
+| Database | Cloud Firestore | Game results & user stats |
+| Local Storage | SharedPreferences | Session & settings cache |
+| Charts | fl_chart | Radar chart for cognitive profile |
+| Networking | dio / http | API communication |
+| UI | Material 3 + Google Fonts | Modern design system |
+
+---
+
+## 📁 Project Structure
 
 ```
 lib/
 ├── core/
-│   ├── memory/
-│   │   ├── memory_bank.dart          # Tüm uygulama hafıza yapısı
-│   │   └── project_memory_bank.md    # Proje dokümantasyonu
-│   ├── models/                       # Veri modelleri
-│   │   ├── user_model.dart
-│   │   ├── game_model.dart
-│   │   └── attempt_model.dart
-│   ├── api/
-│   │   └── api_service.dart          # API servisleri
-│   ├── config/                       # Yapılandırma dosyaları
-│   └── utils/
-│       └── constants.dart            # Sabitler
+│   ├── memory/                    # App-wide memory bank & docs
+│   ├── models/                    # Data models (user, game, attempt)
+│   ├── api/                       # API service layer
+│   ├── config/                    # App configuration
+│   └── utils/constants.dart       # Global constants
 ├── features/
-│   ├── auth/                         # Kimlik doğrulama
-│   │   ├── providers/
-│   │   │   └── auth_provider.dart
-│   │   └── screens/
-│   │       ├── auth_gate_screen.dart
-│   │       ├── login_screen.dart
-│   │       └── register_screen.dart
-│   ├── welcome/                      # Hoş geldin ekranları
-│   │   └── screens/
-│   │       ├── splash_screen.dart
-│   │       └── welcome_screen.dart
-│   ├── home/                         # Ana ekran
-│   │   ├── screens/
-│   │   │   └── home_screen.dart
-│   │   └── widgets/
-│   │       └── home_bottom_nav.dart
-│   ├── daily_plan/                   # Günlük plan
-│   │   └── screens/
-│   ├── game_launcher/                # Oyun başlatıcı
-│   │   ├── screens/
-│   │   │   ├── game_launcher_screen.dart
-│   │   │   └── game_play_screen.dart
-│   │   └── widgets/                  # 12 mini oyun widget'ı
-│   │       ├── reflex_tap_game.dart
-│   │       ├── reflex_dash_game.dart
-│   │       ├── stroop_tap_game.dart
-│   │       ├── focus_line_game.dart
-│   │       ├── n_back_mini_game.dart
-│   │       ├── logic_puzzle_game.dart
-│   │       ├── quick_math_game.dart
-│   │       ├── memory_board_game.dart
-│   │       ├── recall_phase_game.dart
-│   │       ├── sequence_memory_game.dart
-│   │       ├── odd_one_out_game.dart
-│   │       └── word_sprint_game.dart
-│   ├── stats/                        # İstatistikler
-│   │   ├── providers/
-│   │   │   └── user_stats_provider.dart
-│   │   ├── screens/
-│   │   │   └── stats_screen.dart
-│   │   └── widgets/
-│   │       └── radar_chart_widget.dart
-│   ├── profile/                      # Profil
-│   │   ├── providers/
-│   │   │   └── avatar_provider.dart
-│   │   └── screens/
-│   │       └── profile_screen.dart
-│   ├── settings/                     # Ayarlar
-│   │   └── providers/
-│   │       ├── theme_provider.dart
-│   │       └── language_provider.dart
-│   └── shared/                       # Paylaşılan widget'lar
-│       └── widgets/
-│           └── game_card_widgets.dart
+│   ├── auth/                      # Login & Register screens + provider
+│   ├── welcome/                   # Splash & welcome screens
+│   ├── home/                      # Home screen + bottom navigation
+│   ├── daily_plan/                # Daily training plan
+│   ├── game_launcher/             # Game list, launcher & 12 game widgets
+│   ├── stats/                     # Radar chart & statistics screen
+│   ├── profile/                   # User profile & avatar
+│   ├── settings/                  # Theme & language providers
+│   └── shared/                    # Shared widgets (game cards etc.)
 ├── services/
-│   ├── auth_service.dart             # Kimlik doğrulama servisi
-│   ├── firestore_service.dart         # Firestore işlemleri
-│   └── local_storage_service.dart     # Local storage işlemleri
-├── firebase_options.dart              # Firebase yapılandırması
-└── main.dart                          # Uygulama giriş noktası
+│   ├── auth_service.dart          # Firebase Authentication
+│   ├── firestore_service.dart     # Firestore CRUD operations
+│   └── local_storage_service.dart # SharedPreferences wrapper
+├── firebase_options.dart          # Firebase configuration
+└── main.dart                      # App entry point
 ```
 
-## Kurulum
+---
 
-1. Bağımlılıkları yükleyin:
-```bash
-flutter pub get
-```
+## 🚀 Getting Started
 
-2. Firebase yapılandırması:
-   - `firebase_options.dart` dosyası projede mevcut
-   - `google-services.json` (Android) ve `GoogleService-Info.plist` (iOS) dosyalarını Firebase Console'dan indirip ilgili klasörlere ekleyin
-   - Android: `android/app/google-services.json`
-   - iOS: `ios/Runner/GoogleService-Info.plist`
+### Prerequisites
 
-3. Assets yapılandırması:
-   - `assets/images/` klasörüne görselleri ekleyin
-   - `assets/icons/` klasörüne ikonları ekleyin
-   - `assets/games/` klasörüne oyun görsellerini ekleyin
+- Flutter SDK 3.0 or later
+- Dart SDK *(bundled with Flutter)*
+- Android Studio or VS Code with Flutter extension
+- A Firebase project *(free tier works fine)*
+- Android emulator or physical device
 
-## Kullanım
+### Installation
 
-Uygulama başlatıldığında:
-1. **Splash Screen** gösterilir (3 saniye)
-2. **Auth Gate Screen** ile kullanıcı kontrolü yapılır
-3. Giriş yapılmamışsa **Login/Register** ekranları gösterilir
-4. Giriş yapıldıktan sonra **Ana Ekran (Home)** açılır
-5. Ana ekranda 4 sekme bulunur:
-   - **Ana Sayfa**: Günlük plan kartı, hızlı oyun başlatma, istatistikler
-   - **Oyunlar**: Tüm oyunların listesi
-   - **İlerleme**: Radar grafik ile istatistikler
-   - **Ayarlar**: Profil, günlük plan, istatistikler linkleri
-6. Oyunlar Flutter widget'ları olarak çalışır
-7. Sonuçlar otomatik olarak Firestore'a kaydedilir ve zorluk seviyesi güncellenir
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/muhammedsali/norodakika.git
+   cd norodakika
+   ```
 
-## Geliştirme
+2. **Install Flutter dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-### Teknoloji Stack
+3. **Set up Firebase**
+   - Create a project at [firebase.google.com](https://firebase.google.com)
+   - Enable **Email/Password Authentication**
+   - Enable **Cloud Firestore**
+   - Download `google-services.json` → `android/app/`
+   - Download `GoogleService-Info.plist` → `ios/Runner/` *(iOS only)*
 
-- **Framework**: Flutter 3.0+
-- **State Management**: Riverpod (flutter_riverpod ^2.5.1)
-- **UI**: Material 3 + Google Fonts
-- **Backend**: Firebase (Authentication, Cloud Firestore)
-- **Local Storage**: SharedPreferences
-- **Charts**: fl_chart
-- **HTTP**: dio, http
+4. **Add assets**
+   - Place images in `assets/images/`
+   - Place icons in `assets/icons/`
+   - Place game art in `assets/games/`
 
-### Önemli Dosyalar
+5. **Run the app**
+   ```bash
+   flutter run
+   ```
 
-- **Memory Bank**: Tüm sabitler ve yapılandırmalar `lib/core/memory/memory_bank.dart` içinde
-- **Oyunlar**: Tüm mini oyunlar `lib/features/game_launcher/widgets/` klasöründe
-- **State Management**: Riverpod providers `lib/features/*/providers/` klasörlerinde
-- **Services**: Firebase ve local storage servisleri `lib/services/` klasöründe
+---
 
-### Oyun Listesi
+## 📱 User Flow
 
-1. **Reflex Tap** (REF01) - Tepki süresi ölçümü
-2. **Reflex Dash** (REF02) - Şeritler üzerinde kayan hedeflere tepki
-3. **Stroop Tap** (ATT01) - Renk-kelime uyumsuzluğu testi
-4. **Focus Line** (ATT02) - Yatay çizgi üzerindeki hedef renk noktalara odaklanma
-5. **N-Back Mini** (MEM01) - Çalışan bellek testi
-6. **Logic Puzzle** (LOG01) - Mantık dizisi çözme
-7. **Quick Math** (NUM01) - Zaman baskılı mental aritmetik
-8. **Memory Board** (MEM02) - Kart eşleştirme
-9. **Recall Phase** (MEM03) - Kelime hatırlama testi
-10. **Sequence Echo** (MEM04) - Hücre sırasını tekrar etme
-11. **Odd One Out** (VIS02) - Farklı kartı bulma
-12. **Word Sprint** (LANG02) - Gerçek ve uydurma kelimeleri ayırt etme
+1. App launches → **Splash Screen** (3 seconds)
+2. **Auth Gate** checks login state
+3. Not logged in → **Login / Register** screen
+4. Logged in → **Home Screen** with 4 tabs:
+   - **Home** — Daily plan card, quick-start games, stats summary
+   - **Games** — Full list of all 12 mini games
+   - **Progress** — Radar chart with per-domain scores
+   - **Settings** — Profile, daily plan, and stats links
+5. Select a game → Game runs as a Flutter widget
+6. Game ends → Result saved to Firestore → Difficulty recalculated automatically
 
-## Lisans
+---
 
-Bu proje özel bir projedir.
+## 🏗️ Architecture Notes
+
+- **State Management** — All state handled by Riverpod providers; no raw `setState` in business logic
+- **Games** — Every mini game is a self-contained Flutter widget in `features/game_launcher/widgets/`
+- **Memory Bank** — `lib/core/memory/memory_bank.dart` is the single source of truth for app constants
+- **Adaptive Difficulty** — ELO-style rating updated in Firestore after every game attempt
+- **Offline Support** — SharedPreferences caches session data so the app functions without a connection
+
+---
+
+## 🤝 Contributing
+
+Contributions, bug reports, and feature requests are welcome!
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "feat: add your feature"`
+4. Push and open a Pull Request
+
+---
+
+## 📄 License
+
+This project is privately developed. All rights reserved by the author.  
+Contact the repository owner for usage permissions.
+
+---
+
+## 👤 Author
+
+**Muhammed Sali** — [github.com/muhammedsali](https://github.com/muhammedsali)
+
+---
+
+*Train your brain, one minute at a time. 🧠⚡*
