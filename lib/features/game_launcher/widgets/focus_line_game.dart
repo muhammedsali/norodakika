@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../services/audio_service.dart';
 
 class FocusLineGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
@@ -20,7 +21,7 @@ class FocusLineGame extends StatefulWidget {
 }
 
 class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateMixin {
-  static const int gameDuration = 60; // saniye
+  int totalSeconds = 45; // Süre değişebilir
   static const int maxLives = 3;
   static const int baseSpawnInterval = 1200;
 
@@ -32,8 +33,11 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   Timer? _timer;
   Timer? _spawnTimer;
 
-  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(gameDuration);
+  late ValueNotifier<int> _timeRemainingNotifier;
   int _level = 1;
+  int _targetsToClear = 5;
+  int _targetsClearedInLevel = 0;
+  
   int _score = 0;
   int _lives = maxLives;
   int _combo = 0;
@@ -45,10 +49,14 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   Color _targetColor = Colors.blue;
   final List<_FocusDot> _dots = [];
   int _spawnInterval = baseSpawnInterval;
+  
+  final AudioService _audioService = AudioService();
 
   @override
   void initState() {
     super.initState();
+    _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
+    
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -89,9 +97,11 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   }
 
   void _resetState() {
-    _timeRemainingNotifier.value = gameDuration;
+    _timeRemainingNotifier.value = totalSeconds;
     _score = 0;
     _level = 1;
+    _targetsToClear = 5;
+    _targetsClearedInLevel = 0;
     _lives = maxLives;
     _combo = 0;
     _bestCombo = 0;
@@ -109,24 +119,6 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (!mounted) return;
       _timeRemainingNotifier.value--;
-      // Her 10 saniyede bir level artışı
-      if ((gameDuration - _timeRemainingNotifier.value) % 10 == 0 && _timeRemainingNotifier.value < gameDuration) {
-        setState(() {
-          _level++;
-          _spawnInterval = (baseSpawnInterval * (1 - (_level - 1) * 0.1)).clamp(600, baseSpawnInterval).toInt();
-          _resetTargetColor();
-        });
-        
-        // Güncellenmiş spawnInterval ile spawn timer'ı yeniden başlat
-        _spawnTimer?.cancel();
-        _spawnTimer = Timer.periodic(
-          Duration(milliseconds: _spawnInterval),
-          (t) {
-            if (!mounted || _timeRemainingNotifier.value <= 0) return;
-            _spawnDot();
-          },
-        );
-      }
       if (_timeRemainingNotifier.value <= 0) {
         _finishGame();
       }
@@ -141,10 +133,37 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     );
   }
 
+  void _levelUp() {
+    setState(() {
+      _level++;
+      _targetsToClear += 3;
+      _targetsClearedInLevel = 0;
+      
+      _timeRemainingNotifier.value += 12; // Yeni seviye ek zamanı
+      totalSeconds += 12;
+      
+      _spawnInterval = max(400, (_spawnInterval * 0.85).toInt());
+      _resetTargetColor();
+      _dots.clear();
+      _lives = min(3, _lives + 1); // Ödül
+      _audioService.playLevelUp();
+      
+      // Timerı yeni hız ile tekrar çek
+      _spawnTimer?.cancel();
+      _spawnTimer = Timer.periodic(
+        Duration(milliseconds: _spawnInterval),
+        (t) {
+          if (!mounted || _timeRemainingNotifier.value <= 0) return;
+          _spawnDot();
+        },
+      );
+    });
+  }
+
   void _spawnDot() {
     if (_timeRemainingNotifier.value <= 0) return;
 
-    final isTarget = _rng.nextDouble() < 0.4; // %40 hedef, %60 yanlış
+    final isTarget = _rng.nextDouble() < 0.4; // %40 hedef
     final color = isTarget ? _targetColor : _randomOtherColor(_targetColor);
 
     setState(() {
@@ -160,8 +179,13 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
       if (_dots.length > 15) {
         final removed = _dots.removeAt(0);
         if (removed.color == _targetColor) {
+          _audioService.playWrong();
           _missedTargets++;
           _combo = 0;
+          _lives = max(0, _lives - 1);
+          if (_lives <= 0) {
+             _finishGame();
+          }
         }
       }
     });
@@ -175,22 +199,29 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
 
   void _onDotTap(_FocusDot dot) {
     if (_timeRemainingNotifier.value <= 0 || widget.isPaused) return;
-    HapticFeedback.lightImpact();
 
     setState(() {
       if (dot.color == _targetColor) {
+        _audioService.playTap();
+        HapticFeedback.lightImpact();
         _correctHits++;
         _combo++;
+        _targetsClearedInLevel++;
         if (_combo > _bestCombo) _bestCombo = _combo;
         
-        // Combo bonusu
         final comboBonus = _combo > 1 ? (_combo - 1) * 10 : 0;
         _score += (100 + comboBonus + (_level * 5)).toInt();
+        
+        if (_targetsClearedInLevel >= _targetsToClear) {
+           _levelUp();
+        }
       } else {
+        _audioService.playWrong();
+        HapticFeedback.mediumImpact();
         _wrongHits++;
         _lives--;
         _combo = 0;
-        _score = (_score - 50).clamp(0, 999999);
+        _score = max(0, _score - 50);
         _shakeController.forward(from: 0.0);
         
         if (_lives <= 0) {
@@ -205,6 +236,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   void _finishGame() {
     _timer?.cancel();
     _spawnTimer?.cancel();
+    _audioService.playGameOver();
 
     final totalHits = _correctHits + _wrongHits;
     final successRate = totalHits == 0 ? 0.0 : _correctHits / totalHits;
@@ -212,8 +244,9 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': successRate,
-      'duration': gameDuration - max(0, _timeRemainingNotifier.value),
+      'duration': _level * 15,
       'missedTargets': _missedTargets,
+      'level': _level
     });
   }
 
@@ -275,10 +308,11 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Sadece hedef renkteki noktalara dokun',
+                              'Bölüm $_level : $_targetsClearedInLevel / $_targetsToClear',
                               style: GoogleFonts.spaceGrotesk(
-                                fontSize: 12,
-                                color: subtitleColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF4F46E5),
                               ),
                             ),
                           ],
@@ -300,15 +334,6 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                                 );
                               }),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Level $_level',
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: _targetColor,
-                              ),
-                            ),
                           ],
                         ),
                       ],
@@ -328,7 +353,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                               ),
                               child: FractionallySizedBox(
                                 alignment: Alignment.centerLeft,
-                                widthFactor: (timeRemaining / gameDuration).clamp(0.0, 1.0),
+                                widthFactor: totalSeconds == 0 ? 0.0 : (timeRemaining / totalSeconds).clamp(0.0, 1.0),
                                 child: Container(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
@@ -394,7 +419,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Hedef renk: Bu renge dokun',
+                          'Hedef renk: Bu renge dokun!',
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,

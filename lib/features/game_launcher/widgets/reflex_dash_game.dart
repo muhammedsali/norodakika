@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../services/audio_service.dart';
 
 class ReflexDashGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
@@ -22,19 +23,10 @@ class ReflexDashGame extends StatefulWidget {
 
 class _ReflexDashGameState extends State<ReflexDashGame>
     with SingleTickerProviderStateMixin {
-  static const int gameDuration = 40; // saniye
-  static const double _initialLifetimeMs = 1400;
-  static const double _minLifetimeMs = 850;
-  static const double _initialSpawnMs = 900;
-  static const double _minSpawnMs = 480;
-  static const double _difficultyStepMs = 12;
-
-  late Timer _timer;
   late Ticker _ticker;
 
   final Random _rng = Random();
 
-  int _timeRemaining = gameDuration;
   bool _isFinished = false;
   bool _isRunning = false;
 
@@ -46,18 +38,26 @@ class _ReflexDashGameState extends State<ReflexDashGame>
   int _combo = 0;
   int _bestCombo = 0;
 
-  double _spawnCooldownMs = _initialSpawnMs;
+  // Bölüm Modu Değişkenleri
+  int _level = 1;
+  int _targetsToClear = 5;
+  int _targetsClearedInLevel = 0;
+
+  double _spawnCooldownMs = 1200;
   double _spawnAccumulatorMs = 0;
-  double _currentLifetimeMs = _initialLifetimeMs;
+  double _currentLifetimeMs = 1800;
 
   Duration _lastTick = Duration.zero;
   final List<_DashTarget> _targets = [];
+
+  // FPS Optimizasyonu: Sadece arenayı güncelleyen Notifier
+  final ValueNotifier<int> _renderNotifier = ValueNotifier<int>(0);
 
   @override
   void initState() {
     super.initState();
     _ticker = createTicker(_onTick)..start();
-    _startGame();
+    _resetState();
   }
 
   @override
@@ -72,40 +72,33 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     }
   }
 
-  void _startGame() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!_isRunning || _isFinished) return;
-      setState(() {
-        _timeRemaining--;
-      });
-      if (_timeRemaining <= 0) {
-        _finishGame();
-      }
-    });
-
-    _resetState();
-  }
-
   void _resetState() {
-    _timeRemaining = gameDuration;
-    _score = 0;
-    _goodHits = 0;
-    _badHits = 0;
-    _missed = 0;
-    _hearts = 3;
-    _combo = 0;
-    _bestCombo = 0;
-    _spawnCooldownMs = _initialSpawnMs;
-    _currentLifetimeMs = _initialLifetimeMs;
-    _spawnAccumulatorMs = 0;
-    _lastTick = Duration.zero;
-    _targets.clear();
-    _isFinished = false;
-    _isRunning = true;
+    setState(() {
+      _score = 0;
+      _goodHits = 0;
+      _badHits = 0;
+      _missed = 0;
+      _hearts = 3;
+      _combo = 0;
+      _bestCombo = 0;
+      _level = 1;
+      _targetsToClear = 5;
+      _targetsClearedInLevel = 0;
+      _spawnCooldownMs = 1200;
+      _currentLifetimeMs = 1800;
+      _spawnAccumulatorMs = 0;
+      _lastTick = Duration.zero;
+      _targets.clear();
+      _isFinished = false;
+      _isRunning = true;
+    });
   }
 
   void _onTick(Duration elapsed) {
-    if (!_isRunning || _isFinished) return;
+    if (!_isRunning || _isFinished) {
+      _lastTick = elapsed;
+      return;
+    }
     if (_lastTick == Duration.zero) {
       _lastTick = elapsed;
       return;
@@ -119,42 +112,46 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     if (_spawnAccumulatorMs >= _spawnCooldownMs) {
       _spawnAccumulatorMs = 0;
       _spawnTarget();
-      _increaseDifficulty();
     }
   }
 
   void _updateTargets(double dtMs) {
-    if (!mounted) return;
-
+    bool needsUpdate = false;
     final expired = <_DashTarget>[];
+    
     for (final target in _targets) {
       target.elapsedMs += dtMs;
+      needsUpdate = true; // Position changed
       if (target.progress >= 1) {
         expired.add(target);
       }
     }
 
     if (expired.isNotEmpty) {
-      setState(() {
-        for (final target in expired) {
-          _targets.remove(target);
-          if (target.isGood) {
-            _missed++;
+      for (final target in expired) {
+        _targets.remove(target);
+        if (target.isGood) {
+          _missed++;
+          AudioService().playWrong();
+          setState(() {
             _hearts = max(0, _hearts - 1);
             _combo = 0;
-            _checkDeath();
-          }
+          });
+          _checkDeath();
         }
-      });
-    } else {
-      setState(() {});
+      }
+    }
+    
+    if (needsUpdate && mounted) {
+      // FPS Fix: Sadece arena güncellenir, setState kullanılmaz!
+      _renderNotifier.value++;
     }
   }
 
   void _spawnTarget() {
     if (!mounted) return;
     final lane = _rng.nextInt(3);
-    final isGood = _rng.nextDouble() > 0.28; // çoğunluk iyi
+    final isGood = _rng.nextDouble() > 0.3; // %70 iyi, %30 kötü
     _targets.add(
       _DashTarget(
         id: DateTime.now().microsecondsSinceEpoch,
@@ -165,17 +162,26 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     );
   }
 
-  void _increaseDifficulty() {
-    _spawnCooldownMs = max(_minSpawnMs, _spawnCooldownMs - _difficultyStepMs);
-    _currentLifetimeMs = max(_minLifetimeMs, _currentLifetimeMs - _difficultyStepMs);
+  void _levelUp() {
+    setState(() {
+      _level++;
+      _targetsToClear += 3; // Sonraki bölümde hedefler artar
+      _targetsClearedInLevel = 0;
+      
+      // Hız artışı
+      _spawnCooldownMs = max(400, _spawnCooldownMs * 0.85);
+      _currentLifetimeMs = max(800, _currentLifetimeMs * 0.90);
+      
+      _hearts = min(3, _hearts + 1); // Ödül can
+      _targets.clear();
+      AudioService().playLevelUp();
+    });
   }
 
   void _handleTapOnLane(int lane) {
     if (_isFinished || !_isRunning) return;
 
-    HapticFeedback.lightImpact();
-
-    // en önde olan hedefi bul
+    // Hedefi bul
     _DashTarget? hit;
     for (final target in _targets.where((t) => t.lane == lane)) {
       if (hit == null || target.progress > hit.progress) {
@@ -184,33 +190,48 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     }
 
     if (hit == null) {
+      AudioService().playWrong();
       setState(() {
         _badHits++;
         _combo = 0;
-        _score = max(0, _score - 60);
+        _score = max(0, _score - 20);
       });
       return;
     }
 
-    setState(() {
-      _targets.remove(hit);
-      if (hit!.isGood) {
-        _goodHits++;
+    _targets.remove(hit);
+    
+    if (hit.isGood) {
+      AudioService().playTap();
+      _goodHits++;
+      _targetsClearedInLevel++;
+      
+      setState(() {
         _combo++;
         _bestCombo = max(_bestCombo, _combo);
-        _score += 120 + (_combo * 15);
-      } else {
+        _score += 50 + (_combo * 10);
+      });
+
+      if (_targetsClearedInLevel >= _targetsToClear) {
+        _levelUp();
+      }
+    } else {
+      AudioService().playWrong();
+      setState(() {
         _badHits++;
         _combo = 0;
         _hearts = max(0, _hearts - 1);
-        _score = max(0, _score - 120);
-        _checkDeath();
-      }
-    });
+        _score = max(0, _score - 50);
+      });
+      _checkDeath();
+    }
+    
+    _renderNotifier.value++; // Arenayı zorla güncelle
   }
 
   void _checkDeath() {
     if (_hearts <= 0) {
+      AudioService().playGameOver();
       _finishGame();
     }
   }
@@ -219,7 +240,6 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     if (_isFinished) return;
     _isFinished = true;
     _isRunning = false;
-    _timer.cancel();
 
     final totalAttempts = _goodHits + _badHits + _missed;
     final accuracy = totalAttempts == 0 ? 0.0 : _goodHits / totalAttempts;
@@ -227,19 +247,20 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     widget.onComplete({
       'score': _score.toDouble(),
       'successRate': accuracy,
-      'duration': gameDuration,
+      'duration': _level * 15, // Tahmini harcanan süre
       'goodHits': _goodHits,
       'badHits': _badHits,
       'missed': _missed,
       'bestCombo': _bestCombo,
+      'level': _level
     });
     setState(() {});
   }
 
   @override
   void dispose() {
-    _timer.cancel();
     _ticker.dispose();
+    _renderNotifier.dispose();
     super.dispose();
   }
 
@@ -303,10 +324,11 @@ class _ReflexDashGameState extends State<ReflexDashGame>
               ),
               const SizedBox(height: 4),
               Text(
-                'Düşen iyi hedeflere dokun, kırmızılardan kaç.',
+                'Bölüm: $_level - Hedef: $_targetsClearedInLevel / $_targetsToClear',
                 style: GoogleFonts.spaceGrotesk(
-                  fontSize: 12,
-                  color: subtitleColor,
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF4F46E5),
                 ),
               ),
             ],
@@ -315,19 +337,11 @@ class _ReflexDashGameState extends State<ReflexDashGame>
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '$_timeRemaining s',
+                'Skor: $_score',
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: titleColor,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Skor: $_score',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 13,
-                  color: subtitleColor,
                 ),
               ),
             ],
@@ -385,29 +399,6 @@ class _ReflexDashGameState extends State<ReflexDashGame>
             ),
           ),
         ),
-        const SizedBox(width: 10),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          decoration: BoxDecoration(
-            color: panelColor,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
-          ),
-          child: Row(
-            children: [
-              const Icon(Icons.bolt_rounded, color: Color(0xFF4F46E5)),
-              const SizedBox(width: 8),
-              Text(
-                'x${_bestCombo == 0 ? 1 : min(9, _combo).toString()}',
-                style: GoogleFonts.spaceGrotesk(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: titleColor,
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
@@ -429,47 +420,53 @@ class _ReflexDashGameState extends State<ReflexDashGame>
               ),
             ],
           ),
-          child: Stack(
-            children: [
-              for (int lane = 0; lane < 3; lane++)
-                Positioned(
-                  left: lane * laneWidth,
-                  width: laneWidth,
-                  top: 0,
-                  bottom: 0,
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? [const Color(0xFF111827), const Color(0xFF0B1324)]
-                            : [const Color(0xFFF8FAFC), const Color(0xFFE8ECF4)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ),
-                      border: Border.all(
-                        color: isDark
-                            ? const Color(0xFF1F2937)
-                            : const Color(0xFFE5E7EB),
+          child: ValueListenableBuilder<int>(
+            valueListenable: _renderNotifier,
+            builder: (context, _, __) {
+              return Stack(
+                children: [
+                  for (int lane = 0; lane < 3; lane++)
+                    Positioned(
+                      left: lane * laneWidth,
+                      width: laneWidth,
+                      top: 0,
+                      bottom: 0,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: LinearGradient(
+                            colors: isDark
+                                ? [const Color(0xFF111827), const Color(0xFF0B1324)]
+                                : [const Color(0xFFF8FAFC), const Color(0xFFE8ECF4)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          border: Border.all(
+                            color: isDark
+                                ? const Color(0xFF1F2937)
+                                : const Color(0xFFE5E7EB),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              for (final target in _targets)
-                Positioned(
-                  left: target.lane * laneWidth + 14,
-                  width: laneWidth - 28,
-                  top: (constraints.maxHeight - 40) * target.progress,
-                  child: _DashChip(target: target),
-                ),
-              if (!_isFinished && !_isRunning)
-                _PauseOverlay(onResume: () {
-                  setState(() {
-                    _isRunning = true;
-                  });
-                }),
-            ],
+                  // Hedefler
+                  for (final target in _targets)
+                    Positioned(
+                      left: target.lane * laneWidth + 14,
+                      width: laneWidth - 28,
+                      top: (constraints.maxHeight - 40) * target.progress,
+                      child: _DashChip(target: target),
+                    ),
+                  if (!_isFinished && !_isRunning)
+                    _PauseOverlay(onResume: () {
+                      setState(() {
+                        _isRunning = true;
+                      });
+                    }),
+                ],
+              );
+            }
           ),
         );
       },
@@ -486,8 +483,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
               child: GestureDetector(
                 onTapDown: (_) => _handleTapOnLane(lane),
                 behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 120),
+                child: Container(
                   height: 62,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(999),
@@ -503,9 +499,8 @@ class _ReflexDashGameState extends State<ReflexDashGame>
                   child: Center(
                     child: Icon(
                       Icons.bolt_rounded,
-                      color: lane == 1
-                          ? const Color(0xFF4F46E5)
-                          : subtitleColor.withValues(alpha: 0.8),
+                      color: const Color(0xFF4F46E5),
+                      size: 28,
                     ),
                   ),
                 ),
@@ -519,7 +514,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
 
 class _DashTarget {
   final int id;
-  final int lane; // 0,1,2
+  final int lane; 
   final bool isGood;
   final double lifetimeMs;
   double elapsedMs = 0.0;
@@ -545,31 +540,26 @@ class _DashChip extends StatelessWidget {
         ? const [Color(0xFF22C55E), Color(0xFF16A34A)]
         : const [Color(0xFFEF4444), Color(0xFFB91C1C)];
 
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 120),
-      opacity: target.progress.clamp(0, 1).toDouble(),
-      child: Container(
-        height: 40,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
-          gradient: LinearGradient(
-            colors: colors,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: colors.first.withValues(alpha: 0.25),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
-            ),
-          ],
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        gradient: LinearGradient(
+          colors: colors,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colors.first.withValues(alpha: 0.25),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
     );
   }
 }
-
 
 class _PauseOverlay extends StatelessWidget {
   final VoidCallback onResume;
