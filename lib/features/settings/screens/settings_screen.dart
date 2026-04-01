@@ -8,6 +8,7 @@ import '../../profile/screens/profile_screen.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/notification_provider.dart';
+import '../providers/sound_provider.dart';
 import '../../../services/notification_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -18,6 +19,7 @@ class SettingsScreen extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
     final language = ref.watch(languageProvider);
     final notificationsEnabled = ref.watch(notificationProvider);
+    final soundSettings = ref.watch(soundSettingsProvider);
     final s = AppStrings(language);
 
     final cardColor = isDarkMode ? const Color(0xFF111827) : Colors.white;
@@ -85,16 +87,26 @@ class SettingsScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     _buildToggleTile(
+                      icon: Icons.music_note_rounded,
+                      iconColor: const Color(0xFF6366F1),
+                      title: 'Müzik',
+                      subtitle: 'Oyun içi arka plan müziği',
+                      value: soundSettings.isMusicEnabled,
+                      onChanged: (value) {
+                        ref.read(soundSettingsProvider.notifier).toggleMusic();
+                      },
+                      titleColor: titleColor,
+                      subtitleColor: subtitleColor,
+                    ),
+                    Divider(height: 1, color: dividerColor, indent: 56),
+                    _buildToggleTile(
                       icon: Icons.volume_up_rounded,
                       iconColor: const Color(0xFF10B981),
                       title: s.soundTitle,
                       subtitle: s.soundSubtitle,
-                      value: true, // TODO: Add sound provider
+                      value: soundSettings.isSoundEnabled,
                       onChanged: (value) {
-                        // TODO: Implement sound toggle
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Coming soon')),
-                        );
+                        ref.read(soundSettingsProvider.notifier).toggleSound();
                       },
                       titleColor: titleColor,
                       subtitleColor: subtitleColor,
