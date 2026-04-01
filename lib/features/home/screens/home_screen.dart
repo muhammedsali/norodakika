@@ -466,8 +466,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const BorderRadius.vertical(top: Radius.circular(16)),
               color: stitchPrimary.withValues(alpha: 0.1),
             ),
-            child: Icon(Icons.psychology_outlined,
-                size: 48, color: stitchPrimary.withValues(alpha: 0.5)),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: Image.asset(
+                'assets/games/${game.id.toLowerCase()}.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(Icons.psychology_outlined,
+                      size: 48, color: stitchPrimary.withValues(alpha: 0.5));
+                },
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(24),
@@ -921,7 +930,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   color: intelColor.withValues(alpha: isDarkMode ? 0.22 : 0.18),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: intelColor, size: 24),
+                child: ClipOval(
+                  child: Image.asset(
+                    'assets/games/${game.id.toLowerCase()}.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(icon, color: intelColor, size: 24);
+                    },
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -1417,9 +1434,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   spreadRadius: 2)
                             ],
                           ),
-                          child: Center(
-                              child: Text(emoji,
-                                  style: const TextStyle(fontSize: 32))),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.asset(
+                              'assets/games/${gameId.toLowerCase()}.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                    child: Text(emoji,
+                                        style: const TextStyle(fontSize: 32)));
+                              },
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
