@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../services/audio_service.dart';
@@ -496,10 +494,10 @@ class _ReflexDashGameState extends State<ReflexDashGame>
                       ),
                     ],
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Icon(
                       Icons.bolt_rounded,
-                      color: const Color(0xFF4F46E5),
+                      color: Color(0xFF4F46E5),
                       size: 28,
                     ),
                   ),

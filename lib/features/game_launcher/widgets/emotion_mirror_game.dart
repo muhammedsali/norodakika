@@ -487,7 +487,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
                         child: Transform.scale(
                           scale: _scaleAnimation.value,
                           child: Text(
-                            (s.isEn ? 'LEVEL ' : 'SEVİYE ') + '$_level!',
+                            '${s.isEn ? 'LEVEL ' : 'SEVİYE '}$_level!',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 52,
@@ -550,7 +550,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
               ),
               const SizedBox(height: 4),
               Text(
-                s.metaLevel + ' $_level: $_targetsClearedInLevel / $_targetsToClear',
+                '${s.metaLevel} $_level: $_targetsClearedInLevel / $_targetsToClear',
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,

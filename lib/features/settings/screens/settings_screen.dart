@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../profile/screens/profile_screen.dart';
+import '../../../services/local_storage_service.dart';
 
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
@@ -699,13 +700,15 @@ class SettingsScreen extends ConsumerWidget {
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              // TODO: Implement clear local data
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(s.clearDataSuccess),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              await LocalStorageService.clearGameHistory();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(s.clearDataSuccess),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              }
             },
             child: Text(
               'Temizle',
