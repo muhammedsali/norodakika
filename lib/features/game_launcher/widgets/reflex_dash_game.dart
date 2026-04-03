@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../services/audio_service.dart';
@@ -47,6 +48,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
 
   Duration _lastTick = Duration.zero;
   final List<_DashTarget> _targets = [];
+  final List<_FloatingText> _floatingTexts = [];
 
   // FPS Optimizasyonu: Sadece arenayı güncelleyen Notifier
   final ValueNotifier<int> _renderNotifier = ValueNotifier<int>(0);
@@ -87,6 +89,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
       _spawnAccumulatorMs = 0;
       _lastTick = Duration.zero;
       _targets.clear();
+      _floatingTexts.clear();
       _isFinished = false;
       _isRunning = true;
     });
@@ -125,12 +128,24 @@ class _ReflexDashGameState extends State<ReflexDashGame>
       }
     }
 
+    final expiredTexts = <_FloatingText>[];
+    for (final ft in _floatingTexts) {
+      ft.progress += (dtMs / 800.0); // 800ms lifetime
+      if (ft.progress >= 1) expiredTexts.add(ft);
+      needsUpdate = true;
+    }
+    
+    for (final ft in expiredTexts) {
+      _floatingTexts.remove(ft);
+    }
+
     if (expired.isNotEmpty) {
       for (final target in expired) {
         _targets.remove(target);
         if (target.isGood) {
           _missed++;
           AudioService().playWrong();
+          HapticFeedback.heavyImpact();
           setState(() {
             _hearts = max(0, _hearts - 1);
             _combo = 0;
@@ -189,6 +204,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
 
     if (hit == null) {
       AudioService().playWrong();
+      HapticFeedback.mediumImpact();
       setState(() {
         _badHits++;
         _combo = 0;
@@ -201,6 +217,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     
     if (hit.isGood) {
       AudioService().playTap();
+      HapticFeedback.lightImpact();
       _goodHits++;
       _targetsClearedInLevel++;
       
@@ -209,18 +226,37 @@ class _ReflexDashGameState extends State<ReflexDashGame>
         _bestCombo = max(_bestCombo, _combo);
         _score += 50 + (_combo * 10);
       });
+      
+      // Kayan Yazı (Floating text) ekle
+      _floatingTexts.add(_FloatingText(
+        id: DateTime.now().microsecondsSinceEpoch,
+        text: 'x$_combo',
+        color: const Color(0xFF10B981), // Yeşil
+        startY: hit.progress,
+        lane: hit.lane,
+      ));
 
       if (_targetsClearedInLevel >= _targetsToClear) {
         _levelUp();
       }
     } else {
       AudioService().playWrong();
+      HapticFeedback.heavyImpact();
       setState(() {
         _badHits++;
         _combo = 0;
         _hearts = max(0, _hearts - 1);
         _score = max(0, _score - 50);
       });
+      
+      _floatingTexts.add(_FloatingText(
+        id: DateTime.now().microsecondsSinceEpoch,
+        text: 'Hata!',
+        color: const Color(0xFFEF4444), // Kırmızı
+        startY: hit.progress,
+        lane: hit.lane,
+      ));
+
       _checkDeath();
     }
     
@@ -418,53 +454,64 @@ class _ReflexDashGameState extends State<ReflexDashGame>
               ),
             ],
           ),
-          child: ValueListenableBuilder<int>(
-            valueListenable: _renderNotifier,
-            builder: (context, _, __) {
-              return Stack(
-                children: [
-                  for (int lane = 0; lane < 3; lane++)
-                    Positioned(
-                      left: lane * laneWidth,
-                      width: laneWidth,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          gradient: LinearGradient(
-                            colors: isDark
-                                ? [const Color(0xFF111827), const Color(0xFF0B1324)]
-                                : [const Color(0xFFF8FAFC), const Color(0xFFE8ECF4)],
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                          ),
-                          border: Border.all(
-                            color: isDark
-                                ? const Color(0xFF1F2937)
-                                : const Color(0xFFE5E7EB),
-                          ),
-                        ),
+          child: Stack(
+            children: [
+              for (int lane = 0; lane < 3; lane++)
+                Positioned(
+                  left: lane * laneWidth,
+                  width: laneWidth,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [const Color(0xFF111827), const Color(0xFF0B1324)]
+                            : [const Color(0xFFF8FAFC), const Color(0xFFE8ECF4)],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      border: Border.all(
+                        color: isDark
+                            ? const Color(0xFF1F2937)
+                            : const Color(0xFFE5E7EB),
                       ),
                     ),
-                  // Hedefler
-                  for (final target in _targets)
-                    Positioned(
-                      left: target.lane * laneWidth + 14,
-                      width: laneWidth - 28,
-                      top: (constraints.maxHeight - 40) * target.progress,
-                      child: _DashChip(target: target),
-                    ),
-                  if (!_isFinished && !_isRunning)
-                    _PauseOverlay(onResume: () {
-                      setState(() {
-                        _isRunning = true;
-                      });
-                    }),
-                ],
-              );
-            }
+                  ),
+                ),
+              ValueListenableBuilder<int>(
+                valueListenable: _renderNotifier,
+                builder: (context, _, __) {
+                  return Stack(
+                    children: [
+                      // Hedefler
+                      for (final target in _targets)
+                        Positioned(
+                          left: target.lane * laneWidth + 14,
+                          width: laneWidth - 28,
+                          top: (constraints.maxHeight - 40) * target.progress,
+                          child: _DashChip(target: target),
+                        ),
+                      // Kayan Yazılar (Multipliers)
+                      for (final ft in _floatingTexts)
+                        _FloatingTextWidget(
+                          ft: ft,
+                          laneWidth: laneWidth,
+                          maxHeight: constraints.maxHeight - 40,
+                        ),
+                    ],
+                  );
+                }
+              ),
+              if (!_isFinished && !_isRunning)
+                _PauseOverlay(onResume: () {
+                  setState(() {
+                    _isRunning = true;
+                  });
+                }),
+            ],
           ),
         );
       },
@@ -547,13 +594,6 @@ class _DashChip extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: colors.first.withValues(alpha: 0.25),
-            blurRadius: 18,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
     );
   }
@@ -583,6 +623,58 @@ class _PauseOverlay extends StatelessWidget {
             ),
             icon: const Icon(Icons.play_arrow_rounded),
             label: const Text('Devam Et'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FloatingText {
+  final int id;
+  final String text;
+  final Color color;
+  final double startY;
+  final int lane;
+  double progress = 0; // 0 to 1
+
+  _FloatingText({
+    required this.id,
+    required this.text,
+    required this.color,
+    required this.startY,
+    required this.lane,
+  });
+}
+
+class _FloatingTextWidget extends StatelessWidget {
+  final _FloatingText ft;
+  final double laneWidth;
+  final double maxHeight;
+
+  const _FloatingTextWidget({
+    required this.ft,
+    required this.laneWidth,
+    required this.maxHeight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final baseTop = maxHeight * ft.startY;
+    final top = baseTop - (ft.progress * 80);
+    final currentAlpha = (1.0 - ft.progress).clamp(0.0, 1.0);
+
+    return Positioned(
+      left: ft.lane * laneWidth,
+      width: laneWidth,
+      top: top,
+      child: Center(
+        child: Text(
+          ft.text,
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 24 + (ft.progress * 8),
+            fontWeight: FontWeight.w900,
+            color: ft.color.withValues(alpha: currentAlpha),
           ),
         ),
       ),
