@@ -663,18 +663,22 @@ class _FloatingTextWidget extends StatelessWidget {
     final baseTop = maxHeight * ft.startY;
     final top = baseTop - (ft.progress * 80);
     final currentAlpha = (1.0 - ft.progress).clamp(0.0, 1.0);
+    final currentScale = 1.0 + (ft.progress * 0.33);
 
     return Positioned(
       left: ft.lane * laneWidth,
       width: laneWidth,
       top: top,
       child: Center(
-        child: Text(
-          ft.text,
-          style: GoogleFonts.spaceGrotesk(
-            fontSize: 24 + (ft.progress * 8),
-            fontWeight: FontWeight.w900,
-            color: ft.color.withValues(alpha: currentAlpha),
+        child: Transform.scale(
+          scale: currentScale,
+          child: Text(
+            ft.text,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: ft.color.withValues(alpha: currentAlpha),
+            ),
           ),
         ),
       ),

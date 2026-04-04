@@ -21,6 +21,33 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   TimeFilter _selectedFilter = TimeFilter.day;
   Future<List<Map<String, dynamic>>>? _historyFuture;
 
+  // --- YENİ TASARIM RENKLERİ ---
+  static const Color stitchPrimary = Color(0xFF0D59F2);
+
+  // Ana sayfa kart tasarım yapısı
+  BoxDecoration _getNeuDecoration({required bool isDark, bool isCircle = false}) {
+    final bgColor = isDark 
+        ? const Color(0xFF1E293B).withValues(alpha: 0.7) 
+        : Colors.white.withValues(alpha: 0.9);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.05);
+
+    return BoxDecoration(
+      color: bgColor,
+      shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+      borderRadius: isCircle ? null : BorderRadius.circular(24),
+      border: Border.all(color: borderColor, width: 1.5),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
+          offset: const Offset(0, 8),
+          blurRadius: 24,
+        ),
+      ],
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -176,112 +203,45 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     }
 
     return Container(
-      decoration: BoxDecoration(
-        // Arka planı transparent yapmıyoruz çünkü kendi gradient'i var,
-        // ama bunu Scaffold seviyesinde ele aldığımız için burada kalabilir.
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDark
-              ? [
-                  const Color(0xFF0B1220),
-                  const Color(0xFF111827),
-                  const Color(0xFF1F2937),
-                ]
-              : [
-                  const Color(0xFFF9FAFB),
-                  const Color(0xFFF3F4F6),
-                  Colors.white,
-                ],
-        ),
-      ),
+      color: Colors.transparent, // Arka plan
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-            20, 20, 20, 120), // Alt padding eklendi (Menü boşluğu)
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 120), // Alt menü boşluğu
         child: Column(
           children: [
-
-
             // Filtre Butonları
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(6),
               margin: const EdgeInsets.only(bottom: 24),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1F2937).withValues(alpha: 0.6)
-                    : Colors.white.withValues(alpha: 0.8),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF374151)
-                      : const Color(0xFFE5E7EB),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
+              decoration: _getNeuDecoration(isDark: isDark),
               child: Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
-                    child: _buildFilterButton(
-                      s.filterDay,
-                      Icons.today,
-                      TimeFilter.day,
-                      isDark,
-                    ),
+                    child: _buildFilterButton(s.filterDay, Icons.today, TimeFilter.day, isDark),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _buildFilterButton(
-                      s.filterWeek,
-                      Icons.date_range,
-                      TimeFilter.week,
-                      isDark,
-                    ),
+                    child: _buildFilterButton(s.filterWeek, Icons.date_range, TimeFilter.week, isDark),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: _buildFilterButton(
-                      s.filterMonth,
-                      Icons.calendar_month,
-                      TimeFilter.month,
-                      isDark,
-                    ),
+                    child: _buildFilterButton(s.filterMonth, Icons.calendar_month, TimeFilter.month, isDark),
                   ),
                 ],
               ),
             ),
 
-            // Özet Kartı - Modern Gradient
+            // Özet Kartı
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               margin: const EdgeInsets.only(bottom: 24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF4F46E5),
-                    Color(0xFF7C3AED),
-                    Color(0xFF9333EA),
-                  ],
+              decoration: _getNeuDecoration(isDark: isDark).copyWith(
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  width: 1.5,
                 ),
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF4F46E5).withValues(alpha: 0.4),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,18 +258,18 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           children: [
                             Text(
                               filterTitle,
-                              style: GoogleFonts.spaceGrotesk(
+                              style: GoogleFonts.inter(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: textColorPrimary,
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               filterSubtitle,
-                              style: GoogleFonts.spaceGrotesk(
+                              style: GoogleFonts.inter(
                                 fontSize: 14,
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: textColorSecondary,
                               ),
                             ),
                           ],
@@ -318,7 +278,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Icon(
@@ -328,22 +288,17 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                   ? Icons.date_range
                                   : Icons.calendar_month,
                           size: 24,
-                          color: Colors.white,
+                          color: stitchPrimary,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
+                      color: isDark ? const Color(0xFF334155).withValues(alpha: 0.5) : const Color(0xFFE2E8F0).withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -351,7 +306,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         Icon(
                           Icons.access_time,
                           size: 16,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: textColorSecondary,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -359,7 +314,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           style: GoogleFonts.robotoMono(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
+                            color: textColorPrimary,
                           ),
                         ),
                       ],
@@ -369,47 +324,22 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               ),
             ),
 
-            // Radar Chart - Modern Card
+            // Radar Grafiği Kartı
             Container(
               height: 340,
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF1F2937).withValues(alpha: 0.8)
-                    : Colors.white.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(
-                  color: isDark
-                      ? const Color(0xFF374151)
-                      : const Color(0xFFE5E7EB),
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
+              decoration: _getNeuDecoration(isDark: isDark),
               child: filteredHistory.isEmpty
                   ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.bar_chart,
-                            size: 48,
-                            color: textColorSecondary,
-                          ),
+                          Icon(Icons.bar_chart, size: 48, color: textColorSecondary),
                           const SizedBox(height: 12),
                           Text(
                             s.noDataForPeriod,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: textColorSecondary,
-                            ),
+                            style: GoogleFonts.inter(fontSize: 14, color: textColorSecondary),
                           ),
                         ],
                       ),
@@ -418,37 +348,25 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                       RadarChartData(
                         dataSets: [
                           RadarDataSet(
-                            fillColor:
-                                const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                            borderColor: const Color(0xFF4F46E5),
+                            fillColor: stitchPrimary.withValues(alpha: 0.25),
+                            borderColor: stitchPrimary,
                             borderWidth: 3,
                             dataEntries: categories.map((category) {
                               final value = radarStats[category] ?? 0.0;
-                              // Normalize to 0-1 aralığı
-                              return RadarEntry(
-                                  value: (value / 100).clamp(0.0, 1.0));
+                              return RadarEntry(value: (value / 100).clamp(0.0, 1.0));
                             }).toList(),
                           ),
                         ],
                         tickCount: 5,
-                        ticksTextStyle: GoogleFonts.poppins(
-                          fontSize: 10,
-                          color: textColorSecondary,
-                        ),
+                        ticksTextStyle: GoogleFonts.inter(fontSize: 10, color: textColorSecondary),
                         tickBorderData: BorderSide(
-                          color: isDark
-                              ? const Color(0xFF374151)
-                              : const Color(0xFFE5E7EB),
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                           width: 1.5,
                         ),
                         borderData: FlBorderData(show: true),
-                        radarBackgroundColor: isDark
-                            ? const Color(0xFF111827)
-                            : const Color(0xFFF9FAFB),
+                        radarBackgroundColor: Colors.transparent,
                         gridBorderData: BorderSide(
-                          color: isDark
-                              ? const Color(0xFF374151)
-                              : const Color(0xFFE5E7EB),
+                          color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                           width: 1.5,
                         ),
                         titlePositionPercentageOffset: 0.2,
@@ -464,50 +382,18 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
             ),
             const SizedBox(height: 24),
 
-            // İstatistik Kartları - Modern Progress Cards
+            // Kategori Kartları
             ...categories.asMap().entries.map((entry) {
-              final index = entry.key;
               final category = entry.value;
               final value = radarStats[category] ?? 0.0;
               final progress = (value / 100).clamp(0.0, 1.0);
-
-              // Her kategori için farklı renk
-              final categoryColors = [
-                [const Color(0xFFEF4444), const Color(0xFFDC2626)], // Kırmızı
-                [const Color(0xFF3B82F6), const Color(0xFF2563EB)], // Mavi
-                [const Color(0xFF10B981), const Color(0xFF059669)], // Yeşil
-                [const Color(0xFFF59E0B), const Color(0xFFD97706)], // Turuncu
-                [const Color(0xFF8B5CF6), const Color(0xFF7C3AED)], // Mor
-                [const Color(0xFFEC4899), const Color(0xFFDB2777)], // Pembe
-                [const Color(0xFF06B6D4), const Color(0xFF0891B2)], // Cyan
-              ];
-
-              final colors = categoryColors[index % categoryColors.length];
               final icon = _getCategoryIcon(category);
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF1F2937).withValues(alpha: 0.6)
-                        : Colors.white.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: isDark
-                          ? const Color(0xFF374151)
-                          : const Color(0xFFE5E7EB),
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
+                  decoration: _getNeuDecoration(isDark: isDark),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -523,34 +409,20 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: colors,
-                                    ),
+                                    color: stitchPrimary.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: colors[0].withValues(alpha: 0.3),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
                                   ),
-                                  child: Icon(
-                                    icon,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
+                                  child: Icon(icon, color: stitchPrimary, size: 20),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         s.categoryLabel(category),
-                                        style: GoogleFonts.spaceGrotesk(
+                                        style: GoogleFonts.inter(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
                                           color: textColorPrimary,
@@ -559,10 +431,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         '${value.toStringAsFixed(1)} / 100',
-                                        style: GoogleFonts.spaceGrotesk(
+                                        style: GoogleFonts.inter(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: colors[0],
+                                          color: stitchPrimary,
                                         ),
                                       ),
                                     ],
@@ -574,16 +446,13 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      // Progress Bar
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: LinearProgressIndicator(
                           value: progress,
                           minHeight: 10,
-                          backgroundColor: isDark
-                              ? const Color(0xFF374151)
-                              : const Color(0xFFE5E7EB),
-                          valueColor: AlwaysStoppedAnimation<Color>(colors[0]),
+                          backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                          valueColor: const AlwaysStoppedAnimation<Color>(stitchPrimary),
                         ),
                       ),
                     ],
@@ -615,17 +484,12 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         curve: Curves.easeInOut,
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? const LinearGradient(
-                  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
-                )
-              : null,
-          color: isSelected ? null : Colors.transparent,
+          color: isSelected ? stitchPrimary : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF4F46E5).withValues(alpha: 0.3),
+                    color: stitchPrimary.withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -644,19 +508,19 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                     ? Colors.white
                     : isDark
                         ? const Color(0xFF9CA3AF)
-                        : const Color(0xFF6B7280),
+                        : const Color(0xFF64748B),
               ),
               const SizedBox(width: 6),
               Text(
                 label,
-                style: GoogleFonts.spaceGrotesk(
+                style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected
                       ? Colors.white
                       : isDark
                           ? const Color(0xFF9CA3AF)
-                          : const Color(0xFF6B7280),
+                          : const Color(0xFF64748B),
                 ),
               ),
             ],
