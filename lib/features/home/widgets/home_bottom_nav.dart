@@ -57,8 +57,7 @@ class HomeBottomNav extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => onTabSelected(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+      child: Container(
         width: 48,
         height: 48,
         decoration: BoxDecoration(

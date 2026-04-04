@@ -288,9 +288,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final appLanguage = ref.watch(languageProvider);
     final s = AppStrings(appLanguage);
 
-    final quickMath = games.where((g) => g.id == 'NUM01').isNotEmpty
-        ? games.firstWhere((g) => g.id == 'NUM01')
-        : games.first;
+    // Kullanıcının en zayıf olduğu yetenek alanını bulup o alana yönelik oyun öneren zeki kurgu
+    GameModel getRecommendedGame() {
+      final stats = ref.watch(userStatsProvider).value;
+      
+      if (stats != null && stats.isNotEmpty) {
+        final entries = stats.entries.toList();
+        if (entries.isNotEmpty) {
+          entries.sort((a, b) => (a.value as num).compareTo(b.value as num));
+          final weakestArea = entries.first.key; 
+          
+          // Bu yetenek alanına ait oyunları bul
+          final candidateGames = games.where((g) => g.area == weakestArea).toList();
+          if (candidateGames.isNotEmpty) {
+            // Rebuild'lerde oyunun sürekli değişmesini (flicker) engellemek için gün tabanlı sabit seçim
+            final daySeed = DateTime.now().day + DateTime.now().month;
+            return candidateGames[daySeed % candidateGames.length];
+          }
+        }
+      }
+      
+      // Kullanıcının hiç verisi yoksa veya hesaplanamadıysa bugünün oyununu rastgele seç
+      final daySeed = DateTime.now().day + DateTime.now().year;
+      return games[daySeed % games.length];
+    }
+
+    final recommendedGame = getRecommendedGame();
 
     final completedTodayAsync = ref.watch(todayGameCountProvider);
     final completedToday = completedTodayAsync.value ?? 0;
@@ -327,7 +350,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _buildUpNextCard(
             context: context,
             isDarkMode: isDarkMode,
-            game: quickMath,
+            game: recommendedGame,
             s: s,
           ),
           const SizedBox(height: 32),
