@@ -16,21 +16,29 @@ class AudioService {
   bool _isSoundEnabled = true;
   bool _isMusicEnabled = true;
 
+  // Oyunda aynı anda en fazla çalabilecek ses limitini belirleyen bir havuz (pool) 
+  // Bu sayede her ses için Native MediaPlayer üretilip uygulamanın donması engellenir
+  static const int _poolSize = 5;
+  final List<AudioPlayer> _pool = List.generate(
+    _poolSize, 
+    (_) => AudioPlayer()..setReleaseMode(ReleaseMode.stop)
+  );
+  int _poolIndex = 0;
+
   /// Ses efektlerini çal
   /// [soundName] - assets/sounds/ klasöründeki dosya adı (örn: "correct.wav")
   Future<void> playSound(String soundName) async {
     if (!_isSoundEnabled) return;
     
     try {
-      // Her efekt için yeni bir oynatıcı oluştur (çakışmaları engellemek için)
-      final player = AudioPlayer();
+      final player = _pool[_poolIndex];
+      _poolIndex = (_poolIndex + 1) % _poolSize; // Havuzda sıradaki player'a geç
+      
+      // Eğer seçilen player hala çalıyorsa durdurup yeni sesi ver
+      if (player.state == PlayerState.playing) {
+        await player.stop();
+      }
       await player.play(AssetSource('sounds/$soundName'));
-      // Oynatma bitince temizle
-      player.onPlayerStateChanged.listen((state) {
-        if (state == PlayerState.completed || state == PlayerState.stopped) {
-          player.dispose();
-        }
-      });
     } catch (e) {
       debugPrint('⚠️ Ses çalınamadı: $soundName');
       debugPrint('   Hata: $e');
