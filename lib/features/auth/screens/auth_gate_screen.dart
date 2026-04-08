@@ -4,6 +4,8 @@ import '../providers/auth_provider.dart';
 import '../../home/screens/home_screen.dart';
 import 'verify_email_screen.dart';
 import '../../welcome/screens/welcome_screen.dart';
+import '../../survey/screens/pre_test_survey_screen.dart';
+import '../../survey/screens/post_test_survey_screen.dart';
 
 class AuthGateScreen extends ConsumerStatefulWidget {
   const AuthGateScreen({super.key});
@@ -31,7 +33,43 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
             return const VerifyEmailScreen();
           }
           
-          return const HomeScreen();
+          final userDataAsync = ref.watch(userDataProvider);
+          return userDataAsync.when(
+            data: (userData) {
+              if (userData == null) {
+                return const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (!userData.hasCompletedPreTest) {
+                return PreTestSurveyScreen(
+                  onCompleted: () async {
+                    // Kullanıcı tamamladığında Firestore'da true olacak 
+                    // ve stream otomatik olarak HomeScreen'e geçişi sağlayacak.
+                  },
+                );
+              }
+
+              // Kullanıcı 20 oyunu tamamladıysa ve son testi çözmediyse
+              if (userData.history.length >= 20 && !userData.hasCompletedPostTest) {
+                return PostTestSurveyScreen(
+                  onCompleted: () async {
+                    // Kullanıcı tamamladığında Firestore'da true olacak 
+                    // ve stream otomatik olarak HomeScreen'e geçişi sağlayacak.
+                  },
+                );
+              }
+
+              return const HomeScreen();
+            },
+            loading: () => const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+            error: (error, stack) => Scaffold(
+              body: Center(child: Text('Kullanıcı verisi alınamadı: $error')),
+            ),
+          );
         }
       },
       loading: () => const Scaffold(

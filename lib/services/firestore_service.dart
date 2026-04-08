@@ -178,4 +178,31 @@ class FirestoreService {
       return [];
     }
   }
+
+  // ── Anket Sonuçlarını Kaydet ────────────────────────────────
+  Future<void> saveSurveyResult({
+    required String userId,
+    required String surveyType, // 'pre_test' veya 'post_test'
+    required Map<String, dynamic> answers,
+  }) async {
+    try {
+      final userDoc = _usersCollection.doc(userId);
+
+      // Anketi subcollection olarak kaydet
+      await userDoc.collection('surveys').doc(surveyType).set({
+        ...answers,
+        'submittedAt': FieldValue.serverTimestamp(),
+      });
+
+      // User model'deki bayrağı güncelle
+      final updateData = surveyType == 'pre_test'
+          ? {'hasCompletedPreTest': true}
+          : {'hasCompletedPostTest': true};
+
+      await userDoc.update(updateData);
+    } catch (e) {
+      debugPrint('saveSurveyResult($surveyType) hatası: $e');
+      throw 'Anket kaydedilemedi: $e';
+    }
+  }
 }

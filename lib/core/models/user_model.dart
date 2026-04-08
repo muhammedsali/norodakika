@@ -7,6 +7,8 @@ class UserModel {
   final Map<String, double> stats;
   final List<Map<String, dynamic>> history;
   final DateTime createdAt;
+  final bool hasCompletedPreTest;
+  final bool hasCompletedPostTest;
 
   UserModel({
     required this.uid,
@@ -15,6 +17,8 @@ class UserModel {
     required this.stats,
     required this.history,
     required this.createdAt,
+    this.hasCompletedPreTest = false,
+    this.hasCompletedPostTest = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +34,8 @@ class UserModel {
       createdAt: json['createdAt'] != null
           ? _parseDateTime(json['createdAt'])
           : DateTime.now(),
+      hasCompletedPreTest: json['hasCompletedPreTest'] ?? false,
+      hasCompletedPostTest: json['hasCompletedPostTest'] ?? false,
     );
   }
 
@@ -52,6 +58,8 @@ class UserModel {
       'stats': stats.map((key, value) => MapEntry(key, value)),
       'history': history,
       'createdAt': createdAt.toIso8601String(),
+      'hasCompletedPreTest': hasCompletedPreTest,
+      'hasCompletedPostTest': hasCompletedPostTest,
     };
   }
 
@@ -62,6 +70,8 @@ class UserModel {
     Map<String, double>? stats,
     List<Map<String, dynamic>>? history,
     DateTime? createdAt,
+    bool? hasCompletedPreTest,
+    bool? hasCompletedPostTest,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -70,6 +80,8 @@ class UserModel {
       stats: stats ?? this.stats,
       history: history ?? this.history,
       createdAt: createdAt ?? this.createdAt,
+      hasCompletedPreTest: hasCompletedPreTest ?? this.hasCompletedPreTest,
+      hasCompletedPostTest: hasCompletedPostTest ?? this.hasCompletedPostTest,
     );
   }
 }
