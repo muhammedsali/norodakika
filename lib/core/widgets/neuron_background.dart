@@ -94,10 +94,9 @@ class NeuronPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // 1) Temel Renk Tonlamasına Karar Ver:
-    final primaryColor = const Color(0xFF0D59F2);
+    const primaryColor = Color(0xFF0D59F2);
     // Dark mode'da çok dikkat dağıtmaması için biraz saydamlaştırıyoruz (alpha değeri)
     final nodeColor = isDarkMode ? Colors.white.withValues(alpha: 0.25) : primaryColor.withValues(alpha: 0.15);
-    final lineColor = isDarkMode ? Colors.white.withValues(alpha: 0.1) : primaryColor.withValues(alpha: 0.05);
 
     final nodePaint = Paint()
       ..color = nodeColor
@@ -117,7 +116,8 @@ class NeuronPainter extends CustomPainter {
         if (distance < maxDistance) {
            // Mesafeye göre opacity (şeffaflık) azalt/çoğalt
            final opacityRate = 1.0 - (distance / maxDistance);
-           linePaint.color = lineColor.withValues(alpha: lineColor.color.a * opacityRate);
+           final baseAlpha = isDarkMode ? 0.1 : 0.05;
+           linePaint.color = (isDarkMode ? Colors.white : primaryColor).withValues(alpha: baseAlpha * opacityRate);
            canvas.drawLine(
              Offset(nodes[i].x, nodes[i].y), 
              Offset(nodes[j].x, nodes[j].y), 
