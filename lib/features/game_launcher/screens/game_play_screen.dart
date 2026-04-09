@@ -234,6 +234,24 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         final borderColor =
             effectiveIsDark ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
 
+        // Başarı oranına göre renk ve ikon belirle
+        final Color successColor;
+        final IconData medalIcon;
+        final String congratsText;
+        if (successRate >= 0.8) {
+          successColor = const Color(0xFF10B981); // Zümrüt Yeşili
+          medalIcon = Icons.military_tech;
+          congratsText = "MÜKEMMEL!";
+        } else if (successRate >= 0.5) {
+          successColor = const Color(0xFFF59E0B); // Turuncu
+          medalIcon = Icons.thumb_up_alt;
+          congratsText = "HARİKA!";
+        } else {
+          successColor = const Color(0xFFEF4444); // Kırmızı
+          medalIcon = Icons.fitness_center;
+          congratsText = "DAHA İYİ OLABİLİR";
+        }
+
         return Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -241,41 +259,76 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
               color: Colors.transparent,
               child: Container(
                 constraints: const BoxConstraints(
-                  maxWidth: 420,
-                  minHeight: 220,
+                  maxWidth: 380,
                 ),
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
                   color: bgColor,
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: effectiveIsDark
-                          ? Colors.black.withValues(alpha: 0.6)
-                          : Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 40,
-                      spreadRadius: 0,
-                      offset: const Offset(0, 20),
+                      color: successColor.withValues(alpha: effectiveIsDark ? 0.3 : 0.15),
+                      blurRadius: 60,
+                      spreadRadius: -10,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                   border: Border.all(
-                    color: borderColor,
-                    width: 1.5,
+                    color: successColor.withValues(alpha: 0.3),
+                    width: 2,
                   ),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Devasa Dairesel Başarı Göstergesi
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          height: 120,
+                          child: CircularProgressIndicator(
+                            value: successRate,
+                            strokeWidth: 12,
+                            backgroundColor: borderColor,
+                            color: successColor,
+                            strokeCap: StrokeCap.round,
+                          ),
+                        ),
+                        Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: successColor.withValues(alpha: 0.1),
+                          ),
+                          child: Icon(medalIcon, color: successColor, size: 48),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
                     Text(
-                      s.gameCompleted,
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      congratsText,
+                      style: GoogleFonts.inter(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
                         color: titleColor,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
+                    Text(
+                      s.gameCompleted,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      children: [
                         Expanded(
                           child: Column(
                             children: [
@@ -358,6 +411,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
+                              HapticFeedback.lightImpact();
                               Navigator.pop(ctx); // Dialog'u kapat
                               setState(() {
                                 _isGameComplete = false;
@@ -396,6 +450,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                             height: 52,
                             child: ElevatedButton(
                               onPressed: () {
+                                HapticFeedback.selectionClick();
                                 Navigator.pop(ctx); // Dialog'u kapat
                                 Navigator.pop(ctx); // Oyun ekranından çık
                               },
