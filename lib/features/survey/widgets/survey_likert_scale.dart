@@ -40,7 +40,7 @@ class SurveyLikertScale extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = const Color(0xFF0D59F2);
+    const primaryColor = Color(0xFF0D59F2);
     final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
 
     return Container(
