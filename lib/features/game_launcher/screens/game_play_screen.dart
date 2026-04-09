@@ -409,10 +409,10 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {
+                          child: InkWell(
+                            onTap: () {
                               HapticFeedback.lightImpact();
-                              Navigator.pop(ctx); // Dialog'u kapat
+                              Navigator.pop(ctx); 
                               setState(() {
                                 _isGameComplete = false;
                                 _gameResult = null;
@@ -422,50 +422,57 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                               });
                               _showLogoScreen();
                             },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: effectiveIsDark
-                                    ? const Color(0xFF4B5563)
-                                    : const Color(0xFF4F46E5),
-                                width: 1.5,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: effectiveIsDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: effectiveIsDark ? Colors.white12 : Colors.black12, width: 1),
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            child: Text(
-                              s.playAgain,
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: titleColor,
+                              child: Text(
+                                s.playAgain.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                  color: titleColor,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Expanded(
-                          child: SizedBox(
-                            height: 52,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                HapticFeedback.selectionClick();
-                                Navigator.pop(ctx); // Dialog'u kapat
-                                Navigator.pop(ctx); // Oyun ekranından çık
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4F46E5),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
+                          child: InkWell(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.pop(ctx); 
+                              Navigator.pop(ctx); 
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0D59F2),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF0D59F2).withValues(alpha: 0.3),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
                               ),
                               child: Text(
-                                s.backToHome,
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                s.backToHome.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -572,52 +579,61 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton(
-                            onPressed: () {
-                              Navigator.of(ctx).pop(false); // oyuna devam et
+                          child: InkWell(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              Navigator.of(ctx).pop(false);
                             },
-                            style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                color: effectiveIsDark
-                                    ? const Color(0xFF4B5563)
-                                    : const Color(0xFF4F46E5),
-                                width: 1.5,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: effectiveIsDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: effectiveIsDark ? Colors.white12 : Colors.black12, width: 1),
                               ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                            ),
-                            child: Text(
-                              s.continueText,
-                              style: GoogleFonts.spaceGrotesk(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: titleColor,
+                              child: Text(
+                                s.continueText.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                  color: titleColor,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Expanded(
-                          child: SizedBox(
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(ctx).pop(true); // çıkışı onayla
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF4F46E5),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
+                          child: InkWell(
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.of(ctx).pop(true);
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0D59F2),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF0D59F2).withValues(alpha: 0.3),
+                                    blurRadius: 16,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
                               ),
                               child: Text(
-                                s.backToHome,
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                                s.backToHome.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
