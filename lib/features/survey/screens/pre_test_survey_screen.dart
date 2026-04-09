@@ -28,7 +28,18 @@ class _PreTestSurveyScreenState extends ConsumerState<PreTestSurveyScreen> {
 
   final Map<int, int> _likertAnswers = {};
 
-  final List<String> _grades = ['Hazırlık', '9. Sınıf', '10. Sınıf', '11. Sınıf', '12. Sınıf', 'Üniversite', 'Diğer'];
+  final List<String> _grades = [
+    'Hazırlık', 
+    '9. Sınıf', 
+    '10. Sınıf', 
+    '11. Sınıf', 
+    '12. Sınıf', 
+    'Üniversite 1', 
+    'Üniversite 2', 
+    'Üniversite 3', 
+    'Üniversite 4', 
+    'Mezun / Diğer'
+  ];
 
   final List<String> _likertQuestions = [
     'Mezuniyet sonrası oyun sektöründe çalışmayı düşünüyorum.',
