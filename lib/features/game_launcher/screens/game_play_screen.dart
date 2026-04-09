@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
@@ -126,6 +127,9 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
       _isGameComplete = true;
       _gameResult = result;
     });
+
+    // Harika bir haptic titreşim verelim "Oyun Bitti" hissiyatı için
+    HapticFeedback.heavyImpact();
 
     // Attempt kaydet (hem Firestore hem local storage'a)
     await _saveAttempt(result, difficulty, userId);
@@ -272,49 +276,50 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                s.metaScore,
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 13,
+                                "SKOR",
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 2,
                                   color: textColor,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 8),
                               Text(
-                                score.toStringAsFixed(1),
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
+                                score.toStringAsFixed(0),
+                                style: GoogleFonts.inter(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w900,
                                   color: titleColor,
                                 ),
                               ),
                             ],
                           ),
                         ),
+                        Container(width: 1, height: 60, color: borderColor),
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                s.successRate,
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 13,
+                                "BAŞARI",
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 2,
                                   color: textColor,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 8),
                               Text(
-                                '${(successRate * 100).toStringAsFixed(1)}%',
-                                style: GoogleFonts.spaceGrotesk(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w700,
-                                  color: titleColor,
+                                '${(successRate * 100).toStringAsFixed(0)}%',
+                                style: GoogleFonts.inter(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w900,
+                                  color: successColor,
                                 ),
                               ),
                             ],
@@ -322,15 +327,32 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      s.durationSeconds(duration),
-                      style: GoogleFonts.spaceGrotesk(
-                        fontSize: 13,
-                        color: textColor,
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: effectiveIsDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.timer_outlined, size: 16, color: textColor),
+                            const SizedBox(width: 6),
+                            Text(
+                              s.durationSeconds(duration),
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: textColor,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
                     Row(
                       children: [
                         Expanded(
