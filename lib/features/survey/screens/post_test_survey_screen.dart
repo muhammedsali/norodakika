@@ -123,7 +123,7 @@ class _PostTestSurveyScreenState extends ConsumerState<PostTestSurveyScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.stars_rounded, color: primaryColor, size: 32),
+                        const Icon(Icons.stars_rounded, color: primaryColor, size: 32),
                         const SizedBox(width: 12),
                         Text(
                           'Tebrikler!',

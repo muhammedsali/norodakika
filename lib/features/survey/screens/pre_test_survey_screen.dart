@@ -174,7 +174,7 @@ class _PreTestSurveyScreenState extends ConsumerState<PreTestSurveyScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, color: primaryColor, size: 28),
+                        const Icon(Icons.info_outline, color: primaryColor, size: 28),
                         const SizedBox(width: 12),
                         Text(
                           'Hoş Geldiniz!',
