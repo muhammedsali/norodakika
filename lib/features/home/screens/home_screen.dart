@@ -17,6 +17,7 @@ import '../../settings/screens/settings_screen.dart';
 import '../../../core/i18n/app_strings.dart';
 import '../widgets/home_bottom_nav.dart';
 import '../../profile/providers/avatar_provider.dart';
+import '../../../core/widgets/neuron_background.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -136,6 +137,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: bgColor,
       body: Stack(
         children: [
+          // YENİ BÜYÜK GÜNCELLEME: Hareketli Sinapsis Arka Planı
+          Positioned.fill(
+            child: NeuronBackground(isDarkMode: isDarkMode),
+          ),
           SafeArea(
             bottom: false,
             child: Column(
