@@ -12,6 +12,7 @@ import '../providers/auth_provider.dart';
 import 'register_screen.dart';
 import '../../home/screens/home_screen.dart';
 import '../../../core/widgets/neuron_background.dart';
+import 'auth_gate_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -76,7 +77,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.read(authNotifierProvider);
     authState.when(
       data: (_) {
-        // Başarılı giriş - AuthGate otomatik yönlendirecek
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AuthGateScreen()),
+          (route) => false,
+        );
       },
       loading: () {},
       error: (error, _) {
