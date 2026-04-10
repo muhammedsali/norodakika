@@ -6,6 +6,7 @@ import 'verify_email_screen.dart';
 import '../../welcome/screens/welcome_screen.dart';
 import '../../survey/screens/pre_test_survey_screen.dart';
 import '../../survey/screens/post_test_survey_screen.dart';
+import '../../survey/screens/survey_welcome_screen.dart';
 
 class AuthGateScreen extends ConsumerStatefulWidget {
   const AuthGateScreen({super.key});
@@ -15,6 +16,8 @@ class AuthGateScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
+  bool _showSurvey = false;
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(currentUserProvider);
@@ -43,6 +46,16 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
               }
 
               if (!userData.hasCompletedPreTest) {
+                if (!_showSurvey) {
+                  return SurveyWelcomeScreen(
+                    onStart: () {
+                      setState(() {
+                        _showSurvey = true;
+                      });
+                    },
+                  );
+                }
+
                 return PreTestSurveyScreen(
                   onCompleted: () async {
                     // Kullanıcı tamamladığında Firestore'da true olacak 
