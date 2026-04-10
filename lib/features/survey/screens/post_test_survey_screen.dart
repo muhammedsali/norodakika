@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../widgets/survey_likert_scale.dart';
+import '../../../core/widgets/neuron_background.dart';
 
 class PostTestSurveyScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onCompleted;
@@ -83,6 +84,28 @@ class _PostTestSurveyScreenState extends ConsumerState<PostTestSurveyScreen> {
     }
   }
 
+  BoxDecoration _getNeuDecoration({required bool isDarkMode}) {
+    final bgColor = isDarkMode 
+        ? const Color(0xFF1E293B).withValues(alpha: 0.7) 
+        : Colors.white.withValues(alpha: 0.85);
+    final borderColor = isDarkMode
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.05);
+
+    return BoxDecoration(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(32),
+      border: Border.all(color: borderColor, width: 1.5),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+          offset: const Offset(0, 8),
+          blurRadius: 24,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -92,6 +115,7 @@ class _PostTestSurveyScreenState extends ConsumerState<PostTestSurveyScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
           'Nörodakika Son Test Anketi',
@@ -102,96 +126,114 @@ class _PostTestSurveyScreenState extends ConsumerState<PostTestSurveyScreen> {
         centerTitle: true,
         iconTheme: IconThemeData(color: textColor),
       ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(24.0),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.2),
-                    width: 1.5,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: NeuronBackground(isDarkMode: isDarkMode),
+          ),
+          SafeArea(
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.stars_rounded, color: primaryColor, size: 32),
-                        const SizedBox(width: 12),
+                        Row(
+                          children: [
+                            const Icon(Icons.stars_rounded, color: primaryColor, size: 32),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Tebrikler!',
+                                style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
                         Text(
-                          'Tebrikler!',
-                          style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.bold, color: primaryColor),
+                          'Belirli bir ilerlemeye ulaştınız. Oyun deneyiminizi ve oyunların sizlere etkisini ölçmek için bu son anketi doldurmanızı rica ediyoruz. İlginiz ve katılımınız için çok teşekkür ederiz.',
+                          style: GoogleFonts.inter(fontSize: 14, height: 1.5, color: isDarkMode ? Colors.white70 : Colors.black87),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Belirli bir ilerlemeye ulaştınız. Oyun deneyiminizi ve oyunların sizlere etkisini ölçmek için bu son anketi doldurmanızı rica ediyoruz. İlginiz ve katılımınız için çok teşekkür ederiz.',
-                      style: GoogleFonts.inter(fontSize: 14, height: 1.5, color: isDarkMode ? Colors.white70 : Colors.black87),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-              
-              Text('1. Eğitsel Oyunlara Karşı Tutum', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
-              const SizedBox(height: 20),
-
-              ...List.generate(_generalQuestions.length, (index) {
-                return SurveyLikertScale(
-                  questionIndex: index + 1,
-                  questionText: _generalQuestions[index],
-                  selectedValue: _likertAnswers[index],
-                  onChanged: (val) => setState(() => _likertAnswers[index] = val),
-                );
-              }),
-
-              const SizedBox(height: 40),
-              
-              Text('2. Nörodakika Değerlendirmesi', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
-              const SizedBox(height: 20),
-
-              ...List.generate(_gameSpecificQuestions.length, (index) {
-                final globalIdx = index + _generalQuestions.length;
-                return SurveyLikertScale(
-                  questionIndex: globalIdx + 1,
-                  questionText: _gameSpecificQuestions[index],
-                  selectedValue: _likertAnswers[globalIdx],
-                  onChanged: (val) => setState(() => _likertAnswers[globalIdx] = val),
-                );
-              }),
-
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submitSurvey,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    elevation: 8,
-                    shadowColor: primaryColor.withValues(alpha: 0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('1. Eğitsel Oyunlara Karşı Tutum', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
+                        const SizedBox(height: 20),
+                        ...List.generate(_generalQuestions.length, (index) {
+                          return SurveyLikertScale(
+                            questionIndex: index + 1,
+                            questionText: _generalQuestions[index],
+                            selectedValue: _likertAnswers[index],
+                            onChanged: (val) => setState(() => _likertAnswers[index] = val),
+                          );
+                        }),
+                      ],
                     ),
                   ),
-                  child: _isLoading 
-                    ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                    : Text('Anketi Tamamla', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
+
+                  const SizedBox(height: 24),
+                  
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('2. Nörodakika Değerlendirmesi', style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: textColor)),
+                        const SizedBox(height: 20),
+                        ...List.generate(_gameSpecificQuestions.length, (index) {
+                          final globalIdx = index + _generalQuestions.length;
+                          return SurveyLikertScale(
+                            questionIndex: globalIdx + 1,
+                            questionText: _gameSpecificQuestions[index],
+                            selectedValue: _likertAnswers[globalIdx],
+                            onChanged: (val) => setState(() => _likertAnswers[globalIdx] = val),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submitSurvey,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        elevation: 8,
+                        shadowColor: primaryColor.withValues(alpha: 0.4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: _isLoading 
+                        ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
+                        : Text('Anketi Tamamla', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
-              const SizedBox(height: 40),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
