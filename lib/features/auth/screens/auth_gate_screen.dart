@@ -35,7 +35,7 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
           if (!user.emailVerified) {
             return const VerifyEmailScreen();
           }
-          
+
           final userDataAsync = ref.watch(userDataProvider);
           return userDataAsync.when(
             data: (userData) {
@@ -58,17 +58,18 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
 
                 return PreTestSurveyScreen(
                   onCompleted: () async {
-                    // Kullanıcı tamamladığında Firestore'da true olacak 
+                    // Kullanıcı tamamladığında Firestore'da true olacak
                     // ve stream otomatik olarak HomeScreen'e geçişi sağlayacak.
                   },
                 );
               }
 
-              // Kullanıcı 20 oyunu tamamladıysa ve son testi çözmediyse
-              if (userData.history.length >= 20 && !userData.hasCompletedPostTest) {
+              // Kullanıcı 15 tur oyun tamamladıysa ve son testi çözmediyse
+              if (userData.history.length >= 15 &&
+                  !userData.hasCompletedPostTest) {
                 return PostTestSurveyScreen(
                   onCompleted: () async {
-                    // Kullanıcı tamamladığında Firestore'da true olacak 
+                    // Kullanıcı tamamladığında Firestore'da true olacak
                     // ve stream otomatik olarak HomeScreen'e geçişi sağlayacak.
                   },
                 );
@@ -98,4 +99,3 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
     );
   }
 }
-
