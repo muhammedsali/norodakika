@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../widgets/survey_likert_scale.dart';
+import '../../../core/widgets/neuron_background.dart';
 
 class PreTestSurveyScreen extends ConsumerStatefulWidget {
   final Future<void> Function() onCompleted;
@@ -140,8 +141,30 @@ class _PreTestSurveyScreenState extends ConsumerState<PreTestSurveyScreen> {
       ),
       filled: true,
       fillColor: isDarkMode
-          ? const Color(0xFF1E293B).withValues(alpha: 0.7)
-          : Colors.white,
+          ? Colors.black.withValues(alpha: 0.2)
+          : Colors.white.withValues(alpha: 0.5),
+    );
+  }
+
+  BoxDecoration _getNeuDecoration({required bool isDarkMode}) {
+    final bgColor = isDarkMode 
+        ? const Color(0xFF1E293B).withValues(alpha: 0.7) 
+        : Colors.white.withValues(alpha: 0.85);
+    final borderColor = isDarkMode
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.05);
+
+    return BoxDecoration(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(32),
+      border: Border.all(color: borderColor, width: 1.5),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.05),
+          offset: const Offset(0, 8),
+          blurRadius: 24,
+        ),
+      ],
     );
   }
 
@@ -155,6 +178,7 @@ class _PreTestSurveyScreenState extends ConsumerState<PreTestSurveyScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
           'Nörodakika Ön Test Anketi',
@@ -166,195 +190,228 @@ class _PreTestSurveyScreenState extends ConsumerState<PreTestSurveyScreen> {
         centerTitle: true,
         iconTheme: IconThemeData(color: textColor),
       ),
-      body: SafeArea(
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(24.0),
-            children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.2),
-                    width: 1.5,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: NeuronBackground(isDarkMode: isDarkMode),
+          ),
+          SafeArea(
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.info_outline,
-                            color: primaryColor, size: 28),
-                        const SizedBox(width: 12),
+                        Row(
+                          children: [
+                            const Icon(Icons.info_outline,
+                                color: primaryColor, size: 28),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Anketi Doldurun',
+                                style: GoogleFonts.inter(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: primaryColor),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
                         Text(
-                          'Hoş Geldiniz!',
+                          'Oyuna başlamadan önce sizi daha iyi tanımak ve oyunların etkisini ölçmek için bu kısa anketi doldurmanızı rica ediyoruz. Vereceğiniz bilgiler tamamen gizli tutulacak ve sadece bilimsel araştırma amacıyla kullanılacaktır. Tüm soruların cevaplanması zorunludur.',
                           style: GoogleFonts.inter(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
+                              fontSize: 14,
+                              height: 1.5,
+                              color: isDarkMode ? Colors.white70 : Colors.black87),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Oyuna başlamadan önce sizi daha iyi tanımak ve oyunların etkisini ölçmek için bu kısa anketi doldurmanızı rica ediyoruz. Vereceğiniz bilgiler tamamen gizli tutulacak ve sadece bilimsel araştırma amacıyla kullanılacaktır. Tüm soruların cevaplanması zorunludur.',
-                      style: GoogleFonts.inter(
-                          fontSize: 14,
-                          height: 1.5,
-                          color: isDarkMode ? Colors.white70 : Colors.black87),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 40),
-              Text('1. Demografik Bilgiler',
-                  style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor)),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                decoration: _buildInputDecoration(
-                    'Cinsiyet', 'Cinsiyetinizi seçin', isDarkMode),
-                dropdownColor:
-                    isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                initialValue: _gender,
-                items: ['Kadın', 'Erkek'].map((g) {
-                  return DropdownMenuItem(value: g, child: Text(g));
-                }).toList(),
-                onChanged: (val) => setState(() => _gender = val),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                decoration: _buildInputDecoration(
-                    'Sınıf', 'Sınıfınızı seçin', isDarkMode),
-                dropdownColor:
-                    isDarkMode ? const Color(0xFF1E293B) : Colors.white,
-                initialValue: _grade,
-                items: _grades.map((g) {
-                  return DropdownMenuItem(value: g, child: Text(g));
-                }).toList(),
-                onChanged: (val) => setState(() => _grade = val),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _gpaController,
-                style: GoogleFonts.inter(color: textColor),
-                decoration: _buildInputDecoration(
-                    'Not Ortalaması', 'Örn: 3.20', isDarkMode),
-                validator: (val) => val == null || val.isEmpty
-                    ? 'Lütfen not ortalamanızı girin'
-                    : null,
-              ),
-              const SizedBox(height: 40),
-              Text('2. Oyun ve İnternet Kullanım Alışkanlıkları',
-                  style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor)),
-              const SizedBox(height: 8),
-              Text('(Sınav haftası dışındaki ortalama haftalık saat süresi)',
-                  style: GoogleFonts.inter(
-                      color: isDarkMode ? Colors.white54 : Colors.black54,
-                      fontSize: 13)),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _mobileGameController,
-                keyboardType: TextInputType.number,
-                style: GoogleFonts.inter(color: textColor),
-                decoration: _buildInputDecoration('Mobil Oyun Oynama Süresi',
-                    'Saat cinsinden (örn: 5)', isDarkMode),
-                validator: (val) => val == null || val.isEmpty
-                    ? 'Lütfen bir değer girin'
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _casualGameController,
-                keyboardType: TextInputType.number,
-                style: GoogleFonts.inter(color: textColor),
-                decoration: _buildInputDecoration(
-                    'Gündelik (Casual) Oyun Oynama Süresi',
-                    'Saat cinsinden (örn: 3)',
-                    isDarkMode),
-                validator: (val) => val == null || val.isEmpty
-                    ? 'Lütfen bir değer girin'
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _desktopGameController,
-                keyboardType: TextInputType.number,
-                style: GoogleFonts.inter(color: textColor),
-                decoration: _buildInputDecoration('Masaüstü Oyun Oynama Süresi',
-                    'Saat cinsinden (örn: 10)', isDarkMode),
-                validator: (val) => val == null || val.isEmpty
-                    ? 'Lütfen bir değer girin'
-                    : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _internetController,
-                keyboardType: TextInputType.number,
-                style: GoogleFonts.inter(color: textColor),
-                decoration: _buildInputDecoration(
-                    'Haftalık Toplam İnternet Kullanım Süresi',
-                    'Saat cinsinden (örn: 40)',
-                    isDarkMode),
-                validator: (val) => val == null || val.isEmpty
-                    ? 'Lütfen bir değer girin'
-                    : null,
-              ),
-              const SizedBox(height: 40),
-              Text('3. Eğitsel Oyunlara Karşı Tutum',
-                  style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor)),
-              const SizedBox(height: 20),
-              ...List.generate(_likertQuestions.length, (index) {
-                return SurveyLikertScale(
-                  questionIndex: index + 8, // Previous questions were 1 to 7
-                  questionText: _likertQuestions[index],
-                  selectedValue: _likertAnswers[index],
-                  onChanged: (val) =>
-                      setState(() => _likertAnswers[index] = val),
-                );
-              }),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _submitSurvey,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    elevation: 8,
-                    shadowColor: primaryColor.withValues(alpha: 0.4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('1. Demografik Bilgiler',
+                            style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: textColor)),
+                        const SizedBox(height: 20),
+                        DropdownButtonFormField<String>(
+                          decoration: _buildInputDecoration(
+                              'Cinsiyet', 'Cinsiyetinizi seçin', isDarkMode),
+                          dropdownColor:
+                              isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                          initialValue: _gender,
+                          items: ['Kadın', 'Erkek'].map((g) {
+                            return DropdownMenuItem(value: g, child: Text(g));
+                          }).toList(),
+                          onChanged: (val) => setState(() => _gender = val),
+                        ),
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          decoration: _buildInputDecoration(
+                              'Sınıf', 'Sınıfınızı seçin', isDarkMode),
+                          dropdownColor:
+                              isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                          initialValue: _grade,
+                          items: _grades.map((g) {
+                            return DropdownMenuItem(value: g, child: Text(g));
+                          }).toList(),
+                          onChanged: (val) => setState(() => _grade = val),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _gpaController,
+                          style: GoogleFonts.inter(color: textColor),
+                          decoration: _buildInputDecoration(
+                              'Not Ortalaması', 'Örn: 3.20', isDarkMode),
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'Lütfen not ortalamanızı girin'
+                              : null,
+                        ),
+                      ],
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 3))
-                      : Text('Anketi Tamamla ve Oyuna Başla',
-                          style: GoogleFonts.inter(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                ),
+                  
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('2. Oyun ve İnternet',
+                            style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: textColor)),
+                        const SizedBox(height: 8),
+                        Text('(Sınav haftası dışındaki ortalama haftalık saat süresi)',
+                            style: GoogleFonts.inter(
+                                color: isDarkMode ? Colors.white54 : Colors.black54,
+                                fontSize: 13)),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _mobileGameController,
+                          keyboardType: TextInputType.number,
+                          style: GoogleFonts.inter(color: textColor),
+                          decoration: _buildInputDecoration('Mobil Oyun Oynama',
+                              'Saat / Hafta (örn: 5)', isDarkMode),
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'Lütfen bir değer girin'
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _casualGameController,
+                          keyboardType: TextInputType.number,
+                          style: GoogleFonts.inter(color: textColor),
+                          decoration: _buildInputDecoration(
+                              'Gündelik (Casual) Oyun',
+                              'Saat / Hafta (örn: 3)',
+                              isDarkMode),
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'Lütfen bir değer girin'
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _desktopGameController,
+                          keyboardType: TextInputType.number,
+                          style: GoogleFonts.inter(color: textColor),
+                          decoration: _buildInputDecoration('Masaüstü Oyun',
+                              'Saat / Hafta (örn: 10)', isDarkMode),
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'Lütfen bir değer girin'
+                              : null,
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: _internetController,
+                          keyboardType: TextInputType.number,
+                          style: GoogleFonts.inter(color: textColor),
+                          decoration: _buildInputDecoration(
+                              'İnternet Kullanım Süresi',
+                              'Saat / Hafta (örn: 40)',
+                              isDarkMode),
+                          validator: (val) => val == null || val.isEmpty
+                              ? 'Lütfen bir değer girin'
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: _getNeuDecoration(isDarkMode: isDarkMode),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('3. Eğitsel Oyunlara Karşı Tutum',
+                            style: GoogleFonts.inter(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: textColor)),
+                        const SizedBox(height: 20),
+                        ...List.generate(_likertQuestions.length, (index) {
+                          return SurveyLikertScale(
+                            questionIndex: index + 8, // Previous questions were 1 to 7
+                            questionText: _likertQuestions[index],
+                            selectedValue: _likertAnswers[index],
+                            onChanged: (val) =>
+                                setState(() => _likertAnswers[index] = val),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submitSurvey,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        elevation: 8,
+                        shadowColor: primaryColor.withValues(alpha: 0.4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 3))
+                          : Text('Anketi Tamamla ve Oyuna Başla',
+                              style: GoogleFonts.inter(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
-              const SizedBox(height: 40),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
