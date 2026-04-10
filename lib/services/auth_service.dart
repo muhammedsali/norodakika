@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../core/models/user_model.dart';
 import '../core/memory/memory_bank.dart';
+import 'local_storage_service.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -181,6 +182,8 @@ class AuthService {
   // ── Çıkış Yap ─────────────────────────────────────────────
   Future<void> logout() async {
     try {
+      // Çıkış yaparken cihazda kalan yerel oyun verilerini temizle
+      await LocalStorageService.clearGameHistory();
       // Google çıkış işlemini timeout ile sınırla ki uygulama asılı kalmasın
       await _googleSignIn.signOut().timeout(
             const Duration(seconds: 1),
