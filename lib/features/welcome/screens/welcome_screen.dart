@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/memory/memory_bank.dart';
 import '../../settings/providers/theme_provider.dart';
 import '../../auth/screens/login_screen.dart';
+import '../../../core/widgets/neuron_background.dart';
 
 // ─── Oyun Kartı Veri Modeli ───────────────────────────────
 class _GameCardData {
@@ -264,266 +265,228 @@ class WelcomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bool isDarkMode = ref.watch(themeProvider);
 
-    final Color backgroundColor =
-        isDarkMode ? const Color(0xFF101622) : const Color(0xFFf5f6f8);
     final Color textColor =
-        isDarkMode ? const Color(0xFFF1F5F9) : const Color(0xFF1E293B);
+        isDarkMode ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A);
     final Color secondaryTextColor =
         isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness.dark,
-      systemNavigationBarColor: backgroundColor,
-      systemNavigationBarIconBrightness:
-          isDarkMode ? Brightness.light : Brightness.dark,
     ));
 
     const games = MemoryBank.games;
     final cards = games.map((g) => _cardDataForGame(g)).toList();
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            // ── Kaydırılabilir içerik ──
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 180),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Header
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: _primaryColor,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.psychology,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'NöroDakika',
-                              style: GoogleFonts.inter(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.5,
-                                color: textColor,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: isDarkMode
-                                ? Colors.white.withValues(alpha: 0.06)
-                                : Colors.black.withValues(alpha: 0.05),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.info_outline_rounded,
-                            color: secondaryTextColor,
-                            size: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Başlık
-                  Container(
-                    margin: const EdgeInsets.only(top: 32, bottom: 40),
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            text: 'Zihnini geliştiren \n',
-                            style: GoogleFonts.inter(
-                              color: textColor,
-                              fontSize: 30,
-                              fontWeight: FontWeight.w800,
-                              height: 1.25,
-                              letterSpacing: -0.75,
-                            ),
+      backgroundColor: isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF0F2F5),
+      body: Stack(
+        children: [
+          // ── YENİ: Hareketli Sinapsis Arka Planı ──
+          Positioned.fill(
+            child: NeuronBackground(isDarkMode: isDarkMode),
+          ),
+          
+          SafeArea(
+            child: Stack(
+              children: [
+                // ── Kaydırılabilir içerik ──
+                SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 160),
+                  child: Column(
+                    children: [
+                      // Header (Logo & Info)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        child: _GlassContainer(
+                          isDarkMode: isDarkMode,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              TextSpan(
-                                text: 'mini oyunlar',
-                                style: GoogleFonts.inter(
-                                  color: _primaryColor,
-                                ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: _primaryColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: _primaryColor.withValues(alpha: 0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(Icons.psychology, color: Colors.white, size: 24),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'NöroDakika',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: textColor,
+                                      letterSpacing: -0.5,
+                                    ),
+                                  ),
+                                ],
                               ),
+                              Icon(Icons.info_outline_rounded, color: secondaryTextColor, size: 24),
                             ],
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: 300,
-                          child: Text(
-                            'Günde sadece birkaç dakika ayırarak odaklanma ve hafızanı güçlendir.',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(
-                              color: secondaryTextColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        // Küçük istatistik satırı
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                      ),
+
+                      // Büyük Başlık
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
+                        child: Column(
                           children: [
-                            _StatBadge(
-                              label: '${games.length} Oyun',
-                              icon: Icons.games_rounded,
-                              textColor: secondaryTextColor,
-                              isDark: isDarkMode,
+                            Text.rich(
+                              TextSpan(
+                                text: 'Zihnini geliştiren \n',
+                                style: GoogleFonts.inter(
+                                  color: textColor,
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.1,
+                                  letterSpacing: -1.0,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: 'mini oyunlar',
+                                    style: GoogleFonts.inter(color: _primaryColor),
+                                  ),
+                                ],
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            const SizedBox(width: 10),
-                            _StatBadge(
-                              label: '7 Kategori',
-                              icon: Icons.category_rounded,
-                              textColor: secondaryTextColor,
-                              isDark: isDarkMode,
+                            const SizedBox(height: 16),
+                            Text(
+                              'Günde sadece birkaç dakika ayırarak odaklanma ve hafızanı güçlendir.',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                color: secondaryTextColor,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                                height: 1.5,
+                              ),
                             ),
-                            const SizedBox(width: 10),
-                            _StatBadge(
-                              label: '~3 Dakika',
-                              icon: Icons.timer_rounded,
-                              textColor: secondaryTextColor,
-                              isDark: isDarkMode,
+                            const SizedBox(height: 24),
+                            // İstatistik Rozetleri
+                            Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _StatBadge(label: '${games.length} Oyun', icon: Icons.games_rounded, isDark: isDarkMode),
+                                _StatBadge(label: '7 Kategori', icon: Icons.category_rounded, isDark: isDarkMode),
+                                _StatBadge(label: '~3 Dakika', icon: Icons.timer_rounded, isDark: isDarkMode),
+                              ],
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
 
-                  // Oyun Kartları Grid
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: 16,
-                            childAspectRatio: 0.82,
-                          ),
-                          itemCount: cards.length,
-                          itemBuilder: (context, index) {
-                            return _GameCard(
+                      // Oyun Kartları Grid (Showcase)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 500),
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16,
+                              mainAxisSpacing: 16,
+                              childAspectRatio: 0.82,
+                            ),
+                            itemCount: cards.length > 6 ? 6 : cards.length,
+                            itemBuilder: (context, index) => _GameCard(
                               card: cards[index],
                               isDarkMode: isDarkMode,
                               textColor: textColor,
                               secondaryTextColor: secondaryTextColor,
-                              backgroundColor: backgroundColor,
-                            );
-                          },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Alt Footer & CTA
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(24, 40, 24, 30),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          (isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF0F2F5)).withValues(alpha: 0.0),
+                          (isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF0F2F5)).withValues(alpha: 0.9),
+                          isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF0F2F5),
+                        ],
+                        stops: const [0.0, 0.4, 1.0],
+                      ),
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _primaryColor.withValues(alpha: 0.4),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton(
+                                onPressed: () => _navigateToAuth(context),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _primaryColor,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  elevation: 0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Giriş Yap / Üye Ol',
+                                      style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    const Icon(Icons.arrow_forward_rounded),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-
-            // ── Sabit Alt Footer ──
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 36),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      backgroundColor.withValues(alpha: 0.0),
-                      backgroundColor.withValues(alpha: 0.95),
-                      backgroundColor,
-                    ],
-                    stops: const [0.0, 0.35, 1.0],
-                  ),
                 ),
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 480),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Ana CTA butonu
-                        SizedBox(
-                          width: double.infinity,
-                          height: 58,
-                          child: ElevatedButton(
-                            onPressed: () => _navigateToAuth(context),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _primaryColor,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 8,
-                              shadowColor:
-                                  _primaryColor.withValues(alpha: 0.35),
-                            ),
-                            child: Text(
-                              'Giriş Yap / Üye Ol',
-                              style: GoogleFonts.inter(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        // İkincil buton
-                        TextButton(
-                          onPressed: () => _navigateToAuth(context),
-                          child: Text(
-                            'Daha Fazla Bilgi & Oyunları Keşfet',
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -533,93 +496,89 @@ class WelcomeScreen extends ConsumerWidget {
       context,
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => const LoginScreen(),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
+        transitionsBuilder: (_, anim, __, child) => FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 400),
       ),
     );
   }
 }
 
-// ─── Oyun Kartı Widget ─────────────────────────────────────
+// ─── Yardımcı Widget'lar ───────────────────────────────────
+
+class _GlassContainer extends StatelessWidget {
+  final Widget child;
+  final bool isDarkMode;
+  final EdgeInsetsGeometry? padding;
+  final double borderRadius;
+
+  const _GlassContainer({
+    required this.child,
+    required this.isDarkMode,
+    this.padding,
+    this.borderRadius = 20,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: isDarkMode 
+            ? Colors.white.withValues(alpha: 0.08) 
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(
+          color: isDarkMode 
+              ? Colors.white.withValues(alpha: 0.12) 
+              : Colors.black.withValues(alpha: 0.05),
+          width: 1.5,
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
 class _GameCard extends StatelessWidget {
   final _GameCardData card;
   final bool isDarkMode;
   final Color textColor;
   final Color secondaryTextColor;
-  final Color backgroundColor;
 
   const _GameCard({
     required this.card,
     required this.isDarkMode,
     required this.textColor,
     required this.secondaryTextColor,
-    required this.backgroundColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Neumorphic gölgeler
-    final List<BoxShadow> shadows = isDarkMode
-        ? [
-            const BoxShadow(
-              color: Color(0xFF080B11),
-              blurRadius: 16,
-              offset: Offset(8, 8),
-            ),
-            const BoxShadow(
-              color: Color(0xFF182133),
-              blurRadius: 16,
-              offset: Offset(-8, -8),
-            ),
-          ]
-        : [
-            const BoxShadow(
-              color: Color(0xFFE2E3E5),
-              blurRadius: 16,
-              offset: Offset(8, 8),
-            ),
-            const BoxShadow(
-              color: Color(0xFFFFFFFF),
-              blurRadius: 16,
-              offset: Offset(-8, -8),
-            ),
-          ];
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: shadows,
-      ),
+    return _GlassContainer(
+      isDarkMode: isDarkMode,
+      padding: const EdgeInsets.all(16),
+      borderRadius: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // İkon kutusu
           Expanded(
             child: Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: isDarkMode
-                    ? card.backgroundColorDark
-                    : card.backgroundColorLight,
-                borderRadius: BorderRadius.circular(10),
+                color: (isDarkMode ? card.backgroundColorDark : card.backgroundColorLight).withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Stack(
                 children: [
-                  // Gradient overlay
                   Positioned.fill(
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(16),
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            isDarkMode
-                                ? card.gradientColorDark
-                                : card.gradientColorLight,
+                            (isDarkMode ? card.gradientColorDark : card.gradientColorLight).withValues(alpha: 0.3),
                             Colors.transparent,
                           ],
                         ),
@@ -629,37 +588,25 @@ class _GameCard extends StatelessWidget {
                   Center(
                     child: Icon(
                       card.icon,
-                      size: 42,
-                      color:
-                          isDarkMode ? card.iconColorDark : card.iconColorLight,
+                      size: 48,
+                      color: isDarkMode ? card.iconColorDark : card.iconColorLight,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          // Başlık
+          const SizedBox(height: 12),
           Text(
             card.title,
-            style: GoogleFonts.inter(
-              color: textColor,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-            ),
+            style: GoogleFonts.inter(color: textColor, fontSize: 15, fontWeight: FontWeight.w800, height: 1.1),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 2),
-          // Alt başlık
+          const SizedBox(height: 4),
           Text(
             card.subtitle,
-            style: GoogleFonts.inter(
-              color: secondaryTextColor,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
+            style: GoogleFonts.inter(color: secondaryTextColor, fontSize: 12, fontWeight: FontWeight.w600),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -669,41 +616,32 @@ class _GameCard extends StatelessWidget {
   }
 }
 
-// ─── İstatistik Rozeti ────────────────────────────────────
 class _StatBadge extends StatelessWidget {
   final String label;
   final IconData icon;
-  final Color textColor;
   final bool isDark;
 
-  const _StatBadge({
-    required this.label,
-    required this.icon,
-    required this.textColor,
-    required this.isDark,
-  });
+  const _StatBadge({required this.label, required this.icon, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withValues(alpha: 0.06)
-            : Colors.black.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(999),
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: const Color(0xFF0d59f2)),
-          const SizedBox(width: 5),
+          Icon(icon, size: 14, color: const Color(0xFF0d59f2)),
+          const SizedBox(width: 6),
           Text(
             label,
             style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: textColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: isDark ? Colors.white70 : const Color(0xFF1E293B),
             ),
           ),
         ],
