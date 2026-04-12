@@ -46,7 +46,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
-                cardColor: cardColor,
+                isDarkMode: isDarkMode,
                 child: _buildToggleTile(
                   icon: Icons.dark_mode_rounded,
                   iconColor: const Color(0xFF8B5CF6),
@@ -67,7 +67,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
-                cardColor: cardColor,
+                isDarkMode: isDarkMode,
                 child: _buildLanguageTile(
                   context,
                   language: language,
@@ -84,7 +84,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
-                cardColor: cardColor,
+                isDarkMode: isDarkMode,
                 child: Column(
                   children: [
                     _buildToggleTile(
@@ -141,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
-                cardColor: cardColor,
+                isDarkMode: isDarkMode,
                 child: Column(
                   children: [
                     _buildNavigationTile(
@@ -172,7 +172,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
-                cardColor: cardColor,
+                isDarkMode: isDarkMode,
                 child: Column(
                   children: [
                     _buildActionTile(
@@ -206,7 +206,7 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
-                cardColor: cardColor,
+                isDarkMode: isDarkMode,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -274,19 +274,20 @@ class SettingsScreen extends ConsumerWidget {
   Widget _buildSettingCard(
     BuildContext context, {
     required Widget child,
-    required Color cardColor,
+    required bool isDarkMode,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        color: isDarkMode 
+            ? Colors.white.withValues(alpha: 0.08) 
+            : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDarkMode 
+              ? Colors.white.withValues(alpha: 0.12) 
+              : Colors.black.withValues(alpha: 0.05),
+          width: 1.5,
+        ),
       ),
       child: child,
     );
