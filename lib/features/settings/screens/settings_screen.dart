@@ -23,7 +23,6 @@ class SettingsScreen extends ConsumerWidget {
     final soundSettings = ref.watch(soundSettingsProvider);
     final s = AppStrings(language);
 
-    final cardColor = isDarkMode ? const Color(0xFF111827) : Colors.white;
     final titleColor =
         isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final subtitleColor =

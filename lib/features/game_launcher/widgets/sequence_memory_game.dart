@@ -6,52 +6,112 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../services/audio_service.dart';
 
-/// Simon benzeri sıra tekrarlama oyunu.
-/// Gösterilen hücre sırasını aynı sırayla dokun.
+// ─────────────────────────────────────────────
+// Data class — tüm oyun durumu tek yerde
+// ─────────────────────────────────────────────
+class _GameState {
+  final int hearts;
+  final int score;
+  final int round;
+  final int completed;
+  final int attempts;
+  final int streak;
+  final int bestStreak;
+
+  const _GameState({
+    this.hearts = _SequenceMemoryGameState.maxHearts,
+    this.score = 0,
+    this.round = 1,
+    this.completed = 0,
+    this.attempts = 0,
+    this.streak = 0,
+    this.bestStreak = 0,
+  });
+
+  _GameState copyWith({
+    int? hearts,
+    int? score,
+    int? round,
+    int? completed,
+    int? attempts,
+    int? streak,
+    int? bestStreak,
+  }) =>
+      _GameState(
+        hearts: hearts ?? this.hearts,
+        score: score ?? this.score,
+        round: round ?? this.round,
+        completed: completed ?? this.completed,
+        attempts: attempts ?? this.attempts,
+        streak: streak ?? this.streak,
+        bestStreak: bestStreak ?? this.bestStreak,
+      );
+
+  double get successRate =>
+      attempts == 0 ? 0.0 : completed / attempts;
+
+  int get wrongAttempts => attempts - completed;
+}
+
+// ─────────────────────────────────────────────
+// Widget
+// ─────────────────────────────────────────────
 class SequenceMemoryGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
   final bool isPaused;
+  final AudioService audioService;
 
-  const SequenceMemoryGame({
+  SequenceMemoryGame({
     super.key,
     required this.onComplete,
     required this.isPaused,
-  });
+    AudioService? audioService,
+  }) : audioService = audioService ?? AudioService();
 
   @override
-  State<SequenceMemoryGame> createState() => _SequenceMemoryGameState();
+  State<SequenceMemoryGame> createState() =>
+      _SequenceMemoryGameState();
 }
 
-class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
+class _SequenceMemoryGameState
+    extends State<SequenceMemoryGame> {
+  // ── Sabitler ──────────────────────────────
   static const int totalSeconds = 60;
   static const int baseLength = 3;
   static const int maxHearts = 3;
 
-  final Random _rng = Random();
+  static const int _tapPoints = 35;
+  static const int _roundCompleteBase = 180;
+  static const int _roundCompleteMultiplier = 12;
+  static const int _wrongPenalty = 120;
+
+  static const Duration _preDelay =
+      Duration(milliseconds: 220);
+  static const Duration _showDelay =
+      Duration(milliseconds: 520);
+
+  // ── State ──────────────────────────────────
+  final _rng = Random();
+  _GameState _gs = const _GameState();
 
   late List<int> _sequence;
   final List<int> _input = [];
 
-  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
-  final ValueNotifier<int> _activeIndexNotifier = ValueNotifier<int>(-1);
-  int _hearts = maxHearts;
-  int _score = 0;
-  int _round = 1;
-  int _completed = 0;
-  int _attempts = 0;
-  int _streak = 0;
-  int _bestStreak = 0;
+  final _timeNotifier =
+      ValueNotifier<int>(totalSeconds);
+  final _activeNotifier = ValueNotifier<int>(-1);
 
   bool _isPlaying = false;
   bool _isFinished = false;
+  bool _sequenceCancelled = false;
 
   Timer? _gameTimer;
-  final AudioService _audioService = AudioService();
 
+  // ── Lifecycle ──────────────────────────────
   @override
   void initState() {
     super.initState();
-    _resetState();
+    _sequence = [];
     if (!widget.isPaused) {
       _startTimer();
       _startRound();
@@ -59,151 +119,166 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   @override
-  void didUpdateWidget(covariant SequenceMemoryGame oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isPaused != widget.isPaused) {
-      if (widget.isPaused) {
-        _gameTimer?.cancel();
-      } else if (!_isFinished && !_isPlaying) {
-        _startTimer();
-        if (_sequence.isEmpty) {
-          _startRound();
-        }
-      }
+  void didUpdateWidget(covariant SequenceMemoryGame old) {
+    super.didUpdateWidget(old);
+    if (old.isPaused == widget.isPaused) return;
+
+    if (widget.isPaused) {
+      _gameTimer?.cancel();
+    } else if (!_isFinished) {
+      _startTimer();
+      if (_sequence.isEmpty) _startRound();
     }
-  }
-
-  void _resetState() {
-    _timeRemainingNotifier.value = totalSeconds;
-    _hearts = maxHearts;
-    _score = 0;
-    _round = 1;
-    _completed = 0;
-    _attempts = 0;
-    _streak = 0;
-    _bestStreak = 0;
-    _isFinished = false;
-    _isPlaying = false;
-    _activeIndexNotifier.value = -1;
-    _input.clear();
-    _sequence = [];
-  }
-
-  void _startTimer() {
-    _gameTimer?.cancel();
-    _gameTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted || _isFinished) return;
-      _timeRemainingNotifier.value--;
-      if (_timeRemainingNotifier.value <= 0) {
-        _finish();
-      }
-    });
-  }
-
-  void _startRound() {
-    if (_isFinished) return;
-    _attempts++;
-    _input.clear();
-    final length = baseLength + _round - 1;
-    _sequence = List.generate(length, (_) => _rng.nextInt(9));
-    _playSequence();
-  }
-
-  Future<void> _playSequence() async {
-    _isPlaying = true;
-    setState(() {});
-    for (int i = 0; i < _sequence.length; i++) {
-      if (_isFinished) return;
-      await Future.delayed(const Duration(milliseconds: 220));
-      if (!mounted || _isFinished) return;
-      _activeIndexNotifier.value = _sequence[i];
-      await Future.delayed(const Duration(milliseconds: 520));
-      if (!mounted || _isFinished) return;
-      _activeIndexNotifier.value = -1;
-    }
-    if (!mounted || _isFinished) return;
-    setState(() {
-      _isPlaying = false;
-    });
-  }
-
-  void _handleTap(int index) {
-    if (_isFinished || _isPlaying || _timeRemainingNotifier.value <= 0 || widget.isPaused) {
-      return;
-    }
-    HapticFeedback.selectionClick();
-    _audioService.playTap(); // 👆 Dokunma sesi
-
-    final expected = _sequence[_input.length];
-    final isCorrect = expected == index;
-
-    setState(() {
-      if (isCorrect) {
-        _audioService.playCorrect(); // ✅ Doğru cevap sesi
-        HapticFeedback.lightImpact();
-        _input.add(index);
-        _score += 35;
-        if (_input.length == _sequence.length) {
-          _completed++;
-          _streak++;
-          _bestStreak = max(_bestStreak, _streak);
-          _score += 180 + (_round * 12);
-          _audioService.playLevelUp(); // 🎉 Seviye tamamlandı
-          _round++;
-          _startRound();
-        }
-      } else {
-        _audioService.playWrong(); // ❌ Yanlış cevap sesi
-        HapticFeedback.mediumImpact();
-        _streak = 0;
-        _hearts = max(0, _hearts - 1);
-        _score = max(0, _score - 120);
-        if (_hearts == 0) {
-          _finish();
-        } else {
-          _startRound();
-        }
-      }
-    });
-  }
-
-  void _finish() {
-    if (_isFinished) return;
-    _isFinished = true;
-    _gameTimer?.cancel();
-
-    final successRate = _attempts == 0 ? 0.0 : _completed / _attempts;
-    final duration = totalSeconds - max(0, _timeRemainingNotifier.value);
-    final wrongAttempts = _attempts - _completed;
-
-    _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
-
-    widget.onComplete({
-      'score': _score.toDouble(),
-      'successRate': successRate,
-      'duration': duration,
-      'totalAttempts': _attempts,
-      'correctAttempts': _completed,
-      'wrongAttempts': wrongAttempts,
-    });
-
-    setState(() {});
   }
 
   @override
   void dispose() {
     _gameTimer?.cancel();
-    _timeRemainingNotifier.dispose();
-    _activeIndexNotifier.dispose();
+    _timeNotifier.dispose();
+    _activeNotifier.dispose();
     super.dispose();
   }
 
+  // ── Timer ──────────────────────────────────
+  void _startTimer() {
+    _gameTimer?.cancel();
+    _gameTimer =
+        Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted || _isFinished) return;
+      _timeNotifier.value--;
+      if (_timeNotifier.value <= 0) _finish();
+    });
+  }
+
+  // ── Round logic ────────────────────────────
+  void _startRound() {
+    if (_isFinished) return;
+    _gs = _gs.copyWith(attempts: _gs.attempts + 1);
+    _input.clear();
+    final length = baseLength + _gs.round - 1;
+    _sequence =
+        List.generate(length, (_) => _rng.nextInt(9));
+    _playSequence();
+  }
+
+  Future<void> _playSequence() async {
+    _sequenceCancelled = false;
+    setState(() => _isPlaying = true);
+
+    for (final cell in _sequence) {
+      if (_sequenceCancelled) return;
+      await Future.delayed(_preDelay);
+      if (_sequenceCancelled) return;
+      _activeNotifier.value = cell;
+      await Future.delayed(_showDelay);
+      if (_sequenceCancelled) return;
+      _activeNotifier.value = -1;
+    }
+
+    if (!_sequenceCancelled && mounted) {
+      setState(() => _isPlaying = false);
+    }
+  }
+
+  // ── Input ──────────────────────────────────
+  bool get _inputBlocked =>
+      _isFinished ||
+      _isPlaying ||
+      _timeNotifier.value <= 0 ||
+      widget.isPaused;
+
+  void _handleTap(int index) {
+    if (_inputBlocked) return;
+    HapticFeedback.selectionClick();
+    widget.audioService.playTap();
+
+    final expected = _sequence[_input.length];
+    if (index == expected) {
+      _onCorrectTap(index);
+    } else {
+      _onWrongTap();
+    }
+  }
+
+  void _onCorrectTap(int index) {
+    widget.audioService.playCorrect();
+    HapticFeedback.lightImpact();
+    _input.add(index);
+
+    final newScore = _gs.score + _tapPoints;
+
+    if (_input.length < _sequence.length) {
+      setState(() => _gs = _gs.copyWith(score: newScore));
+      return;
+    }
+
+    // Tur tamamlandı
+    final newStreak = _gs.streak + 1;
+    widget.audioService.playLevelUp();
+    setState(() {
+      _gs = _gs.copyWith(
+        score: newScore +
+            _roundCompleteBase +
+            (_gs.round * _roundCompleteMultiplier),
+        round: _gs.round + 1,
+        completed: _gs.completed + 1,
+        streak: newStreak,
+        bestStreak: max(_gs.bestStreak, newStreak),
+      );
+    });
+    _startRound();
+  }
+
+  void _onWrongTap() {
+    widget.audioService.playWrong();
+    HapticFeedback.mediumImpact();
+    final newHearts = max(0, _gs.hearts - 1);
+    setState(() {
+      _gs = _gs.copyWith(
+        hearts: newHearts,
+        score: max(0, _gs.score - _wrongPenalty),
+        streak: 0,
+      );
+    });
+    if (newHearts == 0) {
+      _finish();
+    } else {
+      _startRound();
+    }
+  }
+
+  // ── Finish ─────────────────────────────────
+  void _finish() {
+    if (_isFinished) return;
+    _isFinished = true;
+    _sequenceCancelled = true;
+    _gameTimer?.cancel();
+    widget.audioService.playGameOver();
+
+    final duration =
+        totalSeconds - max(0, _timeNotifier.value);
+
+    widget.onComplete({
+      'score': _gs.score.toDouble(),
+      'successRate': _gs.successRate,
+      'duration': duration,
+      'totalAttempts': _gs.attempts,
+      'correctAttempts': _gs.completed,
+      'wrongAttempts': _gs.wrongAttempts,
+    });
+    setState(() {});
+  }
+
+  // ── Build ──────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0B1220) : const Color(0xFFF6F8FB);
-    final panel = isDark ? const Color(0xFF111827) : Colors.white;
+    final bg = isDark
+        ? const Color(0xFF0B1220)
+        : const Color(0xFFF6F8FB);
+    final panel =
+        isDark ? const Color(0xFF111827) : Colors.white;
 
     return Scaffold(
       backgroundColor: bg,
@@ -212,27 +287,72 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              _buildHeader(isDark, panel),
+              _Header(
+                isDark: isDark,
+                panel: panel,
+                timeNotifier: _timeNotifier,
+                score: _gs.score,
+              ),
               const SizedBox(height: 12),
-              _buildTimerBar(isDark),
+              _TimerBar(
+                isDark: isDark,
+                timeNotifier: _timeNotifier,
+                totalSeconds: totalSeconds,
+              ),
               const SizedBox(height: 12),
-              Expanded(child: _buildGrid(isDark, panel)),
+              Expanded(
+                child: _Grid(
+                  isDark: isDark,
+                  panel: panel,
+                  activeNotifier: _activeNotifier,
+                  onTap: _handleTap,
+                ),
+              ),
               const SizedBox(height: 12),
-              _buildStats(panel, isDark),
+              _StatsBar(
+                panel: panel,
+                isDark: isDark,
+                hearts: _gs.hearts,
+                streak: _gs.streak,
+                completed: _gs.completed,
+                bestStreak: _gs.bestStreak,
+              ),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildHeader(bool isDark, Color panel) {
-    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtitleColor =
-        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+// ─────────────────────────────────────────────
+// Alt widget'lar — her biri tek sorumlu
+// ─────────────────────────────────────────────
+
+class _Header extends StatelessWidget {
+  final bool isDark;
+  final Color panel;
+  final ValueNotifier<int> timeNotifier;
+  final int score;
+
+  const _Header({
+    required this.isDark,
+    required this.panel,
+    required this.timeNotifier,
+    required this.score,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleColor =
+        isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor = isDark
+        ? const Color(0xFF9CA3AF)
+        : const Color(0xFF6B7280);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(
+          horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
@@ -245,10 +365,12 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
         ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
         children: [
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 'Sequence Echo',
@@ -272,21 +394,19 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               ValueListenableBuilder<int>(
-                valueListenable: _timeRemainingNotifier,
-                builder: (context, time, child) {
-                  return Text(
-                    '$time s',
-                    style: GoogleFonts.spaceGrotesk(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: titleColor,
-                    ),
-                  );
-                },
+                valueListenable: timeNotifier,
+                builder: (_, t, __) => Text(
+                  '$t s',
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: titleColor,
+                  ),
+                ),
               ),
               const SizedBox(height: 4),
               Text(
-                'Skor: $_score',
+                'Skor: $score',
                 style: GoogleFonts.spaceGrotesk(
                   fontSize: 13,
                   color: subtitleColor,
@@ -298,32 +418,71 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
       ),
     );
   }
+}
 
-  Widget _buildTimerBar(bool isDark) {
+// ─────────────────────────────────────────────
+class _TimerBar extends StatelessWidget {
+  final bool isDark;
+  final ValueNotifier<int> timeNotifier;
+  final int totalSeconds;
+
+  const _TimerBar({
+    required this.isDark,
+    required this.timeNotifier,
+    required this.totalSeconds,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return ValueListenableBuilder<int>(
-      valueListenable: _timeRemainingNotifier,
-      builder: (context, timeRemaining, child) {
-        final progress = timeRemaining / totalSeconds;
+      valueListenable: timeNotifier,
+      builder: (_, t, __) {
+        final progress = t / totalSeconds;
         return ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: LinearProgressIndicator(
-            value: progress.clamp(0, 1),
+            value: progress.clamp(0.0, 1.0),
             minHeight: 12,
-            backgroundColor:
-                isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
+            backgroundColor: isDark
+                ? const Color(0xFF1F2937)
+                : const Color(0xFFE5E7EB),
             valueColor: AlwaysStoppedAnimation<Color>(
               Color.lerp(
-                  const Color(0xFF22C55E), const Color(0xFFEF4444), 1 - progress)!,
+                const Color(0xFF22C55E),
+                const Color(0xFFEF4444),
+                1 - progress,
+              )!,
             ),
           ),
         );
       },
     );
   }
+}
 
-  Widget _buildGrid(bool isDark, Color panel) {
-    final highlight =
-        isDark ? const Color(0xFF4F46E5) : const Color(0xFF2563EB);
+// ─────────────────────────────────────────────
+class _Grid extends StatelessWidget {
+  final bool isDark;
+  final Color panel;
+  final ValueNotifier<int> activeNotifier;
+  final void Function(int) onTap;
+
+  const _Grid({
+    required this.isDark,
+    required this.panel,
+    required this.activeNotifier,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final highlight = isDark
+        ? const Color(0xFF4F46E5)
+        : const Color(0xFF2563EB);
+    final cellBg = isDark
+        ? const Color(0xFF0F172A)
+        : const Color(0xFFF4F5F7);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -338,43 +497,51 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
         ],
       ),
       child: LayoutBuilder(
-        builder: (context, constraints) {
-          final size = min(constraints.maxWidth, constraints.maxHeight);
+        builder: (_, constraints) {
+          final size = min(
+              constraints.maxWidth,
+              constraints.maxHeight);
           final cellSize = (size - 32) / 3;
+
           return Center(
             child: SizedBox(
               width: cellSize * 3 + 24,
               height: cellSize * 3 + 24,
               child: GridView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                physics:
+                    const NeverScrollableScrollPhysics(),
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
                 ),
                 itemCount: 9,
-                itemBuilder: (context, index) {
+                itemBuilder: (_, index) {
                   return ValueListenableBuilder<int>(
-                    valueListenable: _activeIndexNotifier,
-                    builder: (context, activeIndex, child) {
-                      final isActive = index == activeIndex;
+                    valueListenable: activeNotifier,
+                    builder: (_, active, __) {
+                      final isActive = index == active;
                       return GestureDetector(
-                        onTap: () => _handleTap(index),
+                        onTap: () => onTap(index),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 160),
+                          duration: const Duration(
+                              milliseconds: 160),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius:
+                                BorderRadius.circular(14),
                             color: isActive
                                 ? highlight
-                                : isDark
-                                    ? const Color(0xFF0F172A)
-                                    : const Color(0xFFF4F5F7),
+                                : cellBg,
                             boxShadow: isActive
                                 ? [
                                     BoxShadow(
-                                      color: highlight.withValues(alpha: 0.45),
+                                      color: highlight
+                                          .withValues(
+                                              alpha: 0.45),
                                       blurRadius: 18,
-                                      offset: const Offset(0, 8),
+                                      offset:
+                                          const Offset(0, 8),
                                     ),
                                   ]
                                 : null,
@@ -391,43 +558,67 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
       ),
     );
   }
+}
 
-  Widget _buildStats(Color panel, bool isDark) {
-    final subtitleColor =
-        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
+// ─────────────────────────────────────────────
+class _StatsBar extends StatelessWidget {
+  final Color panel;
+  final bool isDark;
+  final int hearts;
+  final int streak;
+  final int completed;
+  final int bestStreak;
+
+  const _StatsBar({
+    required this.panel,
+    required this.isDark,
+    required this.hearts,
+    required this.streak,
+    required this.completed,
+    required this.bestStreak,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+          horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
+        border: Border.all(
+            color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
         children: [
           _StatChip(
             icon: Icons.favorite,
             label: 'Can',
-            value: '$_hearts/$maxHearts',
+            value:
+                '$hearts/${_SequenceMemoryGameState.maxHearts}',
             color: const Color(0xFFEF4444),
           ),
           _StatChip(
             icon: Icons.local_fire_department,
             label: 'Seri',
-            value: '$_streak',
+            value: '$streak',
             color: const Color(0xFFFFA000),
           ),
           _StatChip(
             icon: Icons.check_circle,
             label: 'Tamamlanan',
-            value: '$_completed',
+            value: '$completed',
             color: const Color(0xFF22C55E),
           ),
           _StatChip(
             icon: Icons.leaderboard,
             label: 'En iyi seri',
-            value: '$_bestStreak',
-            color: subtitleColor,
+            value: '$bestStreak',
+            color: isDark
+                ? const Color(0xFF9CA3AF)
+                : const Color(0xFF6B7280),
           ),
         ],
       ),
@@ -435,6 +626,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 }
 
+// ─────────────────────────────────────────────
 class _StatChip extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -460,7 +652,9 @@ class _StatChip extends StatelessWidget {
             Text(
               label,
               style: GoogleFonts.spaceGrotesk(
-                  fontSize: 11, color: color.withValues(alpha: 0.8)),
+                fontSize: 11,
+                color: color.withValues(alpha: 0.8),
+              ),
             ),
             Text(
               value,
