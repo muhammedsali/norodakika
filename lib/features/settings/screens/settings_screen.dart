@@ -78,40 +78,14 @@ class SettingsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              // Sound & Notifications Section
-              _buildSectionTitle(s.soundTitle, titleColor),
+              // Notifications Section
+              _buildSectionTitle(s.notificationTitle, titleColor),
               const SizedBox(height: 12),
               _buildSettingCard(
                 context,
                 isDarkMode: isDarkMode,
                 child: Column(
                   children: [
-                    _buildToggleTile(
-                      icon: Icons.music_note_rounded,
-                      iconColor: const Color(0xFF6366F1),
-                      title: 'Müzik',
-                      subtitle: 'Oyun içi arka plan müziği',
-                      value: soundSettings.isMusicEnabled,
-                      onChanged: (value) {
-                        ref.read(soundSettingsProvider.notifier).toggleMusic();
-                      },
-                      titleColor: titleColor,
-                      subtitleColor: subtitleColor,
-                    ),
-                    Divider(height: 1, color: dividerColor, indent: 56),
-                    _buildToggleTile(
-                      icon: Icons.volume_up_rounded,
-                      iconColor: const Color(0xFF10B981),
-                      title: s.soundTitle,
-                      subtitle: s.soundSubtitle,
-                      value: soundSettings.isSoundEnabled,
-                      onChanged: (value) {
-                        ref.read(soundSettingsProvider.notifier).toggleSound();
-                      },
-                      titleColor: titleColor,
-                      subtitleColor: subtitleColor,
-                    ),
-                    Divider(height: 1, color: dividerColor, indent: 56),
                     _buildToggleTile(
                       icon: Icons.notifications_rounded,
                       iconColor: const Color(0xFFF59E0B),
