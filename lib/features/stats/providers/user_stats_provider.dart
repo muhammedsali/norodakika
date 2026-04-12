@@ -11,14 +11,14 @@ final firestoreServiceProvider = Provider<FirestoreService>((ref) {
 final userStatsProvider = StreamProvider<Map<String, double>>((ref) async* {
   final user = ref.watch(currentUserProvider).value;
   
-  // Sahte veri - Demo amaçlı
+  // Başlangıçta 0 verisi gönder
   yield {
-    'Refleks': 75.0,
-    'Dikkat': 62.0,
-    'Hafıza': 88.0,
-    'Sayısal': 54.0,
-    'Mantık': 70.0,
-    'Dil': 45.0,
+    'Refleks': 0.0,
+    'Dikkat': 0.0,
+    'Hafıza': 0.0,
+    'Sayısal': 0.0,
+    'Mantık': 0.0,
+    'Dil': 0.0,
   };
   
   if (user == null) {
@@ -57,14 +57,14 @@ final userStatsProvider = StreamProvider<Map<String, double>>((ref) async* {
       debugPrint('Local stats okuma hatası: $e');
     }
 
-    // Gerçek veri yoksa sahte veriyi göster
+    // Gerçek veri yoksa 0 göster
     return {
-      'Refleks': 75.0,
-      'Dikkat': 62.0,
-      'Hafıza': 88.0,
-      'Sayısal': 54.0,
-      'Mantık': 70.0,
-      'Dil': 45.0,
+      'Refleks': 0.0,
+      'Dikkat': 0.0,
+      'Hafıza': 0.0,
+      'Sayısal': 0.0,
+      'Mantık': 0.0,
+      'Dil': 0.0,
     };
   }).asyncMap((future) => future);
 });
