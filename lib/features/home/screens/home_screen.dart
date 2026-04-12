@@ -197,8 +197,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       topText = "MERHABA,";
       bottomText = userName;
     } else if (_selectedTab == 1) {
-      topText = s.appName.toUpperCase(); // Veya "NORODAKIKA"
-      bottomText = "${s.dailyGoal}: 85%";
+      topText = "KEŞFET";
+      bottomText = "Tüm Oyunlar";
     } else if (_selectedTab == 2) {
       topText = s.statsTitle.toUpperCase();
       bottomText = s.statsSubtitle;
@@ -927,15 +927,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final lang = ref.watch(languageProvider);
     final s = AppStrings(lang);
     final intelligenceKey = game.intelligence;
-    final intelLabel = s.intelligenceLabel(intelligenceKey).toUpperCase();
+    final intelLabel = s.intelligenceLabel(intelligenceKey);
     final intelColor = _getIntelligenceColor(intelligenceKey);
-    final tagBg = intelColor.withValues(alpha: isDarkMode ? 0.22 : 0.18);
-    final bottomText = game.area;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         onTap: () {
           _showGameStartSheet(
             context: context,
@@ -947,66 +945,83 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           );
         },
         child: Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           decoration: _getNeuDecoration(isDarkMode: isDarkMode),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: intelColor.withValues(alpha: isDarkMode ? 0.22 : 0.18),
-                  shape: BoxShape.circle,
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/games/${game.id.toLowerCase()}.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Icon(icon, color: intelColor, size: 24);
-                    },
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: intelColor.withValues(alpha: isDarkMode ? 0.25 : 0.15),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                intelColor.withValues(alpha: 0.3),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Center(
+                        child: Icon(icon, color: intelColor, size: 42),
+                      ),
+                    ],
                   ),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
                 game.name,
-                textAlign: TextAlign.center,
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
                   color: titleColor,
-                  height: 1.15,
+                  height: 1.1,
                 ),
               ),
-              const SizedBox(height: 8),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: tagBg,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Text(
-                  intelLabel,
-                  style: GoogleFonts.inter(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: intelColor,
-                    letterSpacing: 0.4,
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.category_rounded, size: 12, color: intelColor),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      intelLabel,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: intelColor,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
+                ],
               ),
-              const Spacer(),
+              const SizedBox(height: 2),
               Text(
-                bottomText,
+                game.area,
                 style: GoogleFonts.inter(
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: subtitleColor,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
