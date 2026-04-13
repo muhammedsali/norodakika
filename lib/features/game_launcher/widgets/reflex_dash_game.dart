@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../services/audio_service.dart';
+
 
 class ReflexDashGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
@@ -144,7 +144,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
         _targets.remove(target);
         if (target.isGood) {
           _missed++;
-          const AudioService().playWrong();
+
           HapticFeedback.heavyImpact();
           setState(() {
             _hearts = max(0, _hearts - 1);
@@ -187,7 +187,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
       
       _hearts = min(3, _hearts + 1); // Ödül can
       _targets.clear();
-      const AudioService().playLevelUp();
+
     });
   }
 
@@ -203,7 +203,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     }
 
     if (hit == null) {
-      const AudioService().playWrong();
+
       HapticFeedback.mediumImpact();
       setState(() {
         _badHits++;
@@ -216,7 +216,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     _targets.remove(hit);
     
     if (hit.isGood) {
-      const AudioService().playTap();
+
       HapticFeedback.lightImpact();
       _goodHits++;
       _targetsClearedInLevel++;
@@ -240,7 +240,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
         _levelUp();
       }
     } else {
-      const AudioService().playWrong();
+
       HapticFeedback.heavyImpact();
       setState(() {
         _badHits++;
@@ -265,7 +265,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
 
   void _checkDeath() {
     if (_hearts <= 0) {
-      const AudioService().playGameOver();
+
       _finishGame();
     }
   }
