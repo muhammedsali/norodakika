@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../services/audio_service.dart';
+
 
 class FocusLineGame extends StatefulWidget {
   final void Function(Map<String, dynamic>) onComplete;
@@ -50,7 +50,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   final List<_FocusDot> _dots = [];
   int _spawnInterval = baseSpawnInterval;
   
-  final AudioService _audioService = const AudioService();
+
 
   @override
   void initState() {
@@ -146,7 +146,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
       _resetTargetColor();
       _dots.clear();
       _lives = min(3, _lives + 1); // Ödül
-      _audioService.playLevelUp();
+
       
       // Timerı yeni hız ile tekrar çek
       _spawnTimer?.cancel();
@@ -179,7 +179,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
       if (_dots.length > 15) {
         final removed = _dots.removeAt(0);
         if (removed.color == _targetColor) {
-          _audioService.playWrong();
+
           _missedTargets++;
           _combo = 0;
           _lives = max(0, _lives - 1);
@@ -202,7 +202,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
 
     setState(() {
       if (dot.color == _targetColor) {
-        _audioService.playTap();
+
         HapticFeedback.lightImpact();
         _correctHits++;
         _combo++;
@@ -216,7 +216,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
            _levelUp();
         }
       } else {
-        _audioService.playWrong();
+
         HapticFeedback.mediumImpact();
         _wrongHits++;
         _lives--;
@@ -236,7 +236,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   void _finishGame() {
     _timer?.cancel();
     _spawnTimer?.cancel();
-    _audioService.playGameOver();
+
 
     final totalHits = _correctHits + _wrongHits;
     final successRate = totalHits == 0 ? 0.0 : _correctHits / totalHits;
