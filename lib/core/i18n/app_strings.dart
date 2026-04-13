@@ -144,9 +144,7 @@ class AppStrings {
       isEn ? 'Change the app language.' : 'Uygulama dilini değiştir.';
   String get languageTurkish => isEn ? 'Turkish' : 'Türkçe';
   String get languageEnglish => 'English';
-  String get soundTitle => isEn ? 'Sound Effects' : 'Ses Efektleri';
-  String get soundSubtitle =>
-      isEn ? 'Enable or disable game sounds.' : 'Oyun seslerini aç veya kapat.';
+
   String get notificationTitle => isEn ? 'Notifications' : 'Bildirimler';
   String get notificationSubtitle => isEn
       ? 'Daily reminders and updates.'
