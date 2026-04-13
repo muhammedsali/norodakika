@@ -163,6 +163,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ),
+          // Telegram tarzı: Alt barın üstünde aşağıya doğru saydamlaşan gradient fade
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: IgnorePointer(
+              child: Container(
+                height: 100,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      bgColor,
+                      bgColor.withValues(alpha: 0.8),
+                      bgColor.withValues(alpha: 0.0),
+                    ],
+                    stops: const [0.0, 0.4, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
           if (_showOnboarding) _buildOnboardingOverlay(context, appLanguage),
         ],
       ),
