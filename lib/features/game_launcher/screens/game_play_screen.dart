@@ -17,7 +17,7 @@ import '../widgets/quick_math_game.dart';
 import '../widgets/memory_board_game.dart';
 import '../widgets/stroop_tap_game.dart';
 import '../widgets/focus_line_game.dart';
-import '../widgets/n_back_mini_game.dart';
+import '../widgets/path_tracker_game.dart';
 import '../widgets/logic_puzzle_game.dart';
 import '../widgets/recall_phase_game.dart';
 import '../widgets/word_sprint_game.dart';
@@ -711,8 +711,8 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
           isPaused: _isPaused,
         );
       case 'MEM01':
-        return NBackMiniGame(
-          key: ValueKey('nback_$_runId'),
+        return PathTrackerGame(
+          key: ValueKey('pathtracker_$_runId'),
           onComplete: _onGameComplete,
           isPaused: _isPaused,
         );
