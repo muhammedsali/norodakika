@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NöroDakika — Beynini Eğit, Her Dakika Güçlen</title>
-    <meta name="description" content="NöroDakika: 18 mini oyunla 7 bilişsel alanını geliştiren, ELO tabanlı adaptif zorluk sistemine sahip mobil beyin eğitim uygulaması. Hemen indir!">
+    <meta name="description"
+        content="NöroDakika: 18 mini oyunla 7 bilişsel alanını geliştiren, ELO tabanlı adaptif zorluk sistemine sahip mobil beyin eğitim uygulaması. Hemen indir!">
     <meta name="keywords" content="beyin eğitimi, bilişsel gelişim, hafıza, dikkat, refleks, mini oyunlar, NöroDakika">
     <meta name="author" content="Muhammed Sali">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="app_icon.png">
+    <link rel="apple-touch-icon" href="app_icon.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Three.js (3D efektler için) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         /* ===== RESET & BASE ===== */
-        *, *::before, *::after {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -99,18 +109,27 @@
             width: 40px;
             height: 40px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            overflow: hidden;
             box-shadow: 0 0 20px var(--glow-primary);
             animation: logoPulse 3s ease-in-out infinite;
         }
 
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         @keyframes logoPulse {
-            0%, 100% { box-shadow: 0 0 20px var(--glow-primary); }
-            50% { box-shadow: 0 0 30px var(--glow-primary), 0 0 60px var(--glow-accent); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px var(--glow-primary);
+            }
+
+            50% {
+                box-shadow: 0 0 30px var(--glow-primary), 0 0 60px var(--glow-accent);
+            }
         }
 
         .nav-logo-text {
@@ -233,8 +252,15 @@
         }
 
         @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
         }
 
         .hero h1 {
@@ -256,8 +282,15 @@
         }
 
         @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .hero-subtitle {
@@ -292,7 +325,7 @@
             border: none;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 32px var(--glow-primary), inset 0 1px 0 rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
         }
@@ -304,7 +337,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
             transition: left 0.6s;
         }
 
@@ -388,17 +421,17 @@
         }
 
         .phone-mockup {
-            width: 280px;
-            height: 560px;
-            border-radius: 40px;
-            background: linear-gradient(145deg, #1E293B, #0F172A);
+            width: 260px;
+            height: 564px;
+            border-radius: 36px;
+            background: #0F172A;
             border: 3px solid rgba(148, 163, 184, 0.15);
             position: relative;
             overflow: hidden;
-            box-shadow: 
-                0 40px 80px rgba(0,0,0,0.5),
+            box-shadow:
+                0 40px 80px rgba(0, 0, 0, 0.5),
                 0 0 60px var(--glow-primary),
-                inset 0 1px 0 rgba(255,255,255,0.08);
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
@@ -412,8 +445,8 @@
             transform: rotateY(0deg) rotateX(0deg) scale(1.08);
             z-index: 2;
             animation: float2 6s ease-in-out infinite;
-            box-shadow: 
-                0 50px 100px rgba(0,0,0,0.6),
+            box-shadow:
+                0 50px 100px rgba(0, 0, 0, 0.6),
                 0 0 80px var(--glow-primary),
                 0 0 120px var(--glow-accent);
         }
@@ -424,28 +457,79 @@
         }
 
         @keyframes float1 {
-            0%, 100% { transform: rotateY(15deg) rotateX(5deg) translateY(0); }
-            50% { transform: rotateY(15deg) rotateX(5deg) translateY(-15px); }
+
+            0%,
+            100% {
+                transform: rotateY(15deg) rotateX(5deg) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(15deg) rotateX(5deg) translateY(-15px);
+            }
         }
 
         @keyframes float2 {
-            0%, 100% { transform: rotateY(0deg) rotateX(0deg) scale(1.08) translateY(0); }
-            50% { transform: rotateY(0deg) rotateX(0deg) scale(1.08) translateY(-20px); }
+
+            0%,
+            100% {
+                transform: rotateY(0deg) rotateX(0deg) scale(1.08) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(0deg) rotateX(0deg) scale(1.08) translateY(-20px);
+            }
         }
 
         @keyframes float3 {
-            0%, 100% { transform: rotateY(-15deg) rotateX(5deg) translateY(0); }
-            50% { transform: rotateY(-15deg) rotateX(5deg) translateY(-15px); }
+
+            0%,
+            100% {
+                transform: rotateY(-15deg) rotateX(5deg) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(-15deg) rotateX(5deg) translateY(-15px);
+            }
         }
 
         .phone-screen {
             width: 100%;
             height: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #0F172A;
+            border-radius: 33px;
+        }
+
+        .phone-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            border-radius: 33px;
+        }
+
+        .phone-screen-placeholder {
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
             background: linear-gradient(180deg, #0F172A, #1E293B);
             padding: 20px;
-            position: relative;
+            text-align: center;
+        }
+
+        .phone-screen-placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .phone-screen-placeholder-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
         .phone-notch {
@@ -457,6 +541,7 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
+            z-index: 5;
         }
 
         .phone-status-bar {
@@ -968,7 +1053,9 @@
         }
 
         @keyframes ctaRotate {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .cta-title {
@@ -1092,8 +1179,15 @@
 
         /* ===== ANIMATIONS ===== */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .reveal {
@@ -1130,26 +1224,62 @@
         }
 
         @keyframes particleFloat {
-            0% { opacity: 0; transform: translateY(100vh) scale(0); }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
-            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1);
+            }
         }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
-            .features-grid { grid-template-columns: repeat(2, 1fr); }
-            .games-carousel { grid-template-columns: repeat(3, 1fr); }
-            .domains-grid { grid-template-columns: repeat(4, 1fr); }
-            .how-steps { grid-template-columns: repeat(2, 1fr); gap: 40px; }
-            .how-steps::before { display: none; }
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .games-carousel {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .domains-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .how-steps {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px;
+            }
+
+            .how-steps::before {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
-            .navbar { padding: 12px 20px; }
-            .nav-links { display: none; }
-            .mobile-menu-btn { display: block; }
-            
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
             .nav-links.mobile-open {
                 display: flex;
                 flex-direction: column;
@@ -1164,39 +1294,134 @@
                 border-bottom: 1px solid var(--border-subtle);
             }
 
-            .hero { padding: 100px 20px 60px; }
-            .hero-stats { gap: 24px; }
-            .hero-stat-value { font-size: 28px; }
+            .hero {
+                padding: 100px 20px 60px;
+            }
 
-            .phone-3d-wrapper { flex-direction: column; }
+            .hero-stats {
+                gap: 24px;
+            }
+
+            .hero-stat-value {
+                font-size: 28px;
+            }
+
+            .phone-showcase {
+                padding: 40px 0 80px;
+                overflow: hidden;
+            }
+
+            .phone-3d-wrapper {
+                flex-wrap: nowrap;
+                gap: 20px;
+                justify-content: flex-start;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                padding: 20px 24px;
+                scrollbar-width: none;
+            }
+
+            .phone-3d-wrapper::-webkit-scrollbar {
+                display: none;
+            }
+
+            .phone-mockup {
+                flex-shrink: 0;
+                width: 220px;
+                height: 478px;
+                border-radius: 30px;
+                scroll-snap-align: center;
+            }
+
             .phone-mockup:nth-child(1),
-            .phone-mockup:nth-child(3) { display: none; }
+            .phone-mockup:nth-child(3) {
+                transform: none !important;
+                animation: floatMobile 5s ease-in-out infinite !important;
+            }
+
             .phone-mockup:nth-child(2) {
                 transform: none !important;
-                animation: float2mobile 4s ease-in-out infinite !important;
+                scale: 1 !important;
+                animation: floatMobile 5s ease-in-out infinite !important;
+                box-shadow:
+                    0 30px 60px rgba(0, 0, 0, 0.5),
+                    0 0 40px var(--glow-primary) !important;
             }
 
-            @keyframes float2mobile {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
+            .phone-screen {
+                border-radius: 27px;
             }
 
-            .features-grid { grid-template-columns: 1fr; }
-            .games-carousel { grid-template-columns: repeat(2, 1fr); }
-            .domains-grid { grid-template-columns: repeat(3, 1fr); }
-            .tech-grid { grid-template-columns: repeat(2, 1fr); }
-            .how-steps { grid-template-columns: 1fr; gap: 32px; }
-            
-            .cta-box { padding: 48px 24px; }
-            .footer-content { flex-direction: column; text-align: center; }
+            .phone-screen img {
+                border-radius: 27px;
+            }
+
+            @keyframes floatMobile {
+
+                0%,
+                100% {
+                    transform: translateY(0);
+                }
+
+                50% {
+                    transform: translateY(-8px);
+                }
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .games-carousel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .domains-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .how-steps {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .cta-box {
+                padding: 48px 24px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
         }
 
         @media (max-width: 480px) {
-            .games-carousel { grid-template-columns: 1fr; }
-            .domains-grid { grid-template-columns: repeat(2, 1fr); }
-            .tech-grid { grid-template-columns: 1fr; }
-            .hero-actions { flex-direction: column; }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+            .games-carousel {
+                grid-template-columns: 1fr;
+            }
+
+            .domains-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
         }
 
         /* ===== GLOW DIVIDER ===== */
@@ -1209,6 +1434,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <!-- 3D Nöral Ağ Arka Plan (Three.js Canvas) -->
@@ -1220,7 +1446,7 @@
     <!-- Navbar -->
     <nav class="navbar" id="navbar">
         <a href="#" class="nav-logo">
-            <div class="nav-logo-icon">🧠</div>
+            <div class="nav-logo-icon"><img src="app_icon.png" alt="NöroDakika Logo"></div>
             <span class="nav-logo-text">NöroDakika</span>
         </a>
         <ul class="nav-links" id="navLinks">
@@ -1247,26 +1473,28 @@
             </h1>
 
             <p class="hero-subtitle">
-                18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle 
-                kişiselleştirilmiş beyin antrenmanı. Günde sadece birkaç dakika ayır, 
+                18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle
+                kişiselleştirilmiş beyin antrenmanı. Günde sadece birkaç dakika ayır,
                 bilişsel kapasiteni kat kat artır.
             </p>
 
             <div class="hero-actions">
-                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk" 
-                   class="btn-primary" id="hero-download-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk"
+                    class="btn-primary" id="hero-download-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" width="20" height="20">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                     APK İndir
                 </a>
                 <a href="#features" class="btn-secondary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 16 16 12 12 8"/>
-                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" width="20" height="20">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 16 16 12 12 8" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
                     </svg>
                     Keşfet
                 </a>
@@ -1295,47 +1523,12 @@
             <!-- Telefon 1: Ana Sayfa -->
             <div class="phone-mockup">
                 <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <div class="phone-status-bar">
-                        <span>21:09</span>
-                        <span>●●●</span>
-                    </div>
-                    <div class="phone-screen-title">Merhaba 👋</div>
-                    <div class="phone-screen-subtitle">Günlük antrenmanını tamamla</div>
-                    
-                    <div class="phone-card">
-                        <div class="phone-card-header">
-                            <span class="phone-card-title">Günlük Hedef</span>
-                            <span class="phone-card-badge">3/5 Oyun</span>
-                        </div>
-                        <div class="phone-progress-bar">
-                            <div class="phone-progress-fill" style="width: 60%"></div>
-                        </div>
-                    </div>
-
-                    <div class="phone-card">
-                        <div class="phone-card-header">
-                            <span class="phone-card-title">Sıradaki Oyun</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366F1,#818CF8);display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
-                            <div>
-                                <div style="font-size:12px;font-weight:700;color:var(--text-primary)">Reflex Tap</div>
-                                <div style="font-size:9px;color:var(--text-muted)">Refleks · 2 dk</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="phone-card">
-                        <div class="phone-card-header">
-                            <span class="phone-card-title">Bilişsel Skor</span>
-                            <span style="color:var(--accent);font-size:10px;font-weight:700;">+12% ↑</span>
-                        </div>
-                        <div style="display:flex;gap:8px;margin-top:4px;">
-                            <div style="flex:1;height:4px;border-radius:2px;background:var(--primary);"></div>
-                            <div style="flex:0.7;height:4px;border-radius:2px;background:#60A5FA;"></div>
-                            <div style="flex:0.5;height:4px;border-radius:2px;background:#818CF8;"></div>
-                        </div>
+                    <img src="screenshot_home.png" alt="NöroDakika Ana Sayfa"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="phone-screen-placeholder" style="display:none;">
+                        <div class="phone-screen-placeholder-icon">🏠</div>
+                        <div class="phone-screen-placeholder-text">Ana Sayfa<br><small
+                                style='opacity:0.5'>screenshot_home.png</small></div>
                     </div>
                 </div>
             </div>
@@ -1343,45 +1536,12 @@
             <!-- Telefon 2: Oyunlar (Merkez, büyük) -->
             <div class="phone-mockup">
                 <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <div class="phone-status-bar">
-                        <span>21:09</span>
-                        <span>●●●</span>
-                    </div>
-                    <div class="phone-screen-title">Oyunlar 🎮</div>
-                    <div class="phone-screen-subtitle">Tüm mini oyunları keşfet</div>
-
-                    <div class="phone-game-grid">
-                        <div class="phone-game-item">
-                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#EF4444,#F87171);">⚡</div>
-                            <div class="phone-game-name">Reflex Tap</div>
-                            <div class="phone-game-area">Refleks</div>
-                        </div>
-                        <div class="phone-game-item">
-                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);">🎯</div>
-                            <div class="phone-game-name">Stroop Tap</div>
-                            <div class="phone-game-area">Dikkat</div>
-                        </div>
-                        <div class="phone-game-item">
-                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#3B82F6,#60A5FA);">🧩</div>
-                            <div class="phone-game-name">Memory Board</div>
-                            <div class="phone-game-area">Hafıza</div>
-                        </div>
-                        <div class="phone-game-item">
-                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#10B981,#34D399);">🔢</div>
-                            <div class="phone-game-name">Quick Math</div>
-                            <div class="phone-game-area">Sayısal</div>
-                        </div>
-                        <div class="phone-game-item">
-                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">🔮</div>
-                            <div class="phone-game-name">Logic Puzzle</div>
-                            <div class="phone-game-area">Mantık</div>
-                        </div>
-                        <div class="phone-game-item">
-                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#EC4899,#F472B6);">📝</div>
-                            <div class="phone-game-name">Word Sprint</div>
-                            <div class="phone-game-area">Dil</div>
-                        </div>
+                    <img src="screenshot_games.png" alt="NöroDakika Oyunlar"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="phone-screen-placeholder" style="display:none;">
+                        <div class="phone-screen-placeholder-icon">🎮</div>
+                        <div class="phone-screen-placeholder-text">Oyunlar<br><small
+                                style='opacity:0.5'>screenshot_games.png</small></div>
                     </div>
                 </div>
             </div>
@@ -1389,68 +1549,12 @@
             <!-- Telefon 3: İstatistik -->
             <div class="phone-mockup">
                 <div class="phone-screen">
-                    <div class="phone-notch"></div>
-                    <div class="phone-status-bar">
-                        <span>21:09</span>
-                        <span>●●●</span>
-                    </div>
-                    <div class="phone-screen-title">İstatistikler 📊</div>
-                    <div class="phone-screen-subtitle">Bilişsel profil radarın</div>
-
-                    <!-- Radar SVG -->
-                    <div class="phone-radar">
-                        <svg width="180" height="180" viewBox="0 0 200 200">
-                            <!-- Arka plan çizgileri -->
-                            <polygon points="100,20 168,55 168,125 100,160 32,125 32,55" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="1"/>
-                            <polygon points="100,40 152,65 152,115 100,140 48,115 48,65" fill="none" stroke="rgba(148,163,184,0.08)" stroke-width="1"/>
-                            <polygon points="100,60 136,75 136,105 100,120 64,105 64,75" fill="none" stroke="rgba(148,163,184,0.06)" stroke-width="1"/>
-                            <!-- Veri -->
-                            <polygon points="100,30 160,60 155,130 100,150 45,110 50,55" 
-                                     fill="rgba(79,70,229,0.2)" stroke="rgba(129,140,248,0.8)" stroke-width="2"/>
-                            <!-- Noktalar -->
-                            <circle cx="100" cy="30" r="4" fill="#818CF8"/>
-                            <circle cx="160" cy="60" r="4" fill="#818CF8"/>
-                            <circle cx="155" cy="130" r="4" fill="#818CF8"/>
-                            <circle cx="100" cy="150" r="4" fill="#818CF8"/>
-                            <circle cx="45" cy="110" r="4" fill="#818CF8"/>
-                            <circle cx="50" cy="55" r="4" fill="#818CF8"/>
-                            
-                            <!-- Etiketler -->
-                            <text x="100" y="14" text-anchor="middle" fill="#94A3B8" font-size="8" font-family="Inter">Hafıza</text>
-                            <text x="178" y="58" text-anchor="start" fill="#94A3B8" font-size="8" font-family="Inter">Dikkat</text>
-                            <text x="178" y="132" text-anchor="start" fill="#94A3B8" font-size="8" font-family="Inter">Refleks</text>
-                            <text x="100" y="175" text-anchor="middle" fill="#94A3B8" font-size="8" font-family="Inter">Mantık</text>
-                            <text x="18" y="115" text-anchor="end" fill="#94A3B8" font-size="8" font-family="Inter">Dil</text>
-                            <text x="18" y="58" text-anchor="end" fill="#94A3B8" font-size="8" font-family="Inter">Görsel</text>
-                        </svg>
-                    </div>
-
-                    <div class="phone-card" style="padding:10px 14px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:9px;color:var(--text-muted);font-weight:600;">Hafıza</span>
-                            <span style="font-size:9px;color:var(--text-primary);font-weight:700;">87</span>
-                        </div>
-                        <div class="phone-progress-bar" style="height:4px;">
-                            <div class="phone-progress-fill" style="width:87%;background:linear-gradient(90deg,#6366F1,#818CF8);"></div>
-                        </div>
-                    </div>
-                    <div class="phone-card" style="padding:10px 14px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:9px;color:var(--text-muted);font-weight:600;">Dikkat</span>
-                            <span style="font-size:9px;color:var(--text-primary);font-weight:700;">72</span>
-                        </div>
-                        <div class="phone-progress-bar" style="height:4px;">
-                            <div class="phone-progress-fill" style="width:72%;background:linear-gradient(90deg,#3B82F6,#60A5FA);"></div>
-                        </div>
-                    </div>
-                    <div class="phone-card" style="padding:10px 14px;">
-                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:9px;color:var(--text-muted);font-weight:600;">Refleks</span>
-                            <span style="font-size:9px;color:var(--text-primary);font-weight:700;">65</span>
-                        </div>
-                        <div class="phone-progress-bar" style="height:4px;">
-                            <div class="phone-progress-fill" style="width:65%;background:linear-gradient(90deg,#06B6D4,#22D3EE);"></div>
-                        </div>
+                    <img src="screenshot_stats.png" alt="NöroDakika İstatistikler"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="phone-screen-placeholder" style="display:none;">
+                        <div class="phone-screen-placeholder-icon">📊</div>
+                        <div class="phone-screen-placeholder-text">İstatistikler<br><small
+                                style='opacity:0.5'>screenshot_stats.png</small></div>
                     </div>
                 </div>
             </div>
@@ -1469,62 +1573,68 @@
             </div>
             <h2 class="section-title">Neden <span class="gradient-text">NöroDakika</span>?</h2>
             <p class="section-subtitle">
-                Bilimsel temelli mini oyunlarla beyninin tam potansiyelini ortaya çıkar. 
+                Bilimsel temelli mini oyunlarla beyninin tam potansiyelini ortaya çıkar.
                 Her antrenman seansı, sana özel ayarlanır.
             </p>
         </div>
 
         <div class="features-grid">
             <div class="feature-card reveal">
-                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(79,70,229,0.2),rgba(79,70,229,0.05));">🎮</div>
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(79,70,229,0.2),rgba(79,70,229,0.05));">🎮</div>
                 <h3 class="feature-title">18 Mini Oyun</h3>
                 <p class="feature-desc">
-                    Tamamen Flutter ile geliştirilmiş, WebView kullanmayan 18 eşsiz mini oyun. 
+                    Tamamen Flutter ile geliştirilmiş, WebView kullanmayan 18 eşsiz mini oyun.
                     Her biri farklı bilişsel beceriyi hedefler.
                 </p>
             </div>
 
             <div class="feature-card reveal">
-                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));">📊</div>
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));">📊</div>
                 <h3 class="feature-title">ELO Adaptif Zorluk</h3>
                 <p class="feature-desc">
-                    Satranç dünyasından esinlenen ELO puanlama sistemiyle zorluk seviyesi 
+                    Satranç dünyasından esinlenen ELO puanlama sistemiyle zorluk seviyesi
                     otomatik olarak sana uyum sağlar.
                 </p>
             </div>
 
             <div class="feature-card reveal">
-                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05));">🕸️</div>
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05));">🕸️</div>
                 <h3 class="feature-title">Radar Grafik Profili</h3>
                 <p class="feature-desc">
-                    7 bilişsel alanındaki performansını interaktif radar grafik ile görselleştir. 
+                    7 bilişsel alanındaki performansını interaktif radar grafik ile görselleştir.
                     Güçlü ve zayıf yönlerini keşfet.
                 </p>
             </div>
 
             <div class="feature-card reveal">
-                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05));">📅</div>
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05));">📅</div>
                 <h3 class="feature-title">Günlük Plan</h3>
                 <p class="feature-desc">
-                    Her gün sana özel oluşturulan kişiselleştirilmiş antrenman planıyla 
+                    Her gün sana özel oluşturulan kişiselleştirilmiş antrenman planıyla
                     zayıf alanlarına odaklan.
                 </p>
             </div>
 
             <div class="feature-card reveal">
-                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.05));">🔥</div>
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.05));">🔥</div>
                 <h3 class="feature-title">Firebase Altyapısı</h3>
                 <p class="feature-desc">
-                    Firebase Authentication ve Cloud Firestore ile güvenli kimlik doğrulama 
+                    Firebase Authentication ve Cloud Firestore ile güvenli kimlik doğrulama
                     ve anlık veri senkronizasyonu.
                 </p>
             </div>
 
             <div class="feature-card reveal">
-                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(139,92,246,0.05));">⚡</div>
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(139,92,246,0.05));">⚡</div>
                 <h3 class="feature-title">Çevrimdışı Destek</h3>
                 <p class="feature-desc">
-                    SharedPreferences ile oturum verileri yerel olarak saklanır. 
+                    SharedPreferences ile oturum verileri yerel olarak saklanır.
                     İnternet olmadan da antrenman yapabilirsin.
                 </p>
             </div>
@@ -1543,7 +1653,7 @@
             </div>
             <h2 class="section-title">18 Farklı <span class="gradient-text">Mini Oyun</span></h2>
             <p class="section-subtitle">
-                Her biri farklı bir zeka türünü ve bilişsel kapasiteyi hedefleyen, 
+                Her biri farklı bir zeka türünü ve bilişsel kapasiteyi hedefleyen,
                 tamamen Flutter ile geliştirilmiş özgün oyunlar.
             </p>
         </div>
@@ -1693,14 +1803,15 @@
         <div class="cta-box reveal">
             <h2 class="cta-title">Beynini Eğitmeye<br><span class="gradient-text">Bugün Başla</span></h2>
             <p class="cta-desc">
-                18 mini oyun, adaptif zorluk, kişisel radar profil — hepsi ücretsiz. 
+                18 mini oyun, adaptif zorluk, kişisel radar profil — hepsi ücretsiz.
                 Hemen APK'yı indir ve antrenmanına başla.
             </p>
             <div class="cta-buttons">
-                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk" 
-                   class="btn-download" id="cta-download-btn">
+                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk"
+                    class="btn-download" id="cta-download-btn">
                     <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+                        <path
+                            d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z" />
                     </svg>
                     GitHub'dan APK İndir
                 </a>
@@ -1715,7 +1826,8 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <div class="footer-logo">🧠</div>
+                <div class="footer-logo"><img src="app_icon.png" alt="NöroDakika"
+                        style="width:100%;height:100%;object-fit:cover;border-radius:10px;"></div>
                 <span class="footer-name">NöroDakika</span>
             </div>
             <p class="footer-copy">© 2026 Muhammed Sali. Tüm hakları saklıdır.</p>
@@ -1728,206 +1840,206 @@
 
 
     <script>
-    // ===== OYUN VERİLERİ =====
-    const gamesData = [
-        { id: "REF01", name: "Reflex Tap", area: "Refleks", icon: "⚡", color: "linear-gradient(135deg,#EF4444,#F87171)", desc: "Tepki süresi ölçümü + Go/No-Go" },
-        { id: "REF02", name: "Reflex Dash", area: "Refleks", icon: "🏃", color: "linear-gradient(135deg,#DC2626,#EF4444)", desc: "Şeritlerde hızlı hedef yakalama" },
-        { id: "ATT01", name: "Stroop Tap", area: "Dikkat", icon: "🎯", color: "linear-gradient(135deg,#F59E0B,#FBBF24)", desc: "Renk-kelime uyumsuzluğu testi" },
-        { id: "ATT02", name: "Focus Line", area: "Dikkat + Görsel", icon: "👁️", color: "linear-gradient(135deg,#D97706,#F59E0B)", desc: "Çizgi üzerinde hedef noktaları tak" },
-        { id: "MEM01", name: "Path Tracker", area: "Mantık + Hafıza", icon: "🗺️", color: "linear-gradient(135deg,#3B82F6,#60A5FA)", desc: "Görünmez nesneyi zihninde takip et" },
-        { id: "MEM02", name: "Memory Board", area: "Hafıza + Görsel", icon: "🧩", color: "linear-gradient(135deg,#2563EB,#3B82F6)", desc: "Kart eşleştirme + görsel hafıza" },
-        { id: "MEM03", name: "Recall Phase", area: "Dil + Hafıza", icon: "📋", color: "linear-gradient(135deg,#7C3AED,#8B5CF6)", desc: "Kelimeleri göster ve hatırla" },
-        { id: "MEM04", name: "Sequence Echo", area: "Hafıza + Dikkat", icon: "🔁", color: "linear-gradient(135deg,#6D28D9,#7C3AED)", desc: "Gösterilen sırayı aynen tekrala" },
-        { id: "LOG01", name: "Logic Puzzle", area: "Mantık + Görsel", icon: "🔮", color: "linear-gradient(135deg,#8B5CF6,#A78BFA)", desc: "Mantık dizisi çözme oyunu" },
-        { id: "NUM01", name: "Quick Math", area: "Sayısal Zeka", icon: "🔢", color: "linear-gradient(135deg,#10B981,#34D399)", desc: "Zaman baskılı mental aritmetik" },
-        { id: "VIS02", name: "Odd One Out", area: "Görsel Algı", icon: "🃏", color: "linear-gradient(135deg,#14B8A6,#2DD4BF)", desc: "Farklı kartı hızlıca bul" },
-        { id: "LANG02", name: "Word Sprint", area: "Dil", icon: "📝", color: "linear-gradient(135deg,#EC4899,#F472B6)", desc: "Gerçek-uydurma kelime ayırt et" },
-        { id: "MUS01", name: "Rhythm Match", area: "Dikkat + Refleks", icon: "🎵", color: "linear-gradient(135deg,#F43F5E,#FB7185)", desc: "Ritim dizilerini doğru sırayla yakala" },
-        { id: "SOC01", name: "Emotion Mirror", area: "Dil + Dikkat", icon: "😊", color: "linear-gradient(135deg,#E11D48,#F43F5E)", desc: "Duygu ifadelerini eşleştir" },
-        { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "🌿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
-        { id: "KIN01", name: "Balance Tap", area: "Refleks", icon: "⚖️", color: "linear-gradient(135deg,#0891B2,#06B6D4)", desc: "Dengeyi koru, hızlı dokunuşlar" },
-        { id: "SPA01", name: "Route Builder", area: "Mantık + Görsel", icon: "🛤️", color: "linear-gradient(135deg,#0284C7,#0EA5E9)", desc: "En kısa rotayı planla" },
-        { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "🧘", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
-    ];
+        // ===== OYUN VERİLERİ =====
+        const gamesData = [
+            { id: "REF01", name: "Reflex Tap", area: "Refleks", icon: "⚡", color: "linear-gradient(135deg,#EF4444,#F87171)", desc: "Tepki süresi ölçümü + Go/No-Go" },
+            { id: "REF02", name: "Reflex Dash", area: "Refleks", icon: "🏃", color: "linear-gradient(135deg,#DC2626,#EF4444)", desc: "Şeritlerde hızlı hedef yakalama" },
+            { id: "ATT01", name: "Stroop Tap", area: "Dikkat", icon: "🎯", color: "linear-gradient(135deg,#F59E0B,#FBBF24)", desc: "Renk-kelime uyumsuzluğu testi" },
+            { id: "ATT02", name: "Focus Line", area: "Dikkat + Görsel", icon: "👁️", color: "linear-gradient(135deg,#D97706,#F59E0B)", desc: "Çizgi üzerinde hedef noktaları tak" },
+            { id: "MEM01", name: "Path Tracker", area: "Mantık + Hafıza", icon: "🗺️", color: "linear-gradient(135deg,#3B82F6,#60A5FA)", desc: "Görünmez nesneyi zihninde takip et" },
+            { id: "MEM02", name: "Memory Board", area: "Hafıza + Görsel", icon: "🧩", color: "linear-gradient(135deg,#2563EB,#3B82F6)", desc: "Kart eşleştirme + görsel hafıza" },
+            { id: "MEM03", name: "Recall Phase", area: "Dil + Hafıza", icon: "📋", color: "linear-gradient(135deg,#7C3AED,#8B5CF6)", desc: "Kelimeleri göster ve hatırla" },
+            { id: "MEM04", name: "Sequence Echo", area: "Hafıza + Dikkat", icon: "🔁", color: "linear-gradient(135deg,#6D28D9,#7C3AED)", desc: "Gösterilen sırayı aynen tekrala" },
+            { id: "LOG01", name: "Logic Puzzle", area: "Mantık + Görsel", icon: "🔮", color: "linear-gradient(135deg,#8B5CF6,#A78BFA)", desc: "Mantık dizisi çözme oyunu" },
+            { id: "NUM01", name: "Quick Math", area: "Sayısal Zeka", icon: "🔢", color: "linear-gradient(135deg,#10B981,#34D399)", desc: "Zaman baskılı mental aritmetik" },
+            { id: "VIS02", name: "Odd One Out", area: "Görsel Algı", icon: "🃏", color: "linear-gradient(135deg,#14B8A6,#2DD4BF)", desc: "Farklı kartı hızlıca bul" },
+            { id: "LANG02", name: "Word Sprint", area: "Dil", icon: "📝", color: "linear-gradient(135deg,#EC4899,#F472B6)", desc: "Gerçek-uydurma kelime ayırt et" },
+            { id: "MUS01", name: "Rhythm Match", area: "Dikkat + Refleks", icon: "🎵", color: "linear-gradient(135deg,#F43F5E,#FB7185)", desc: "Ritim dizilerini doğru sırayla yakala" },
+            { id: "SOC01", name: "Emotion Mirror", area: "Dil + Dikkat", icon: "😊", color: "linear-gradient(135deg,#E11D48,#F43F5E)", desc: "Duygu ifadelerini eşleştir" },
+            { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "🌿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
+            { id: "KIN01", name: "Balance Tap", area: "Refleks", icon: "⚖️", color: "linear-gradient(135deg,#0891B2,#06B6D4)", desc: "Dengeyi koru, hızlı dokunuşlar" },
+            { id: "SPA01", name: "Route Builder", area: "Mantık + Görsel", icon: "🛤️", color: "linear-gradient(135deg,#0284C7,#0EA5E9)", desc: "En kısa rotayı planla" },
+            { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "🧘", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
+        ];
 
-    // Oyun kartlarını oluştur
-    const gamesGrid = document.getElementById('gamesGrid');
-    gamesData.forEach((game, i) => {
-        const card = document.createElement('div');
-        card.className = 'game-card reveal';
-        card.innerHTML = `
+        // Oyun kartlarını oluştur
+        const gamesGrid = document.getElementById('gamesGrid');
+        gamesData.forEach((game, i) => {
+            const card = document.createElement('div');
+            card.className = 'game-card reveal';
+            card.innerHTML = `
             <div class="game-card-icon" style="background:${game.color};">${game.icon}</div>
             <div class="game-card-name">${game.name}</div>
             <div class="game-card-area">${game.area}</div>
             <div class="game-card-desc">${game.desc}</div>
         `;
-        gamesGrid.appendChild(card);
-    });
-
-    // ===== CSS PARÇACIKLARI =====
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 30; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDuration = (8 + Math.random() * 12) + 's';
-        particle.style.animationDelay = Math.random() * 10 + 's';
-        particle.style.width = (2 + Math.random() * 4) + 'px';
-        particle.style.height = particle.style.width;
-        // Rastgele renk çeşitliliği
-        const colors = ['#818CF8', '#06B6D4', '#A78BFA', '#60A5FA', '#22D3EE'];
-        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        particlesContainer.appendChild(particle);
-    }
-
-    // ===== NAVBAR SCROLL ETKİSİ =====
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
-
-    // ===== MOBİL MENÜ =====
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navLinks = document.getElementById('navLinks');
-    mobileMenuBtn.addEventListener('click', () => {
-        navLinks.classList.toggle('mobile-open');
-        mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
-    });
-
-    // Mobil menüde link tıklanınca menüyü kapat
-    navLinks.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            navLinks.classList.remove('mobile-open');
-            mobileMenuBtn.textContent = '☰';
+            gamesGrid.appendChild(card);
         });
-    });
 
-    // ===== SCROLL ANİMASYONLARI (Intersection Observer) =====
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
+        // ===== CSS PARÇACIKLARI =====
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+            particle.style.animationDelay = Math.random() * 10 + 's';
+            particle.style.width = (2 + Math.random() * 4) + 'px';
+            particle.style.height = particle.style.width;
+            // Rastgele renk çeşitliliği
+            const colors = ['#818CF8', '#06B6D4', '#A78BFA', '#60A5FA', '#22D3EE'];
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particlesContainer.appendChild(particle);
+        }
 
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, index) => {
-            if (entry.isIntersecting) {
-                // Kademeli gecikme ekle
-                const delay = entry.target.dataset.delay || 0;
-                setTimeout(() => {
-                    entry.target.classList.add('visible');
-                }, delay);
-                observer.unobserve(entry.target);
+        // ===== NAVBAR SCROLL ETKİSİ =====
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
         });
-    }, observerOptions);
 
-    document.querySelectorAll('.reveal').forEach((el, i) => {
-        el.dataset.delay = Math.min(i * 80, 400);
-        observer.observe(el);
-    });
-
-    // ===== SAYAÇ ANİMASYONU (Hero Stats) =====
-    function animateCounter(elementId, target, duration = 2000) {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        
-        let start = 0;
-        const startTime = performance.now();
-        
-        function update(currentTime) {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            
-            // easeOutExpo efekti
-            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-            const current = Math.round(eased * target);
-            
-            el.textContent = current;
-            
-            if (progress < 1) {
-                requestAnimationFrame(update);
-            }
-        }
-        
-        requestAnimationFrame(update);
-    }
-
-    // Sayfa yüklenince sayaçları başlat
-    setTimeout(() => {
-        animateCounter('stat-games', 18, 1500);
-        animateCounter('stat-domains', 7, 1200);
-        animateCounter('stat-intel', 8, 1300);
-    }, 1000);
-
-
-    // ===== THREE.JS — 3D NÖRAL AĞ ARKA PLANI =====
-    (function initNeuralNetwork() {
-        const canvas = document.getElementById('neural-canvas');
-        if (!canvas || typeof THREE === 'undefined') return;
-
-        const renderer = new THREE.WebGLRenderer({ 
-            canvas, 
-            alpha: true, 
-            antialias: true 
+        // ===== MOBİL MENÜ =====
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('mobile-open');
+            mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
         });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 50;
+        // Mobil menüde link tıklanınca menüyü kapat
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('mobile-open');
+                mobileMenuBtn.textContent = '☰';
+            });
+        });
 
-        // Nöron noktaları oluştur
-        const nodeCount = 120;
-        const nodePositions = [];
-        const nodeGeometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(nodeCount * 3);
-        const colors = new Float32Array(nodeCount * 3);
-        const sizes = new Float32Array(nodeCount);
+        // ===== SCROLL ANİMASYONLARI (Intersection Observer) =====
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
 
-        const primaryColor = new THREE.Color(0x4F46E5);
-        const accentColor = new THREE.Color(0x06B6D4);
-        const softColor = new THREE.Color(0x818CF8);
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Kademeli gecikme ekle
+                    const delay = entry.target.dataset.delay || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
 
-        for (let i = 0; i < nodeCount; i++) {
-            const x = (Math.random() - 0.5) * 80;
-            const y = (Math.random() - 0.5) * 60;
-            const z = (Math.random() - 0.5) * 40;
+        document.querySelectorAll('.reveal').forEach((el, i) => {
+            el.dataset.delay = Math.min(i * 80, 400);
+            observer.observe(el);
+        });
 
-            positions[i * 3] = x;
-            positions[i * 3 + 1] = y;
-            positions[i * 3 + 2] = z;
+        // ===== SAYAÇ ANİMASYONU (Hero Stats) =====
+        function animateCounter(elementId, target, duration = 2000) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
 
-            nodePositions.push(new THREE.Vector3(x, y, z));
+            let start = 0;
+            const startTime = performance.now();
 
-            // Renk çeşitliliği
-            const colorChoice = Math.random();
-            let c;
-            if (colorChoice < 0.4) c = primaryColor;
-            else if (colorChoice < 0.7) c = accentColor;
-            else c = softColor;
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
 
-            colors[i * 3] = c.r;
-            colors[i * 3 + 1] = c.g;
-            colors[i * 3 + 2] = c.b;
+                // easeOutExpo efekti
+                const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                const current = Math.round(eased * target);
 
-            sizes[i] = 1.5 + Math.random() * 2.5;
+                el.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
         }
 
-        nodeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        nodeGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        nodeGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+        // Sayfa yüklenince sayaçları başlat
+        setTimeout(() => {
+            animateCounter('stat-games', 18, 1500);
+            animateCounter('stat-domains', 7, 1200);
+            animateCounter('stat-intel', 8, 1300);
+        }, 1000);
 
-        // Özel nöron shader materyali
-        const nodeMaterial = new THREE.ShaderMaterial({
-            uniforms: {
-                uTime: { value: 0 }
-            },
-            vertexShader: `
+
+        // ===== THREE.JS — 3D NÖRAL AĞ ARKA PLANI =====
+        (function initNeuralNetwork() {
+            const canvas = document.getElementById('neural-canvas');
+            if (!canvas || typeof THREE === 'undefined') return;
+
+            const renderer = new THREE.WebGLRenderer({
+                canvas,
+                alpha: true,
+                antialias: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 50;
+
+            // Nöron noktaları oluştur
+            const nodeCount = 120;
+            const nodePositions = [];
+            const nodeGeometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(nodeCount * 3);
+            const colors = new Float32Array(nodeCount * 3);
+            const sizes = new Float32Array(nodeCount);
+
+            const primaryColor = new THREE.Color(0x4F46E5);
+            const accentColor = new THREE.Color(0x06B6D4);
+            const softColor = new THREE.Color(0x818CF8);
+
+            for (let i = 0; i < nodeCount; i++) {
+                const x = (Math.random() - 0.5) * 80;
+                const y = (Math.random() - 0.5) * 60;
+                const z = (Math.random() - 0.5) * 40;
+
+                positions[i * 3] = x;
+                positions[i * 3 + 1] = y;
+                positions[i * 3 + 2] = z;
+
+                nodePositions.push(new THREE.Vector3(x, y, z));
+
+                // Renk çeşitliliği
+                const colorChoice = Math.random();
+                let c;
+                if (colorChoice < 0.4) c = primaryColor;
+                else if (colorChoice < 0.7) c = accentColor;
+                else c = softColor;
+
+                colors[i * 3] = c.r;
+                colors[i * 3 + 1] = c.g;
+                colors[i * 3 + 2] = c.b;
+
+                sizes[i] = 1.5 + Math.random() * 2.5;
+            }
+
+            nodeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            nodeGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            nodeGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            // Özel nöron shader materyali
+            const nodeMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 }
+                },
+                vertexShader: `
                 attribute float size;
                 attribute vec3 color;
                 varying vec3 vColor;
@@ -1942,7 +2054,7 @@
                     gl_Position = projectionMatrix * mvPosition;
                 }
             `,
-            fragmentShader: `
+                fragmentShader: `
                 varying vec3 vColor;
                 void main() {
                     float d = length(gl_PointCoord - vec2(0.5));
@@ -1951,102 +2063,103 @@
                     gl_FragColor = vec4(vColor, alpha * 0.7);
                 }
             `,
-            transparent: true,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-            vertexColors: true
-        });
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            });
 
-        const nodePoints = new THREE.Points(nodeGeometry, nodeMaterial);
-        scene.add(nodePoints);
+            const nodePoints = new THREE.Points(nodeGeometry, nodeMaterial);
+            scene.add(nodePoints);
 
-        // Bağlantı çizgileri (Sinaps efekti)
-        const linePositions = [];
-        const lineColors = [];
-        const maxDist = 18;
+            // Bağlantı çizgileri (Sinaps efekti)
+            const linePositions = [];
+            const lineColors = [];
+            const maxDist = 18;
 
-        for (let i = 0; i < nodeCount; i++) {
-            for (let j = i + 1; j < nodeCount; j++) {
-                const dist = nodePositions[i].distanceTo(nodePositions[j]);
-                if (dist < maxDist) {
-                    linePositions.push(
-                        nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
-                        nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
-                    );
+            for (let i = 0; i < nodeCount; i++) {
+                for (let j = i + 1; j < nodeCount; j++) {
+                    const dist = nodePositions[i].distanceTo(nodePositions[j]);
+                    if (dist < maxDist) {
+                        linePositions.push(
+                            nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
+                            nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
+                        );
 
-                    const alpha = 1 - (dist / maxDist);
-                    lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
-                    lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
+                        const alpha = 1 - (dist / maxDist);
+                        lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
+                        lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
+                    }
                 }
             }
-        }
 
-        const lineGeometry = new THREE.BufferGeometry();
-        lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-        lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
+            const lineGeometry = new THREE.BufferGeometry();
+            lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+            lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
 
-        const lineMaterial = new THREE.LineBasicMaterial({
-            vertexColors: true,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false
-        });
+            const lineMaterial = new THREE.LineBasicMaterial({
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
 
-        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
-        scene.add(lines);
+            const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lines);
 
-        // Fare takibi
-        let mouseX = 0, mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-            mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
-        });
+            // Fare takibi
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+            });
 
-        // Pencere boyutlandırma
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+            // Pencere boyutlandırma
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
 
-        // Animasyon döngüsü
-        const clock = new THREE.Clock();
-        
-        function animate() {
-            requestAnimationFrame(animate);
+            // Animasyon döngüsü
+            const clock = new THREE.Clock();
 
-            const elapsed = clock.getElapsedTime();
-            nodeMaterial.uniforms.uTime.value = elapsed;
+            function animate() {
+                requestAnimationFrame(animate);
 
-            // Yavaş, organik döndürme + fare takibi
-            nodePoints.rotation.y = elapsed * 0.03 + mouseX * 0.15;
-            nodePoints.rotation.x = elapsed * 0.02 + mouseY * 0.1;
-            lines.rotation.y = nodePoints.rotation.y;
-            lines.rotation.x = nodePoints.rotation.x;
+                const elapsed = clock.getElapsedTime();
+                nodeMaterial.uniforms.uTime.value = elapsed;
 
-            // Scroll bazlı parallax
-            const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-            camera.position.z = 50 + scrollProgress * 30;
-            camera.position.y = scrollProgress * -10;
+                // Yavaş, organik döndürme + fare takibi
+                nodePoints.rotation.y = elapsed * 0.03 + mouseX * 0.15;
+                nodePoints.rotation.x = elapsed * 0.02 + mouseY * 0.1;
+                lines.rotation.y = nodePoints.rotation.y;
+                lines.rotation.x = nodePoints.rotation.x;
 
-            renderer.render(scene, camera);
-        }
+                // Scroll bazlı parallax
+                const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+                camera.position.z = 50 + scrollProgress * 30;
+                camera.position.y = scrollProgress * -10;
 
-        animate();
-    })();
-
-    // ===== SMOOTH SCROLL =====
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                renderer.render(scene, camera);
             }
+
+            animate();
+        })();
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
         });
-    });
 
     </script>
 </body>
+
 </html>
