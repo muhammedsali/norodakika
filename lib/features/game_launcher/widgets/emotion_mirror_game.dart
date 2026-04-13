@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../settings/providers/language_provider.dart';
 import '../../../core/i18n/app_strings.dart';
-import '../../../services/audio_service.dart';
+
 
 class EmotionMirrorGame extends ConsumerStatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
@@ -26,7 +26,7 @@ class EmotionMirrorGame extends ConsumerStatefulWidget {
 class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
     with TickerProviderStateMixin {
   final Random _rng = Random();
-  final AudioService _audioService = const AudioService();
+
 
   Timer? _gameTimer; // Genel oyun süresi 
   Timer? _promptTimer; // Tekil sorunun süresi (ValueNotifier çalıştırır, setState çalışmaz)
@@ -215,7 +215,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
   
   void _handlePromptTimeout() {
     if (_isFinished) return;
-    _audioService.playWrong();
+
     HapticFeedback.mediumImpact();
     
     setState(() {
@@ -278,7 +278,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
     _targetsToClear += 2;
     _targetsClearedInLevel = 0;
     
-    _audioService.playLevelUp();
+
     _levelUpController.forward(from: 0.0);
     
     _timeRemainingNotifier.value += 12; // Level bonus süresi
@@ -292,7 +292,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
 
     setState(() {
       if (isCorrect) {
-        _audioService.playCorrect();
+
         HapticFeedback.lightImpact();
         
         _correct++;
@@ -306,7 +306,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
            _levelUp();
         }
       } else {
-        _audioService.playWrong();
+
         HapticFeedback.mediumImpact();
         
         _wrong++;
@@ -329,7 +329,7 @@ class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
     _isFinished = true;
     _gameTimer?.cancel();
     _promptTimer?.cancel();
-    _audioService.playGameOver();
+
     
     final total = max(1, _correct + _wrong);
     widget.onComplete({
