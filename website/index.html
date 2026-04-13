@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NöroDakika — Beynini Eğit, Her Dakika Güçlen</title>
+    <meta name="description" content="NöroDakika: 18 mini oyunla 7 bilişsel alanını geliştiren, ELO tabanlı adaptif zorluk sistemine sahip mobil beyin eğitim uygulaması. Hemen indir!">
+    <meta name="keywords" content="beyin eğitimi, bilişsel gelişim, hafıza, dikkat, refleks, mini oyunlar, NöroDakika">
+    <meta name="author" content="Muhammed Sali">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Three.js (3D efektler için) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #818CF8;
+            --primary-dark: #3730A3;
+            --accent: #06B6D4;
+            --accent-glow: #22D3EE;
+            --bg-dark: #030712;
+            --bg-surface: #0F172A;
+            --bg-card: rgba(15, 23, 42, 0.6);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border-subtle: rgba(148, 163, 184, 0.1);
+            --glow-primary: rgba(79, 70, 229, 0.4);
+            --glow-accent: rgba(6, 182, 212, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* ===== 3D CANVAS ARKA PLAN ===== */
+        #neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(3, 7, 18, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-subtle);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            padding: 12px 32px;
+            background: rgba(3, 7, 18, 0.85);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 20px var(--glow-primary);
+            animation: logoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { box-shadow: 0 0 20px var(--glow-primary); }
+            50% { box-shadow: 0 0 30px var(--glow-primary), 0 0 60px var(--glow-accent); }
+        }
+
+        .nav-logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+            border-radius: 2px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            padding: 10px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white !important;
+            font-weight: 600 !important;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 4px 20px var(--glow-primary);
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--glow-primary);
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 120px 32px 80px;
+            z-index: 1;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 999px;
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            color: var(--primary-light);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 32px;
+            animation: fadeInUp 0.8s 0.2s both;
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(40px, 6vw, 80px);
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.8s 0.4s both;
+        }
+
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-glow), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(16px, 2vw, 20px);
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto 48px;
+            line-height: 1.7;
+            animation: fadeInUp 0.8s 0.6s both;
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s 0.8s both;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px var(--glow-primary), inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px var(--glow-primary), 0 0 80px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 72px;
+            animation: fadeInUp 0.8s 1s both;
+        }
+
+        .hero-stat {
+            text-align: center;
+        }
+
+        .hero-stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ===== PARALLAX PHONE MOCKUP ===== */
+        .phone-showcase {
+            position: relative;
+            padding: 80px 32px 120px;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-3d-wrapper {
+            perspective: 1200px;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .phone-mockup {
+            width: 280px;
+            height: 560px;
+            border-radius: 40px;
+            background: linear-gradient(145deg, #1E293B, #0F172A);
+            border: 3px solid rgba(148, 163, 184, 0.15);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 40px 80px rgba(0,0,0,0.5),
+                0 0 60px var(--glow-primary),
+                inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .phone-mockup:nth-child(1) {
+            transform: rotateY(15deg) rotateX(5deg);
+            animation: float1 6s ease-in-out infinite;
+        }
+
+        .phone-mockup:nth-child(2) {
+            transform: rotateY(0deg) rotateX(0deg) scale(1.08);
+            z-index: 2;
+            animation: float2 6s ease-in-out infinite;
+            box-shadow: 
+                0 50px 100px rgba(0,0,0,0.6),
+                0 0 80px var(--glow-primary),
+                0 0 120px var(--glow-accent);
+        }
+
+        .phone-mockup:nth-child(3) {
+            transform: rotateY(-15deg) rotateX(5deg);
+            animation: float3 6s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: rotateY(15deg) rotateX(5deg) translateY(0); }
+            50% { transform: rotateY(15deg) rotateX(5deg) translateY(-15px); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: rotateY(0deg) rotateX(0deg) scale(1.08) translateY(0); }
+            50% { transform: rotateY(0deg) rotateX(0deg) scale(1.08) translateY(-20px); }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: rotateY(-15deg) rotateX(5deg) translateY(0); }
+            50% { transform: rotateY(-15deg) rotateX(5deg) translateY(-15px); }
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #0F172A, #1E293B);
+            padding: 20px;
+            position: relative;
+        }
+
+        .phone-notch {
+            width: 120px;
+            height: 28px;
+            background: #030712;
+            border-radius: 0 0 16px 16px;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .phone-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            padding-top: 8px;
+        }
+
+        .phone-screen-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .phone-screen-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .phone-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .phone-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .phone-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .phone-card-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(79, 70, 229, 0.2);
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+
+        .phone-progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(51, 65, 85, 0.8);
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .phone-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 2s ease;
+        }
+
+        .phone-game-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .phone-game-item {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+            border-radius: 14px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .phone-game-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            margin: 0 auto 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .phone-game-name {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .phone-game-area {
+            font-size: 8px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Radar grafik (SVG) */
+        .phone-radar {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+        }
+
+        /* ===== FEATURES (Özellikler) ===== */
+        .features {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 80px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+        }
+
+        .section-tag-line {
+            width: 24px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(32px, 4vw, 52px);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            font-size: 17px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 24px;
+            padding: 36px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--glow-primary);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 20px;
+            background: inherit;
+            filter: blur(20px);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .feature-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* ===== OYUNLAR (Games Section) ===== */
+        .games-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .games-carousel {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 28px 24px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            background: radial-gradient(circle at 50% 0%, var(--glow-primary), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: rgba(79, 70, 229, 0.4);
+        }
+
+        .game-card:hover::after {
+            opacity: 0.15;
+        }
+
+        .game-card-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-card-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-card-area {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-card-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== COGNITIVE DOMAINS ===== */
+        .domains-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .domains-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 16px;
+        }
+
+        .domain-item {
+            text-align: center;
+            padding: 28px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+        }
+
+        .domain-item:hover {
+            transform: translateY(-6px);
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .domain-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .domain-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .how-steps {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            position: relative;
+        }
+
+        .how-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+            opacity: 0.3;
+        }
+
+        .how-step {
+            text-align: center;
+            position: relative;
+        }
+
+        .how-step-num {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 32px var(--glow-primary);
+            position: relative;
+            z-index: 2;
+        }
+
+        .how-step-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .how-step-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===== TEKNIK (Tech) ===== */
+        .tech-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .tech-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .tech-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+
+        .tech-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .tech-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tech-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* ===== CTA FINAL ===== */
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+            text-align: center;
+        }
+
+        .cta-box {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 48px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(6, 182, 212, 0.08));
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            border-radius: 32px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--glow-primary), transparent, var(--glow-accent), transparent);
+            animation: ctaRotate 8s linear infinite;
+            opacity: 0.1;
+        }
+
+        @keyframes ctaRotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-desc {
+            font-size: 17px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), #6366F1);
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.4s;
+            box-shadow: 0 8px 40px var(--glow-primary);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 12px 60px var(--glow-primary);
+        }
+
+        .btn-download svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            position: relative;
+            z-index: 1;
+            padding: 48px 32px;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .footer-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== FLOATING PARTICLES (CSS) ===== */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            opacity: 0;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .games-carousel { grid-template-columns: repeat(3, 1fr); }
+            .domains-grid { grid-template-columns: repeat(4, 1fr); }
+            .how-steps { grid-template-columns: repeat(2, 1fr); gap: 40px; }
+            .how-steps::before { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 20px; }
+            .nav-links { display: none; }
+            .mobile-menu-btn { display: block; }
+            
+            .nav-links.mobile-open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(3, 7, 18, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 24px;
+                gap: 20px;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+
+            .hero { padding: 100px 20px 60px; }
+            .hero-stats { gap: 24px; }
+            .hero-stat-value { font-size: 28px; }
+
+            .phone-3d-wrapper { flex-direction: column; }
+            .phone-mockup:nth-child(1),
+            .phone-mockup:nth-child(3) { display: none; }
+            .phone-mockup:nth-child(2) {
+                transform: none !important;
+                animation: float2mobile 4s ease-in-out infinite !important;
+            }
+
+            @keyframes float2mobile {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+
+            .features-grid { grid-template-columns: 1fr; }
+            .games-carousel { grid-template-columns: repeat(2, 1fr); }
+            .domains-grid { grid-template-columns: repeat(3, 1fr); }
+            .tech-grid { grid-template-columns: repeat(2, 1fr); }
+            .how-steps { grid-template-columns: 1fr; gap: 32px; }
+            
+            .cta-box { padding: 48px 24px; }
+            .footer-content { flex-direction: column; text-align: center; }
+        }
+
+        @media (max-width: 480px) {
+            .games-carousel { grid-template-columns: 1fr; }
+            .domains-grid { grid-template-columns: repeat(2, 1fr); }
+            .tech-grid { grid-template-columns: 1fr; }
+            .hero-actions { flex-direction: column; }
+            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+        }
+
+        /* ===== GLOW DIVIDER ===== */
+        .glow-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+            opacity: 0.3;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 3D Nöral Ağ Arka Plan (Three.js Canvas) -->
+    <canvas id="neural-canvas"></canvas>
+
+    <!-- CSS Parçacık Efektleri -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">🧠</div>
+            <span class="nav-logo-text">NöroDakika</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#features">Özellikler</a></li>
+            <li><a href="#games">Oyunlar</a></li>
+            <li><a href="#domains">Kategoriler</a></li>
+            <li><a href="#how">Nasıl Çalışır</a></li>
+            <li><a href="#download" class="nav-cta">İndir — Ücretsiz</a></li>
+        </ul>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü aç">☰</button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                Bilişsel Eğitim Platformu
+            </div>
+
+            <h1>
+                Beynini Eğit,<br>
+                <span class="gradient-text">Her Dakika Güçlen.</span>
+            </h1>
+
+            <p class="hero-subtitle">
+                18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle 
+                kişiselleştirilmiş beyin antrenmanı. Günde sadece birkaç dakika ayır, 
+                bilişsel kapasiteni kat kat artır.
+            </p>
+
+            <div class="hero-actions">
+                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk" 
+                   class="btn-primary" id="hero-download-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    APK İndir
+                </a>
+                <a href="#features" class="btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 16 16 12 12 8"/>
+                        <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                    Keşfet
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-games">18</div>
+                    <div class="hero-stat-label">Mini Oyun</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-domains">7</div>
+                    <div class="hero-stat-label">Bilişsel Alan</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-intel">8</div>
+                    <div class="hero-stat-label">Zeka Türü</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TELEFON SHOWCASE (3D Perspektif) -->
+    <section class="phone-showcase reveal">
+        <div class="phone-3d-wrapper">
+            <!-- Telefon 1: Ana Sayfa -->
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <div class="phone-status-bar">
+                        <span>21:09</span>
+                        <span>●●●</span>
+                    </div>
+                    <div class="phone-screen-title">Merhaba 👋</div>
+                    <div class="phone-screen-subtitle">Günlük antrenmanını tamamla</div>
+                    
+                    <div class="phone-card">
+                        <div class="phone-card-header">
+                            <span class="phone-card-title">Günlük Hedef</span>
+                            <span class="phone-card-badge">3/5 Oyun</span>
+                        </div>
+                        <div class="phone-progress-bar">
+                            <div class="phone-progress-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+
+                    <div class="phone-card">
+                        <div class="phone-card-header">
+                            <span class="phone-card-title">Sıradaki Oyun</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6366F1,#818CF8);display:flex;align-items:center;justify-content:center;font-size:16px;">⚡</div>
+                            <div>
+                                <div style="font-size:12px;font-weight:700;color:var(--text-primary)">Reflex Tap</div>
+                                <div style="font-size:9px;color:var(--text-muted)">Refleks · 2 dk</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="phone-card">
+                        <div class="phone-card-header">
+                            <span class="phone-card-title">Bilişsel Skor</span>
+                            <span style="color:var(--accent);font-size:10px;font-weight:700;">+12% ↑</span>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-top:4px;">
+                            <div style="flex:1;height:4px;border-radius:2px;background:var(--primary);"></div>
+                            <div style="flex:0.7;height:4px;border-radius:2px;background:#60A5FA;"></div>
+                            <div style="flex:0.5;height:4px;border-radius:2px;background:#818CF8;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telefon 2: Oyunlar (Merkez, büyük) -->
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <div class="phone-status-bar">
+                        <span>21:09</span>
+                        <span>●●●</span>
+                    </div>
+                    <div class="phone-screen-title">Oyunlar 🎮</div>
+                    <div class="phone-screen-subtitle">Tüm mini oyunları keşfet</div>
+
+                    <div class="phone-game-grid">
+                        <div class="phone-game-item">
+                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#EF4444,#F87171);">⚡</div>
+                            <div class="phone-game-name">Reflex Tap</div>
+                            <div class="phone-game-area">Refleks</div>
+                        </div>
+                        <div class="phone-game-item">
+                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);">🎯</div>
+                            <div class="phone-game-name">Stroop Tap</div>
+                            <div class="phone-game-area">Dikkat</div>
+                        </div>
+                        <div class="phone-game-item">
+                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#3B82F6,#60A5FA);">🧩</div>
+                            <div class="phone-game-name">Memory Board</div>
+                            <div class="phone-game-area">Hafıza</div>
+                        </div>
+                        <div class="phone-game-item">
+                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#10B981,#34D399);">🔢</div>
+                            <div class="phone-game-name">Quick Math</div>
+                            <div class="phone-game-area">Sayısal</div>
+                        </div>
+                        <div class="phone-game-item">
+                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">🔮</div>
+                            <div class="phone-game-name">Logic Puzzle</div>
+                            <div class="phone-game-area">Mantık</div>
+                        </div>
+                        <div class="phone-game-item">
+                            <div class="phone-game-icon" style="background:linear-gradient(135deg,#EC4899,#F472B6);">📝</div>
+                            <div class="phone-game-name">Word Sprint</div>
+                            <div class="phone-game-area">Dil</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Telefon 3: İstatistik -->
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="phone-notch"></div>
+                    <div class="phone-status-bar">
+                        <span>21:09</span>
+                        <span>●●●</span>
+                    </div>
+                    <div class="phone-screen-title">İstatistikler 📊</div>
+                    <div class="phone-screen-subtitle">Bilişsel profil radarın</div>
+
+                    <!-- Radar SVG -->
+                    <div class="phone-radar">
+                        <svg width="180" height="180" viewBox="0 0 200 200">
+                            <!-- Arka plan çizgileri -->
+                            <polygon points="100,20 168,55 168,125 100,160 32,125 32,55" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="1"/>
+                            <polygon points="100,40 152,65 152,115 100,140 48,115 48,65" fill="none" stroke="rgba(148,163,184,0.08)" stroke-width="1"/>
+                            <polygon points="100,60 136,75 136,105 100,120 64,105 64,75" fill="none" stroke="rgba(148,163,184,0.06)" stroke-width="1"/>
+                            <!-- Veri -->
+                            <polygon points="100,30 160,60 155,130 100,150 45,110 50,55" 
+                                     fill="rgba(79,70,229,0.2)" stroke="rgba(129,140,248,0.8)" stroke-width="2"/>
+                            <!-- Noktalar -->
+                            <circle cx="100" cy="30" r="4" fill="#818CF8"/>
+                            <circle cx="160" cy="60" r="4" fill="#818CF8"/>
+                            <circle cx="155" cy="130" r="4" fill="#818CF8"/>
+                            <circle cx="100" cy="150" r="4" fill="#818CF8"/>
+                            <circle cx="45" cy="110" r="4" fill="#818CF8"/>
+                            <circle cx="50" cy="55" r="4" fill="#818CF8"/>
+                            
+                            <!-- Etiketler -->
+                            <text x="100" y="14" text-anchor="middle" fill="#94A3B8" font-size="8" font-family="Inter">Hafıza</text>
+                            <text x="178" y="58" text-anchor="start" fill="#94A3B8" font-size="8" font-family="Inter">Dikkat</text>
+                            <text x="178" y="132" text-anchor="start" fill="#94A3B8" font-size="8" font-family="Inter">Refleks</text>
+                            <text x="100" y="175" text-anchor="middle" fill="#94A3B8" font-size="8" font-family="Inter">Mantık</text>
+                            <text x="18" y="115" text-anchor="end" fill="#94A3B8" font-size="8" font-family="Inter">Dil</text>
+                            <text x="18" y="58" text-anchor="end" fill="#94A3B8" font-size="8" font-family="Inter">Görsel</text>
+                        </svg>
+                    </div>
+
+                    <div class="phone-card" style="padding:10px 14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:9px;color:var(--text-muted);font-weight:600;">Hafıza</span>
+                            <span style="font-size:9px;color:var(--text-primary);font-weight:700;">87</span>
+                        </div>
+                        <div class="phone-progress-bar" style="height:4px;">
+                            <div class="phone-progress-fill" style="width:87%;background:linear-gradient(90deg,#6366F1,#818CF8);"></div>
+                        </div>
+                    </div>
+                    <div class="phone-card" style="padding:10px 14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:9px;color:var(--text-muted);font-weight:600;">Dikkat</span>
+                            <span style="font-size:9px;color:var(--text-primary);font-weight:700;">72</span>
+                        </div>
+                        <div class="phone-progress-bar" style="height:4px;">
+                            <div class="phone-progress-fill" style="width:72%;background:linear-gradient(90deg,#3B82F6,#60A5FA);"></div>
+                        </div>
+                    </div>
+                    <div class="phone-card" style="padding:10px 14px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                            <span style="font-size:9px;color:var(--text-muted);font-weight:600;">Refleks</span>
+                            <span style="font-size:9px;color:var(--text-primary);font-weight:700;">65</span>
+                        </div>
+                        <div class="phone-progress-bar" style="height:4px;">
+                            <div class="phone-progress-fill" style="width:65%;background:linear-gradient(90deg,#06B6D4,#22D3EE);"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ÖZELLİKLER -->
+    <section class="features" id="features">
+        <div class="section-header reveal">
+            <div class="section-tag">
+                <span class="section-tag-line"></span>
+                Özellikler
+                <span class="section-tag-line"></span>
+            </div>
+            <h2 class="section-title">Neden <span class="gradient-text">NöroDakika</span>?</h2>
+            <p class="section-subtitle">
+                Bilimsel temelli mini oyunlarla beyninin tam potansiyelini ortaya çıkar. 
+                Her antrenman seansı, sana özel ayarlanır.
+            </p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(79,70,229,0.2),rgba(79,70,229,0.05));">🎮</div>
+                <h3 class="feature-title">18 Mini Oyun</h3>
+                <p class="feature-desc">
+                    Tamamen Flutter ile geliştirilmiş, WebView kullanmayan 18 eşsiz mini oyun. 
+                    Her biri farklı bilişsel beceriyi hedefler.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));">📊</div>
+                <h3 class="feature-title">ELO Adaptif Zorluk</h3>
+                <p class="feature-desc">
+                    Satranç dünyasından esinlenen ELO puanlama sistemiyle zorluk seviyesi 
+                    otomatik olarak sana uyum sağlar.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05));">🕸️</div>
+                <h3 class="feature-title">Radar Grafik Profili</h3>
+                <p class="feature-desc">
+                    7 bilişsel alanındaki performansını interaktif radar grafik ile görselleştir. 
+                    Güçlü ve zayıf yönlerini keşfet.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05));">📅</div>
+                <h3 class="feature-title">Günlük Plan</h3>
+                <p class="feature-desc">
+                    Her gün sana özel oluşturulan kişiselleştirilmiş antrenman planıyla 
+                    zayıf alanlarına odaklan.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(236,72,153,0.2),rgba(236,72,153,0.05));">🔥</div>
+                <h3 class="feature-title">Firebase Altyapısı</h3>
+                <p class="feature-desc">
+                    Firebase Authentication ve Cloud Firestore ile güvenli kimlik doğrulama 
+                    ve anlık veri senkronizasyonu.
+                </p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(139,92,246,0.05));">⚡</div>
+                <h3 class="feature-title">Çevrimdışı Destek</h3>
+                <p class="feature-desc">
+                    SharedPreferences ile oturum verileri yerel olarak saklanır. 
+                    İnternet olmadan da antrenman yapabilirsin.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- OYUNLAR -->
+    <section class="games-section" id="games">
+        <div class="section-header reveal">
+            <div class="section-tag">
+                <span class="section-tag-line"></span>
+                Oyunlar
+                <span class="section-tag-line"></span>
+            </div>
+            <h2 class="section-title">18 Farklı <span class="gradient-text">Mini Oyun</span></h2>
+            <p class="section-subtitle">
+                Her biri farklı bir zeka türünü ve bilişsel kapasiteyi hedefleyen, 
+                tamamen Flutter ile geliştirilmiş özgün oyunlar.
+            </p>
+        </div>
+
+        <div class="games-carousel" id="gamesGrid">
+            <!-- JavaScript ile doldurulacak -->
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- BİLİŞSEL KATEGORİLER -->
+    <section class="domains-section" id="domains">
+        <div class="section-header reveal">
+            <div class="section-tag">
+                <span class="section-tag-line"></span>
+                Bilişsel Alanlar
+                <span class="section-tag-line"></span>
+            </div>
+            <h2 class="section-title">7 Farklı <span class="gradient-text">Bilişsel Alan</span></h2>
+            <p class="section-subtitle">
+                Beyninin her köşesini eğit. Hafızadan dile, refleksten mantığa — tüm bilişsel kapasiteni geliştir.
+            </p>
+        </div>
+
+        <div class="domains-grid reveal">
+            <div class="domain-item">
+                <span class="domain-icon">🧠</span>
+                <span class="domain-name">Hafıza</span>
+            </div>
+            <div class="domain-item">
+                <span class="domain-icon">🎯</span>
+                <span class="domain-name">Dikkat</span>
+            </div>
+            <div class="domain-item">
+                <span class="domain-icon">⚡</span>
+                <span class="domain-name">Refleks</span>
+            </div>
+            <div class="domain-item">
+                <span class="domain-icon">🧩</span>
+                <span class="domain-name">Mantık</span>
+            </div>
+            <div class="domain-item">
+                <span class="domain-icon">🔢</span>
+                <span class="domain-name">Sayısal Zeka</span>
+            </div>
+            <div class="domain-item">
+                <span class="domain-icon">👁️</span>
+                <span class="domain-name">Görsel Algı</span>
+            </div>
+            <div class="domain-item">
+                <span class="domain-icon">📝</span>
+                <span class="domain-name">Dil</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- NASIL ÇALIŞIR -->
+    <section class="how-section" id="how">
+        <div class="section-header reveal">
+            <div class="section-tag">
+                <span class="section-tag-line"></span>
+                Nasıl Çalışır
+                <span class="section-tag-line"></span>
+            </div>
+            <h2 class="section-title">4 Adımda <span class="gradient-text">Beyin Eğitimi</span></h2>
+        </div>
+
+        <div class="how-steps reveal">
+            <div class="how-step">
+                <div class="how-step-num">1</div>
+                <h3 class="how-step-title">APK İndir</h3>
+                <p class="how-step-desc">GitHub Releases sayfasından en son APK dosyasını indir ve kur.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-num">2</div>
+                <h3 class="how-step-title">Hesap Oluştur</h3>
+                <p class="how-step-desc">Email/şifre veya Google ile hızlıca kayıt ol ve profilini oluştur.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-num">3</div>
+                <h3 class="how-step-title">Antrenman Yap</h3>
+                <p class="how-step-desc">Günlük plan veya istediğin oyunu seç, günde 5–10 dakika antrenman yap.</p>
+            </div>
+            <div class="how-step">
+                <div class="how-step-num">4</div>
+                <h3 class="how-step-title">Gelişimini Takip Et</h3>
+                <p class="how-step-desc">Radar grafiğin ve istatistiklerinle bilişsel gelişimini görselleştir.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- TEKNOLOJİ -->
+    <section class="tech-section">
+        <div class="section-header reveal">
+            <div class="section-tag">
+                <span class="section-tag-line"></span>
+                Teknoloji
+                <span class="section-tag-line"></span>
+            </div>
+            <h2 class="section-title">Güçlü <span class="gradient-text">Altyapı</span></h2>
+            <p class="section-subtitle">Modern ve güvenilir teknolojilerle inşa edildi.</p>
+        </div>
+
+        <div class="tech-grid reveal">
+            <div class="tech-item">
+                <span class="tech-icon">💙</span>
+                <div class="tech-name">Flutter</div>
+                <div class="tech-desc">Cross-platform UI</div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">🎯</span>
+                <div class="tech-name">Dart</div>
+                <div class="tech-desc">Tip güvenli dil</div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">🔥</span>
+                <div class="tech-name">Firebase</div>
+                <div class="tech-desc">Auth + Firestore</div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">🔄</span>
+                <div class="tech-name">Riverpod</div>
+                <div class="tech-desc">State yönetimi</div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">📈</span>
+                <div class="tech-name">fl_chart</div>
+                <div class="tech-desc">Radar grafikler</div>
+            </div>
+            <div class="tech-item">
+                <span class="tech-icon">🎨</span>
+                <div class="tech-name">Material 3</div>
+                <div class="tech-desc">Modern tasarım</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- FINAL CTA -->
+    <section class="cta-section" id="download">
+        <div class="cta-box reveal">
+            <h2 class="cta-title">Beynini Eğitmeye<br><span class="gradient-text">Bugün Başla</span></h2>
+            <p class="cta-desc">
+                18 mini oyun, adaptif zorluk, kişisel radar profil — hepsi ücretsiz. 
+                Hemen APK'yı indir ve antrenmanına başla.
+            </p>
+            <div class="cta-buttons">
+                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk" 
+                   class="btn-download" id="cta-download-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub'dan APK İndir
+                </a>
+            </div>
+            <p style="margin-top:20px;font-size:12px;color:var(--text-muted);position:relative;z-index:1;">
+                Android 5.0+ · Tamamen Ücretsiz · Açık Kaynak
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">🧠</div>
+                <span class="footer-name">NöroDakika</span>
+            </div>
+            <p class="footer-copy">© 2026 Muhammed Sali. Tüm hakları saklıdır.</p>
+            <div class="footer-links">
+                <a href="https://github.com/muhammedsali/norodakika" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/muhammedsali" target="_blank" rel="noopener">Geliştirici</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+    // ===== OYUN VERİLERİ =====
+    const gamesData = [
+        { id: "REF01", name: "Reflex Tap", area: "Refleks", icon: "⚡", color: "linear-gradient(135deg,#EF4444,#F87171)", desc: "Tepki süresi ölçümü + Go/No-Go" },
+        { id: "REF02", name: "Reflex Dash", area: "Refleks", icon: "🏃", color: "linear-gradient(135deg,#DC2626,#EF4444)", desc: "Şeritlerde hızlı hedef yakalama" },
+        { id: "ATT01", name: "Stroop Tap", area: "Dikkat", icon: "🎯", color: "linear-gradient(135deg,#F59E0B,#FBBF24)", desc: "Renk-kelime uyumsuzluğu testi" },
+        { id: "ATT02", name: "Focus Line", area: "Dikkat + Görsel", icon: "👁️", color: "linear-gradient(135deg,#D97706,#F59E0B)", desc: "Çizgi üzerinde hedef noktaları tak" },
+        { id: "MEM01", name: "Path Tracker", area: "Mantık + Hafıza", icon: "🗺️", color: "linear-gradient(135deg,#3B82F6,#60A5FA)", desc: "Görünmez nesneyi zihninde takip et" },
+        { id: "MEM02", name: "Memory Board", area: "Hafıza + Görsel", icon: "🧩", color: "linear-gradient(135deg,#2563EB,#3B82F6)", desc: "Kart eşleştirme + görsel hafıza" },
+        { id: "MEM03", name: "Recall Phase", area: "Dil + Hafıza", icon: "📋", color: "linear-gradient(135deg,#7C3AED,#8B5CF6)", desc: "Kelimeleri göster ve hatırla" },
+        { id: "MEM04", name: "Sequence Echo", area: "Hafıza + Dikkat", icon: "🔁", color: "linear-gradient(135deg,#6D28D9,#7C3AED)", desc: "Gösterilen sırayı aynen tekrala" },
+        { id: "LOG01", name: "Logic Puzzle", area: "Mantık + Görsel", icon: "🔮", color: "linear-gradient(135deg,#8B5CF6,#A78BFA)", desc: "Mantık dizisi çözme oyunu" },
+        { id: "NUM01", name: "Quick Math", area: "Sayısal Zeka", icon: "🔢", color: "linear-gradient(135deg,#10B981,#34D399)", desc: "Zaman baskılı mental aritmetik" },
+        { id: "VIS02", name: "Odd One Out", area: "Görsel Algı", icon: "🃏", color: "linear-gradient(135deg,#14B8A6,#2DD4BF)", desc: "Farklı kartı hızlıca bul" },
+        { id: "LANG02", name: "Word Sprint", area: "Dil", icon: "📝", color: "linear-gradient(135deg,#EC4899,#F472B6)", desc: "Gerçek-uydurma kelime ayırt et" },
+        { id: "MUS01", name: "Rhythm Match", area: "Dikkat + Refleks", icon: "🎵", color: "linear-gradient(135deg,#F43F5E,#FB7185)", desc: "Ritim dizilerini doğru sırayla yakala" },
+        { id: "SOC01", name: "Emotion Mirror", area: "Dil + Dikkat", icon: "😊", color: "linear-gradient(135deg,#E11D48,#F43F5E)", desc: "Duygu ifadelerini eşleştir" },
+        { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "🌿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
+        { id: "KIN01", name: "Balance Tap", area: "Refleks", icon: "⚖️", color: "linear-gradient(135deg,#0891B2,#06B6D4)", desc: "Dengeyi koru, hızlı dokunuşlar" },
+        { id: "SPA01", name: "Route Builder", area: "Mantık + Görsel", icon: "🛤️", color: "linear-gradient(135deg,#0284C7,#0EA5E9)", desc: "En kısa rotayı planla" },
+        { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "🧘", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
+    ];
+
+    // Oyun kartlarını oluştur
+    const gamesGrid = document.getElementById('gamesGrid');
+    gamesData.forEach((game, i) => {
+        const card = document.createElement('div');
+        card.className = 'game-card reveal';
+        card.innerHTML = `
+            <div class="game-card-icon" style="background:${game.color};">${game.icon}</div>
+            <div class="game-card-name">${game.name}</div>
+            <div class="game-card-area">${game.area}</div>
+            <div class="game-card-desc">${game.desc}</div>
+        `;
+        gamesGrid.appendChild(card);
+    });
+
+    // ===== CSS PARÇACIKLARI =====
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+        particle.style.width = (2 + Math.random() * 4) + 'px';
+        particle.style.height = particle.style.width;
+        // Rastgele renk çeşitliliği
+        const colors = ['#818CF8', '#06B6D4', '#A78BFA', '#60A5FA', '#22D3EE'];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particlesContainer.appendChild(particle);
+    }
+
+    // ===== NAVBAR SCROLL ETKİSİ =====
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // ===== MOBİL MENÜ =====
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+    mobileMenuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('mobile-open');
+        mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+
+    // Mobil menüde link tıklanınca menüyü kapat
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('mobile-open');
+            mobileMenuBtn.textContent = '☰';
+        });
+    });
+
+    // ===== SCROLL ANİMASYONLARI (Intersection Observer) =====
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                // Kademeli gecikme ekle
+                const delay = entry.target.dataset.delay || 0;
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, delay);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+        el.dataset.delay = Math.min(i * 80, 400);
+        observer.observe(el);
+    });
+
+    // ===== SAYAÇ ANİMASYONU (Hero Stats) =====
+    function animateCounter(elementId, target, duration = 2000) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        
+        let start = 0;
+        const startTime = performance.now();
+        
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // easeOutExpo efekti
+            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            const current = Math.round(eased * target);
+            
+            el.textContent = current;
+            
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+        
+        requestAnimationFrame(update);
+    }
+
+    // Sayfa yüklenince sayaçları başlat
+    setTimeout(() => {
+        animateCounter('stat-games', 18, 1500);
+        animateCounter('stat-domains', 7, 1200);
+        animateCounter('stat-intel', 8, 1300);
+    }, 1000);
+
+
+    // ===== THREE.JS — 3D NÖRAL AĞ ARKA PLANI =====
+    (function initNeuralNetwork() {
+        const canvas = document.getElementById('neural-canvas');
+        if (!canvas || typeof THREE === 'undefined') return;
+
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas, 
+            alpha: true, 
+            antialias: true 
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 50;
+
+        // Nöron noktaları oluştur
+        const nodeCount = 120;
+        const nodePositions = [];
+        const nodeGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(nodeCount * 3);
+        const colors = new Float32Array(nodeCount * 3);
+        const sizes = new Float32Array(nodeCount);
+
+        const primaryColor = new THREE.Color(0x4F46E5);
+        const accentColor = new THREE.Color(0x06B6D4);
+        const softColor = new THREE.Color(0x818CF8);
+
+        for (let i = 0; i < nodeCount; i++) {
+            const x = (Math.random() - 0.5) * 80;
+            const y = (Math.random() - 0.5) * 60;
+            const z = (Math.random() - 0.5) * 40;
+
+            positions[i * 3] = x;
+            positions[i * 3 + 1] = y;
+            positions[i * 3 + 2] = z;
+
+            nodePositions.push(new THREE.Vector3(x, y, z));
+
+            // Renk çeşitliliği
+            const colorChoice = Math.random();
+            let c;
+            if (colorChoice < 0.4) c = primaryColor;
+            else if (colorChoice < 0.7) c = accentColor;
+            else c = softColor;
+
+            colors[i * 3] = c.r;
+            colors[i * 3 + 1] = c.g;
+            colors[i * 3 + 2] = c.b;
+
+            sizes[i] = 1.5 + Math.random() * 2.5;
+        }
+
+        nodeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        nodeGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        nodeGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        // Özel nöron shader materyali
+        const nodeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 }
+            },
+            vertexShader: `
+                attribute float size;
+                attribute vec3 color;
+                varying vec3 vColor;
+                uniform float uTime;
+                void main() {
+                    vColor = color;
+                    vec3 pos = position;
+                    pos.y += sin(uTime * 0.5 + position.x * 0.1) * 0.5;
+                    pos.x += cos(uTime * 0.3 + position.z * 0.1) * 0.3;
+                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                    gl_PointSize = size * (50.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor;
+                void main() {
+                    float d = length(gl_PointCoord - vec2(0.5));
+                    if (d > 0.5) discard;
+                    float alpha = 1.0 - smoothstep(0.2, 0.5, d);
+                    gl_FragColor = vec4(vColor, alpha * 0.7);
+                }
+            `,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: true
+        });
+
+        const nodePoints = new THREE.Points(nodeGeometry, nodeMaterial);
+        scene.add(nodePoints);
+
+        // Bağlantı çizgileri (Sinaps efekti)
+        const linePositions = [];
+        const lineColors = [];
+        const maxDist = 18;
+
+        for (let i = 0; i < nodeCount; i++) {
+            for (let j = i + 1; j < nodeCount; j++) {
+                const dist = nodePositions[i].distanceTo(nodePositions[j]);
+                if (dist < maxDist) {
+                    linePositions.push(
+                        nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
+                        nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
+                    );
+
+                    const alpha = 1 - (dist / maxDist);
+                    lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
+                    lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
+                }
+            }
+        }
+
+        const lineGeometry = new THREE.BufferGeometry();
+        lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+        lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
+
+        const lineMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(lines);
+
+        // Fare takibi
+        let mouseX = 0, mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        // Pencere boyutlandırma
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animasyon döngüsü
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsed = clock.getElapsedTime();
+            nodeMaterial.uniforms.uTime.value = elapsed;
+
+            // Yavaş, organik döndürme + fare takibi
+            nodePoints.rotation.y = elapsed * 0.03 + mouseX * 0.15;
+            nodePoints.rotation.x = elapsed * 0.02 + mouseY * 0.1;
+            lines.rotation.y = nodePoints.rotation.y;
+            lines.rotation.x = nodePoints.rotation.x;
+
+            // Scroll bazlı parallax
+            const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+            camera.position.z = 50 + scrollProgress * 30;
+            camera.position.y = scrollProgress * -10;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    })();
+
+    // ===== SMOOTH SCROLL =====
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    </script>
+</body>
+</html>
