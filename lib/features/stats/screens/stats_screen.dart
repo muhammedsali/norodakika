@@ -388,6 +388,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
               final value = radarStats[category] ?? 0.0;
               final progress = (value / 100).clamp(0.0, 1.0);
               final icon = _getCategoryIcon(category);
+              final categoryColor = _getCategoryColor(category); // Her alan kendi rengini kullanır
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -409,10 +410,10 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: stitchPrimary.withValues(alpha: 0.1),
+                                    color: categoryColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Icon(icon, color: stitchPrimary, size: 20),
+                                  child: Icon(icon, color: categoryColor, size: 20),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -434,7 +435,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                                         style: GoogleFonts.inter(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
-                                          color: stitchPrimary,
+                                          color: categoryColor,
                                         ),
                                       ),
                                     ],
@@ -452,7 +453,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
                           value: progress,
                           minHeight: 10,
                           backgroundColor: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
-                          valueColor: const AlwaysStoppedAnimation<Color>(stitchPrimary),
+                          valueColor: AlwaysStoppedAnimation<Color>(categoryColor),
                         ),
                       ),
                     ],
@@ -555,6 +556,35 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
         return Icons.translate;
       default:
         return Icons.star;
+    }
+  }
+
+  // Her bilişsel alana özel renk ataması
+  Color _getCategoryColor(String category) {
+    switch (category) {
+      case 'Hafıza':
+      case 'Memory':
+        return const Color(0xFF7C3AED); // Mor
+      case 'Dikkat':
+      case 'Attention':
+        return const Color(0xFFF97316); // Turuncu
+      case 'Refleks':
+      case 'Reflex':
+        return const Color(0xFFEAB308); // Sarı-altın
+      case 'Mantık':
+      case 'Logic':
+        return const Color(0xFF2563EB); // Mavi
+      case 'Sayısal Zeka':
+      case 'Numerical':
+        return const Color(0xFF10B981); // Yeşil
+      case 'Görsel Algı':
+      case 'Visual':
+        return const Color(0xFF0EA5E9); // Camgöbeği
+      case 'Dil':
+      case 'Language':
+        return const Color(0xFFEC4899); // Pembe
+      default:
+        return stitchPrimary;
     }
   }
 
