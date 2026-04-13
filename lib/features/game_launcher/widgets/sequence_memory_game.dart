@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../services/audio_service.dart';
+
 
 // ─────────────────────────────────────────────
 // Data class — tüm oyun durumu tek yerde
@@ -58,13 +58,10 @@ class _GameState {
 class SequenceMemoryGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
   final bool isPaused;
-  final AudioService audioService;
-
   const SequenceMemoryGame({
     super.key,
     required this.onComplete,
     required this.isPaused,
-    this.audioService = const AudioService(),
   });
 
   @override
@@ -179,7 +176,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   void _handleTap(int index) {
     if (_inputBlocked) return;
     HapticFeedback.selectionClick();
-    widget.audioService.playTap();
+
 
     final expected = _sequence[_input.length];
     if (index == expected) {
@@ -190,7 +187,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _onCorrectTap(int index) {
-    widget.audioService.playCorrect();
+
     HapticFeedback.lightImpact();
     _input.add(index);
 
@@ -203,7 +200,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
     // Tur tamamlandı
     final newStreak = _gs.streak + 1;
-    widget.audioService.playLevelUp();
+
     setState(() {
       _gs = _gs.copyWith(
         score: newScore +
@@ -219,7 +216,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _onWrongTap() {
-    widget.audioService.playWrong();
+
     HapticFeedback.mediumImpact();
     final newHearts = max(0, _gs.hearts - 1);
     setState(() {
@@ -242,7 +239,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     _isFinished = true;
     _sequenceCancelled = true;
     _gameTimer?.cancel();
-    widget.audioService.playGameOver();
+
 
     final duration = totalSeconds - max(0, _timeNotifier.value);
 
