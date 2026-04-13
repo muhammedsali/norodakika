@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../services/audio_service.dart';
+
 
 /// Kelime akışı: gerçek kelimelere dokun, uydurmalara dokunma.
 /// 60 sn, 3 can, seri/bonus, kaçan kelime cezası, hızlanan spawn.
@@ -46,7 +46,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
   double _spawnMs = initialSpawnMs;
 
   final List<_WordItem> _items = [];
-  final AudioService _audioService = const AudioService();
+
 
   static const _realWords = [
     'memory', 'focus', 'speed', 'brain', 'logic', 'number',
@@ -150,18 +150,18 @@ class _WordSprintGameState extends State<WordSprintGame> {
   void _onWordTap(_WordItem item) {
     if (_isFinished || widget.isPaused) return;
     HapticFeedback.selectionClick();
-    _audioService.playTap(); // 👆 Dokunma sesi
+
 
     setState(() {
       if (item.isReal) {
-        _audioService.playCorrect(); // ✅ Doğru kelime sesi
+
         HapticFeedback.lightImpact();
         _correctHits++;
         _streak++;
         _bestStreak = max(_bestStreak, _streak);
         _score += 140 + (_streak * 12);
       } else {
-        _audioService.playWrong(); // ❌ Yanlış kelime sesi
+
         HapticFeedback.mediumImpact();
         _wrongHits++;
         _streak = 0;
@@ -176,7 +176,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
   }
 
   void _registerMiss() {
-    _audioService.playWrong(); // ❌ Kaçan kelime
+
     HapticFeedback.mediumImpact();
     _missed++;
     _streak = 0;
@@ -196,7 +196,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
     final totalHits = _correctHits + _wrongHits + _missed;
     final successRate = totalHits == 0 ? 0.0 : _correctHits / totalHits;
 
-    _audioService.playGameOver(); // 🎮 Oyun bitiş sesi
+
 
     widget.onComplete({
       'score': _score.toDouble(),
