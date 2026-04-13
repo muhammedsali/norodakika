@@ -44,10 +44,10 @@ class MemoryBank {
     },
     {
       "id": "MEM01",
-      "name": "N-Back Mini",
-      "area": "Hafıza + Dikkat",
-      "intelligence": "intrapersonal",
-      "description": "Çalışan bellek testi (1-back / 2-back)."
+      "name": "Path Tracker",
+      "area": "Mantık + Hafıza",
+      "intelligence": "visual",
+      "description": "Görünmez bir nesneyi yön oklarına göre zihninde takip et."
     },
     {
       "id": "LOG01",

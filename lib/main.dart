@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'features/welcome/screens/splash_screen.dart';
 import 'features/settings/providers/language_provider.dart';
 import 'features/settings/providers/theme_provider.dart';
-import 'features/settings/providers/sound_provider.dart';
+
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
 
@@ -37,7 +37,7 @@ class NorodakikaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isDarkMode = ref.watch(themeProvider);
     ref.watch(languageProvider);
-    ref.watch(soundSettingsProvider);
+
     
     return MaterialApp(
       title: 'NöroDakika',

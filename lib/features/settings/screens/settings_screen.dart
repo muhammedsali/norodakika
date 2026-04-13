@@ -9,7 +9,7 @@ import '../../../services/local_storage_service.dart';
 import '../providers/language_provider.dart';
 import '../providers/theme_provider.dart';
 import '../providers/notification_provider.dart';
-import '../providers/sound_provider.dart';
+
 import '../../../services/notification_service.dart';
 
 class SettingsScreen extends ConsumerWidget {

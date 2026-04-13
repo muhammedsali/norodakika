@@ -11,8 +11,7 @@ class LocalStorageService {
   static const String _gameHistoryKey = 'game_history';
   static const String _gameStatsKey = 'game_stats';
   static const String _gameDifficultyKey = 'game_difficulty';
-  static const String _soundKey = 'is_sound_enabled';
-  static const String _musicKey = 'is_music_enabled';
+
 
   // İlk açılış onboarding durumunu getir
   static Future<bool> hasSeenOnboarding() async {
@@ -48,27 +47,6 @@ class LocalStorageService {
     await prefs.setBool(_themeKey, isDark);
   }
 
-  // Ses Tercihi
-  static Future<bool> getIsSoundEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_soundKey) ?? true;
-  }
-
-  static Future<void> setIsSoundEnabled(bool isEnabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_soundKey, isEnabled);
-  }
-
-  // Müzik Tercihi
-  static Future<bool> getIsMusicEnabled() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_musicKey) ?? true;
-  }
-
-  static Future<void> setIsMusicEnabled(bool isEnabled) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_musicKey, isEnabled);
-  }
 
   // Avatar seçimi
   static const String _avatarKey = 'selected_avatar';
