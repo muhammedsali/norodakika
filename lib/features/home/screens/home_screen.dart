@@ -757,6 +757,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }).toList();
 
     return SingleChildScrollView(
+      physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -767,6 +768,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 18),
           GridView.builder(
             shrinkWrap: true,
+            padding: EdgeInsets.zero, // MediaQuery padding'inin otomatik eklenmesini engelle
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
