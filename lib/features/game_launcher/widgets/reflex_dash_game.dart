@@ -144,7 +144,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
         _targets.remove(target);
         if (target.isGood) {
           _missed++;
-          AudioService().playWrong();
+          const AudioService().playWrong();
           HapticFeedback.heavyImpact();
           setState(() {
             _hearts = max(0, _hearts - 1);
@@ -187,7 +187,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
       
       _hearts = min(3, _hearts + 1); // Ödül can
       _targets.clear();
-      AudioService().playLevelUp();
+      const AudioService().playLevelUp();
     });
   }
 
@@ -203,7 +203,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     }
 
     if (hit == null) {
-      AudioService().playWrong();
+      const AudioService().playWrong();
       HapticFeedback.mediumImpact();
       setState(() {
         _badHits++;
@@ -216,7 +216,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
     _targets.remove(hit);
     
     if (hit.isGood) {
-      AudioService().playTap();
+      const AudioService().playTap();
       HapticFeedback.lightImpact();
       _goodHits++;
       _targetsClearedInLevel++;
@@ -240,7 +240,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
         _levelUp();
       }
     } else {
-      AudioService().playWrong();
+      const AudioService().playWrong();
       HapticFeedback.heavyImpact();
       setState(() {
         _badHits++;
@@ -265,7 +265,7 @@ class _ReflexDashGameState extends State<ReflexDashGame>
 
   void _checkDeath() {
     if (_hearts <= 0) {
-      AudioService().playGameOver();
+      const AudioService().playGameOver();
       _finishGame();
     }
   }

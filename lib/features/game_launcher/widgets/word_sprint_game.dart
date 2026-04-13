@@ -46,7 +46,7 @@ class _WordSprintGameState extends State<WordSprintGame> {
   double _spawnMs = initialSpawnMs;
 
   final List<_WordItem> _items = [];
-  final AudioService _audioService = AudioService();
+  final AudioService _audioService = const AudioService();
 
   static const _realWords = [
     'memory', 'focus', 'speed', 'brain', 'logic', 'number',

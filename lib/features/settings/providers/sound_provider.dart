@@ -31,7 +31,7 @@ class SoundSettingsNotifier extends StateNotifier<SoundSettings> {
     state = SoundSettings(isSoundEnabled: sound, isMusicEnabled: music);
     
     // Apply initial settings to audio service
-    final audioService = AudioService();
+    final audioService = const AudioService();
     audioService.setSoundEnabled(sound);
     audioService.setMusicEnabled(music);
   }
@@ -41,7 +41,7 @@ class SoundSettingsNotifier extends StateNotifier<SoundSettings> {
     state = state.copyWith(isSoundEnabled: newValue);
     await LocalStorageService.setIsSoundEnabled(newValue);
     
-    final audioService = AudioService();
+    final audioService = const AudioService();
     audioService.setSoundEnabled(newValue);
   }
 
@@ -50,7 +50,7 @@ class SoundSettingsNotifier extends StateNotifier<SoundSettings> {
     state = state.copyWith(isMusicEnabled: newValue);
     await LocalStorageService.setIsMusicEnabled(newValue);
     
-    final audioService = AudioService();
+    final audioService = const AudioService();
     audioService.setMusicEnabled(newValue);
   }
 }

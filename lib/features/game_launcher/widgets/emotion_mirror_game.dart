@@ -26,7 +26,7 @@ class EmotionMirrorGame extends ConsumerStatefulWidget {
 class _EmotionMirrorGameState extends ConsumerState<EmotionMirrorGame>
     with TickerProviderStateMixin {
   final Random _rng = Random();
-  final AudioService _audioService = AudioService();
+  final AudioService _audioService = const AudioService();
 
   Timer? _gameTimer; // Genel oyun süresi 
   Timer? _promptTimer; // Tekil sorunun süresi (ValueNotifier çalıştırır, setState çalışmaz)

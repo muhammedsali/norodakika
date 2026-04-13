@@ -47,8 +47,7 @@ class _GameState {
         bestStreak: bestStreak ?? this.bestStreak,
       );
 
-  double get successRate =>
-      attempts == 0 ? 0.0 : completed / attempts;
+  double get successRate => attempts == 0 ? 0.0 : completed / attempts;
 
   int get wrongAttempts => attempts - completed;
 }
@@ -61,20 +60,18 @@ class SequenceMemoryGame extends StatefulWidget {
   final bool isPaused;
   final AudioService audioService;
 
-  SequenceMemoryGame({
+  const SequenceMemoryGame({
     super.key,
     required this.onComplete,
     required this.isPaused,
-    AudioService? audioService,
-  }) : audioService = audioService ?? AudioService();
+    this.audioService = const AudioService(),
+  });
 
   @override
-  State<SequenceMemoryGame> createState() =>
-      _SequenceMemoryGameState();
+  State<SequenceMemoryGame> createState() => _SequenceMemoryGameState();
 }
 
-class _SequenceMemoryGameState
-    extends State<SequenceMemoryGame> {
+class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   // ── Sabitler ──────────────────────────────
   static const int totalSeconds = 60;
   static const int baseLength = 3;
@@ -85,10 +82,8 @@ class _SequenceMemoryGameState
   static const int _roundCompleteMultiplier = 12;
   static const int _wrongPenalty = 120;
 
-  static const Duration _preDelay =
-      Duration(milliseconds: 220);
-  static const Duration _showDelay =
-      Duration(milliseconds: 520);
+  static const Duration _preDelay = Duration(milliseconds: 220);
+  static const Duration _showDelay = Duration(milliseconds: 520);
 
   // ── State ──────────────────────────────────
   final _rng = Random();
@@ -97,8 +92,7 @@ class _SequenceMemoryGameState
   late List<int> _sequence;
   final List<int> _input = [];
 
-  final _timeNotifier =
-      ValueNotifier<int>(totalSeconds);
+  final _timeNotifier = ValueNotifier<int>(totalSeconds);
   final _activeNotifier = ValueNotifier<int>(-1);
 
   bool _isPlaying = false;
@@ -142,8 +136,7 @@ class _SequenceMemoryGameState
   // ── Timer ──────────────────────────────────
   void _startTimer() {
     _gameTimer?.cancel();
-    _gameTimer =
-        Timer.periodic(const Duration(seconds: 1), (_) {
+    _gameTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _isFinished) return;
       _timeNotifier.value--;
       if (_timeNotifier.value <= 0) _finish();
@@ -156,8 +149,7 @@ class _SequenceMemoryGameState
     _gs = _gs.copyWith(attempts: _gs.attempts + 1);
     _input.clear();
     final length = baseLength + _gs.round - 1;
-    _sequence =
-        List.generate(length, (_) => _rng.nextInt(9));
+    _sequence = List.generate(length, (_) => _rng.nextInt(9));
     _playSequence();
   }
 
@@ -182,10 +174,7 @@ class _SequenceMemoryGameState
 
   // ── Input ──────────────────────────────────
   bool get _inputBlocked =>
-      _isFinished ||
-      _isPlaying ||
-      _timeNotifier.value <= 0 ||
-      widget.isPaused;
+      _isFinished || _isPlaying || _timeNotifier.value <= 0 || widget.isPaused;
 
   void _handleTap(int index) {
     if (_inputBlocked) return;
@@ -255,8 +244,7 @@ class _SequenceMemoryGameState
     _gameTimer?.cancel();
     widget.audioService.playGameOver();
 
-    final duration =
-        totalSeconds - max(0, _timeNotifier.value);
+    final duration = totalSeconds - max(0, _timeNotifier.value);
 
     widget.onComplete({
       'score': _gs.score.toDouble(),
@@ -274,11 +262,8 @@ class _SequenceMemoryGameState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bg = isDark
-        ? const Color(0xFF0B1220)
-        : const Color(0xFFF6F8FB);
-    final panel =
-        isDark ? const Color(0xFF111827) : Colors.white;
+    final bg = isDark ? const Color(0xFF0B1220) : const Color(0xFFF6F8FB);
+    final panel = isDark ? const Color(0xFF111827) : Colors.white;
 
     return Scaffold(
       backgroundColor: bg,
@@ -344,15 +329,12 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleColor =
-        isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtitleColor = isDark
-        ? const Color(0xFF9CA3AF)
-        : const Color(0xFF6B7280);
+    final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtitleColor =
+        isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
@@ -365,12 +347,10 @@ class _Header extends StatelessWidget {
         ],
       ),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Sequence Echo',
@@ -443,9 +423,8 @@ class _TimerBar extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress.clamp(0.0, 1.0),
             minHeight: 12,
-            backgroundColor: isDark
-                ? const Color(0xFF1F2937)
-                : const Color(0xFFE5E7EB),
+            backgroundColor:
+                isDark ? const Color(0xFF1F2937) : const Color(0xFFE5E7EB),
             valueColor: AlwaysStoppedAnimation<Color>(
               Color.lerp(
                 const Color(0xFF22C55E),
@@ -476,12 +455,9 @@ class _Grid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final highlight = isDark
-        ? const Color(0xFF4F46E5)
-        : const Color(0xFF2563EB);
-    final cellBg = isDark
-        ? const Color(0xFF0F172A)
-        : const Color(0xFFF4F5F7);
+    final highlight =
+        isDark ? const Color(0xFF4F46E5) : const Color(0xFF2563EB);
+    final cellBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF4F5F7);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -498,9 +474,7 @@ class _Grid extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (_, constraints) {
-          final size = min(
-              constraints.maxWidth,
-              constraints.maxHeight);
+          final size = min(constraints.maxWidth, constraints.maxHeight);
           final cellSize = (size - 32) / 3;
 
           return Center(
@@ -508,10 +482,8 @@ class _Grid extends StatelessWidget {
               width: cellSize * 3 + 24,
               height: cellSize * 3 + 24,
               child: GridView.builder(
-                physics:
-                    const NeverScrollableScrollPhysics(),
-                gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
@@ -525,23 +497,16 @@ class _Grid extends StatelessWidget {
                       return GestureDetector(
                         onTap: () => onTap(index),
                         child: AnimatedContainer(
-                          duration: const Duration(
-                              milliseconds: 160),
+                          duration: const Duration(milliseconds: 160),
                           decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.circular(14),
-                            color: isActive
-                                ? highlight
-                                : cellBg,
+                            borderRadius: BorderRadius.circular(14),
+                            color: isActive ? highlight : cellBg,
                             boxShadow: isActive
                                 ? [
                                     BoxShadow(
-                                      color: highlight
-                                          .withValues(
-                                              alpha: 0.45),
+                                      color: highlight.withValues(alpha: 0.45),
                                       blurRadius: 18,
-                                      offset:
-                                          const Offset(0, 8),
+                                      offset: const Offset(0, 8),
                                     ),
                                   ]
                                 : null,
@@ -581,23 +546,19 @@ class _StatsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: panel,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: Colors.black.withValues(alpha: 0.02)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.02)),
       ),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _StatChip(
             icon: Icons.favorite,
             label: 'Can',
-            value:
-                '$hearts/${_SequenceMemoryGameState.maxHearts}',
+            value: '$hearts/${_SequenceMemoryGameState.maxHearts}',
             color: const Color(0xFFEF4444),
           ),
           _StatChip(
@@ -616,9 +577,7 @@ class _StatsBar extends StatelessWidget {
             icon: Icons.leaderboard,
             label: 'En iyi seri',
             value: '$bestStreak',
-            color: isDark
-                ? const Color(0xFF9CA3AF)
-                : const Color(0xFF6B7280),
+            color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
           ),
         ],
       ),

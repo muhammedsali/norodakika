@@ -50,7 +50,7 @@ class _FocusLineGameState extends State<FocusLineGame> with TickerProviderStateM
   final List<_FocusDot> _dots = [];
   int _spawnInterval = baseSpawnInterval;
   
-  final AudioService _audioService = AudioService();
+  final AudioService _audioService = const AudioService();
 
   @override
   void initState() {

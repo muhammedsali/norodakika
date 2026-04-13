@@ -20,7 +20,6 @@ class SettingsScreen extends ConsumerWidget {
     final isDarkMode = ref.watch(themeProvider);
     final language = ref.watch(languageProvider);
     final notificationsEnabled = ref.watch(notificationProvider);
-    final soundSettings = ref.watch(soundSettingsProvider);
     final s = AppStrings(language);
 
     final titleColor =

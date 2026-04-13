@@ -48,7 +48,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   late List<_CardFace> _options;
   late int _oddIndex;
   bool _isFinished = false;
-  final AudioService _audioService = AudioService();
+  final AudioService _audioService = const AudioService();
 
   @override
   void initState() {
