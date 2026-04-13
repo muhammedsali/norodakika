@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../services/audio_service.dart';
+
 
 /// Görsel algı oyunu: 4 karttan farklı olanı hızlıca bul.
 class OddOneOutGame extends StatefulWidget {
@@ -48,7 +48,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   late List<_CardFace> _options;
   late int _oddIndex;
   bool _isFinished = false;
-  final AudioService _audioService = const AudioService();
+
 
   @override
   void initState() {
@@ -113,7 +113,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
   }
 
   void _handleTimeout() {
-    _audioService.playWrong();
+
     HapticFeedback.mediumImpact();
     
     setState(() {
@@ -136,7 +136,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
       totalSeconds += 15;
       _roundMs = max(2000, _roundMs * 0.85); // Hızlanma
       _hearts = min(3, _hearts + 1);
-      _audioService.playLevelUp();
+
     });
   }
 
@@ -193,7 +193,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
     final isCorrect = index == _oddIndex;
     setState(() {
       if (isCorrect) {
-        _audioService.playCorrect(); 
+
         HapticFeedback.lightImpact();
         _correct++;
         _streak++;
@@ -205,7 +205,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
           _levelUp();
         }
       } else {
-        _audioService.playWrong();
+
         HapticFeedback.mediumImpact();
         _wrong++;
         _streak = 0;
@@ -228,7 +228,7 @@ class _OddOneOutGameState extends State<OddOneOutGame> {
     final successRate = _rounds == 0 ? 0.0 : _correct / _rounds;
     final duration = totalSeconds - max(0, _timeRemainingNotifier.value);
 
-    _audioService.playGameOver();
+
 
     widget.onComplete({
       'score': _score.toDouble(),
