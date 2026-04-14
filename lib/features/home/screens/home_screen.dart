@@ -254,39 +254,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => _showAvatarPicker(context),
-            child: Consumer(
-              builder: (context, ref, child) {
-                final selectedAvatar = ref.watch(avatarProvider);
-                final avatarData = AvatarData.getAvatar(selectedAvatar);
-                return Container(
-                  width: 44,
-                  height: 44,
-                  decoration:
-                      _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true)
-                          .copyWith(
-                    border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.5), width: 2),
-                  ),
-                  child: ClipOval(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: avatarData['colors'] as List<Color>,
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Icon(avatarData['icon'] as IconData,
-                          color: Colors.white, size: 22),
+          if (_selectedTab == 0) ...[
+            GestureDetector(
+              onTap: () => _showAvatarPicker(context),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final selectedAvatar = ref.watch(avatarProvider);
+                  final avatarData = AvatarData.getAvatar(selectedAvatar);
+                  return Container(
+                    width: 44,
+                    height: 44,
+                    decoration:
+                        _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true)
+                            .copyWith(
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.5), width: 2),
                     ),
-                  ),
-                );
-              },
+                    child: ClipOval(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: avatarData['colors'] as List<Color>,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: Icon(avatarData['icon'] as IconData,
+                            color: Colors.white, size: 22),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
+          ],
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,21 +316,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ),
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration:
-                    _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
-                child: IconButton(
-                  onPressed: () => showLeaderboardSheet(context, ref),
-                  icon: Icon(Icons.emoji_events_outlined,
-                      color: titleColor, size: 22),
+          if (_selectedTab == 0)
+            Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child: IconButton(
+                    onPressed: () => showLeaderboardSheet(context, ref),
+                    icon: const Icon(Icons.emoji_events_rounded,
+                        color: Colors.white, size: 22),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
         ],
       ),
     );

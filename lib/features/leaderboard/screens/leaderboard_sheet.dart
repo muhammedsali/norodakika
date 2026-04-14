@@ -195,122 +195,150 @@ void showLeaderboardSheet(BuildContext context, WidgetRef ref) {
                               Expanded(child: Center(child: Text(isEn ? 'No users found.' : 'Henüz oyuncu bulunamadı.', style: TextStyle(color: textColor))))
                            else
                              Expanded(
-                               child: ListView.separated(
-                                 controller: controller,
-                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                 itemCount: users.length,
-                                 separatorBuilder: (context, index) => const SizedBox(height: 12),
-                                 itemBuilder: (context, index) {
-                                   final u = users[index];
-                                   final isMe = u.id == myUid;
-                                   final rank = index + 1;
-                                   
-                                   // Top 3 colors
-                                   Color? rankColor;
-                                   if (rank == 1) {
-                                     rankColor = const Color(0xFFFBBF24); // Gold
-                                   } else if (rank == 2) {
-                                     rankColor = const Color(0xFF94A3B8); // Silver
-                                   } else if (rank == 3) {
-                                     rankColor = const Color(0xFFD97706); // Bronze
+                               child: Builder(
+                                 builder: (context) {
+                                   List<dynamic> displayItems = [];
+                                   if (users.length <= 5) {
+                                     displayItems.addAll(users);
+                                   } else {
+                                     displayItems.addAll(users.take(5));
+                                     if (userRank > 5) {
+                                       if (userRank > 6) {
+                                         displayItems.add("separator");
+                                       }
+                                       if (userRank - 1 < users.length) {
+                                         displayItems.add(users[userRank - 1]);
+                                       }
+                                     }
                                    }
-      
-                                   return Container(
-                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                     decoration: BoxDecoration(
-                                       color: isMe 
-                                         ? const Color(0xFF4F46E5).withValues(alpha: 0.15)
-                                         : (isDarkMode ? const Color(0xFF0F172A).withValues(alpha: 0.5) : Colors.white),
-                                       borderRadius: BorderRadius.circular(20),
-                                       border: Border.all(
-                                         color: isMe 
-                                           ? const Color(0xFF4F46E5).withValues(alpha: 0.5)
-                                           : Colors.transparent,
-                                       ),
-                                       boxShadow: [
-                                         if (!isDarkMode && !isMe)
-                                           BoxShadow(
-                                             color: Colors.grey.withValues(alpha: 0.08),
-                                             blurRadius: 10,
-                                             offset: const Offset(0, 4),
-                                           )
-                                       ],
-                                     ),
-                                     child: Row(
-                                       children: [
-                                         // Ranking Number
-                                         SizedBox(
-                                           width: 32,
-                                           child: Text(
-                                             '#$rank',
-                                             style: GoogleFonts.inter(
-                                               fontSize: 18,
-                                               fontWeight: FontWeight.bold,
-                                               color: rankColor ?? subtitleColor,
-                                             ),
+
+                                   return ListView.separated(
+                                     controller: controller,
+                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                     itemCount: displayItems.length,
+                                     separatorBuilder: (context, index) => const SizedBox(height: 12),
+                                     itemBuilder: (context, index) {
+                                       final item = displayItems[index];
+
+                                       if (item is String) {
+                                         return Padding(
+                                           padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                           child: Icon(Icons.more_vert, color: subtitleColor.withValues(alpha: 0.5)),
+                                         );
+                                       }
+
+                                       final u = item as LeaderboardUser;
+                                       final isMe = u.id == myUid;
+                                       final rank = users.indexWhere((x) => x.id == u.id) + 1;
+                                       
+                                       // Top 3 colors
+                                       Color? rankColor;
+                                       if (rank == 1) {
+                                         rankColor = const Color(0xFFFBBF24); // Gold
+                                       } else if (rank == 2) {
+                                         rankColor = const Color(0xFF94A3B8); // Silver
+                                       } else if (rank == 3) {
+                                         rankColor = const Color(0xFFD97706); // Bronze
+                                       }
+          
+                                       return Container(
+                                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                                         decoration: BoxDecoration(
+                                           color: isMe 
+                                             ? const Color(0xFF4F46E5).withValues(alpha: 0.15)
+                                             : (isDarkMode ? const Color(0xFF0F172A).withValues(alpha: 0.5) : Colors.white),
+                                           borderRadius: BorderRadius.circular(20),
+                                           border: Border.all(
+                                             color: isMe 
+                                               ? const Color(0xFF4F46E5).withValues(alpha: 0.5)
+                                               : Colors.transparent,
                                            ),
+                                           boxShadow: [
+                                             if (!isDarkMode && !isMe)
+                                               BoxShadow(
+                                                 color: Colors.grey.withValues(alpha: 0.08),
+                                                 blurRadius: 10,
+                                                 offset: const Offset(0, 4),
+                                               )
+                                           ],
                                          ),
-                                         const SizedBox(width: 8),
-                                         
-                                         // Avatar
-                                         Container(
-                                           width: 44,
-                                           height: 44,
-                                           decoration: BoxDecoration(
-                                             shape: BoxShape.circle,
-                                             color: isMe ? const Color(0xFF4F46E5) : (rankColor ?? subtitleColor.withValues(alpha: 0.3)),
-                                           ),
-                                           child: Center(
-                                             child: Icon(
-                                                isMe ? Icons.person : Icons.emoji_events,
-                                                color: Colors.white,
-                                                size: 20,
-                                             )
-                                           ),
-                                         ),
-                                         const SizedBox(width: 14),
-                                         
-                                         // Name
-                                         Expanded(
-                                           child: Text(
-                                             u.name.isNotEmpty ? u.name : 'Anonim',
-                                             style: GoogleFonts.inter(
-                                               fontSize: 15,
-                                               fontWeight: isMe ? FontWeight.w800 : FontWeight.w600,
-                                               color: textColor,
-                                             ),
-                                             maxLines: 1,
-                                             overflow: TextOverflow.ellipsis,
-                                           ),
-                                         ),
-                                         
-                                         // Score
-                                         Column(
-                                           crossAxisAlignment: CrossAxisAlignment.end,
-                                           mainAxisAlignment: MainAxisAlignment.center,
+                                         child: Row(
                                            children: [
-                                             Text(
-                                               '${u.score}',
-                                               style: GoogleFonts.inter(
-                                                 fontSize: 18,
-                                                 fontWeight: FontWeight.w900,
-                                                 color: isMe ? (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5)) : textColor,
+                                             // Ranking Number
+                                             SizedBox(
+                                               width: 32,
+                                               child: Text(
+                                                 '#$rank',
+                                                 style: GoogleFonts.inter(
+                                                   fontSize: 18,
+                                                   fontWeight: FontWeight.bold,
+                                                   color: rankColor ?? subtitleColor,
+                                                 ),
                                                ),
                                              ),
-                                             Text(
-                                               pointsText,
-                                               style: GoogleFonts.inter(
-                                                 fontSize: 10,
-                                                 fontWeight: FontWeight.bold,
-                                                 color: subtitleColor,
+                                             const SizedBox(width: 8),
+                                             
+                                             // Avatar
+                                             Container(
+                                               width: 44,
+                                               height: 44,
+                                               decoration: BoxDecoration(
+                                                 shape: BoxShape.circle,
+                                                 color: isMe ? const Color(0xFF4F46E5) : (rankColor ?? subtitleColor.withValues(alpha: 0.3)),
                                                ),
+                                               child: Center(
+                                                 child: Icon(
+                                                    isMe ? Icons.person : Icons.emoji_events,
+                                                    color: Colors.white,
+                                                    size: 20,
+                                                 )
+                                               ),
+                                             ),
+                                             const SizedBox(width: 14),
+                                             
+                                             // Name
+                                             Expanded(
+                                               child: Text(
+                                                 u.name.isNotEmpty ? u.name : 'Anonim',
+                                                 style: GoogleFonts.inter(
+                                                   fontSize: 15,
+                                                   fontWeight: isMe ? FontWeight.w800 : FontWeight.w600,
+                                                   color: textColor,
+                                                 ),
+                                                 maxLines: 1,
+                                                 overflow: TextOverflow.ellipsis,
+                                               ),
+                                             ),
+                                             
+                                             // Score
+                                             Column(
+                                               crossAxisAlignment: CrossAxisAlignment.end,
+                                               mainAxisAlignment: MainAxisAlignment.center,
+                                               children: [
+                                                 Text(
+                                                   '${u.score}',
+                                                   style: GoogleFonts.inter(
+                                                     fontSize: 18,
+                                                     fontWeight: FontWeight.w900,
+                                                     color: isMe ? (isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5)) : textColor,
+                                                   ),
+                                                 ),
+                                                 Text(
+                                                   pointsText,
+                                                   style: GoogleFonts.inter(
+                                                     fontSize: 10,
+                                                     fontWeight: FontWeight.bold,
+                                                     color: subtitleColor,
+                                                   ),
+                                                 ),
+                                               ],
                                              ),
                                            ],
                                          ),
-                                       ],
-                                     ),
+                                       );
+                                     },
                                    );
-                                 },
+                                 }
                                ),
                              ),
                              ],
