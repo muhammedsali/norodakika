@@ -325,15 +325,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFFBBF24), Color(0xFFF59E0B)],
+                      colors: [Color(0xFF818CF8), Color(0xFF4F46E5)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        color: const Color(0xFF4F46E5).withValues(alpha: 0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
                       )
                     ],
                   ),
@@ -1249,41 +1249,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: isDarkMode ? const Color(0xFF1F2937) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 12),
-            Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                    color: isDarkMode ? Colors.white24 : Colors.black12,
-                    borderRadius: BorderRadius.circular(10))),
-            const SizedBox(height: 20),
-            Text(s.chooseAvatarTitle,
-                style: GoogleFonts.inter(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color:
-                        isDarkMode ? Colors.white : const Color(0xFF111827))),
-            const SizedBox(height: 24),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1,
-              ),
-              itemCount: AvatarData.avatars.length,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                    width: 44,
+                    height: 5,
+                    decoration: BoxDecoration(
+                        color: isDarkMode ? Colors.white24 : Colors.black12,
+                        borderRadius: BorderRadius.circular(10))),
+                const SizedBox(height: 20),
+                Text(s.chooseAvatarTitle,
+                    style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color:
+                            isDarkMode ? Colors.white : const Color(0xFF111827))),
+                const SizedBox(height: 24),
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: AvatarData.avatars.length,
               itemBuilder: (context, index) {
                 final avatar = AvatarData.avatars[index];
                 final isSelected = ref.watch(avatarProvider) == index;
@@ -1310,18 +1313,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             offset: const Offset(0, 4))
                       ],
                     ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(avatar['icon'] as IconData,
-                            color: Colors.white, size: 40),
-                        const SizedBox(height: 8),
-                        Text(s.avatarLabel(avatar['name'] as String),
-                            style: GoogleFonts.inter(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white)),
-                      ],
+                    child: Center(
+                      child: Icon(avatar['icon'] as IconData,
+                          color: Colors.white, size: 40),
                     ),
                   ),
                 );
@@ -1331,7 +1325,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
       ),
-    );
+     ),
+    ),
+   );
   }
 
   Map<String, dynamic> _getGameIconData(String gameId) {
