@@ -13,7 +13,8 @@ import '../providers/notification_provider.dart';
 import '../../../services/notification_service.dart';
 
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({super.key});
+  final ScrollController? controller;
+  const SettingsScreen({super.key, this.controller});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,6 +35,7 @@ class SettingsScreen extends ConsumerWidget {
       body: SafeArea(
         bottom: false, // SafeArea'nın alttan menüyü itmesini engelledik
         child: SingleChildScrollView(
+          controller: controller,
           padding: const EdgeInsets.fromLTRB(
               20, 20, 20, 120), // 2. Değişiklik: Alt padding eklendi
           child: Column(

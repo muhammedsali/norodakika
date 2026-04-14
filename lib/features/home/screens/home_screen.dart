@@ -33,6 +33,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _gamesSearchController = TextEditingController();
   final ScrollController _homeScrollController = ScrollController();
   final ScrollController _gamesScrollController = ScrollController();
+  final ScrollController _statsScrollController = ScrollController();
+  final ScrollController _settingsScrollController = ScrollController();
   String _gamesQuery = '';
   String _gamesFilter = 'all';
 
@@ -70,6 +72,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _gamesSearchController.dispose();
     _homeScrollController.dispose();
     _gamesScrollController.dispose();
+    _statsScrollController.dispose();
+    _settingsScrollController.dispose();
     super.dispose();
   }
 
@@ -161,7 +165,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       _buildHomeTabBody(context, games),
                       _buildGamesTabBody(context, games),
-                      const StatsScreen(),
+                      StatsScreen(controller: _statsScrollController),
                       _buildSettingsTabBody(),
                     ],
                   ),
@@ -203,15 +207,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             isDarkMode: isDarkMode,
             language: appLanguage,
             onTabSelected: (index) {
+              // Sekmeye geçmeden önce scroll'u sıfırla ki kullanıcı geçiş anında "zıplama" görmesin
+              if (index == 0 && _homeScrollController.hasClients) {
+                _homeScrollController.jumpTo(0);
+              } else if (index == 1 && _gamesScrollController.hasClients) {
+                _gamesScrollController.jumpTo(0);
+              } else if (index == 2 && _statsScrollController.hasClients) {
+                _statsScrollController.jumpTo(0);
+              } else if (index == 3 && _settingsScrollController.hasClients) {
+                _settingsScrollController.jumpTo(0);
+              }
+
               setState(() {
                 _selectedTab = index;
-              });
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (index == 0 && _homeScrollController.hasClients) {
-                  _homeScrollController.jumpTo(0);
-                } else if (index == 1 && _gamesScrollController.hasClients) {
-                  _gamesScrollController.jumpTo(0);
-                }
               });
             },
           ),
@@ -376,7 +384,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionLabel(s.homeDailyProgress.toUpperCase(), isDarkMode),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildDailyProgressCard(
             isDarkMode: isDarkMode,
             completedToday: completedToday,
@@ -389,18 +397,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               });
             },
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
           _buildSectionLabel(s.homeUpNext.toUpperCase(), isDarkMode),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildUpNextCard(
             context: context,
             isDarkMode: isDarkMode,
             game: recommendedGame,
             s: s,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
           _buildSectionLabel(s.homeInsights.toUpperCase(), isDarkMode),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _buildCognitiveScoreCard(isDarkMode: isDarkMode, s: s),
         ],
       ),
@@ -436,7 +444,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: _getNeuDecoration(isDarkMode: isDarkMode),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -527,7 +535,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 80,
+            height: 120,
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius:
@@ -652,7 +660,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final globalPts = (total * 10).round();
 
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           decoration: _getNeuDecoration(isDarkMode: isDarkMode),
           child: Column(
             children: [
@@ -1082,7 +1090,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildSettingsTabBody() {
-    return const SettingsScreen();
+    return SettingsScreen(controller: _settingsScrollController);
   }
 
   Widget _buildOnboardingOverlay(BuildContext context, AppLanguage lang) {

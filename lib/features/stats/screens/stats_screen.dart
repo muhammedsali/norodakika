@@ -12,7 +12,8 @@ import '../../settings/providers/language_provider.dart';
 enum TimeFilter { day, week, month }
 
 class StatsScreen extends ConsumerStatefulWidget {
-  const StatsScreen({super.key});
+  final ScrollController? controller;
+  const StatsScreen({super.key, this.controller});
 
   @override
   ConsumerState<StatsScreen> createState() => _StatsScreenState();
@@ -206,6 +207,7 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
     return Container(
       color: Colors.transparent, // Arka plan
       child: SingleChildScrollView(
+        controller: widget.controller,
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 120), // Alt menü boşluğu
         child: Column(
           children: [
