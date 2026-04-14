@@ -127,8 +127,6 @@ class _StroopTapGameState extends State<StroopTapGame> {
     if (_isFinished || _isInputLocked || widget.isPaused) return;
     _isInputLocked = true;
 
-    HapticFeedback.lightImpact();
-
     final correctColor = _colors[_colorWords.indexOf(_currentWord)];
     final isCorrect = selected == correctColor;
 
@@ -139,12 +137,14 @@ class _StroopTapGameState extends State<StroopTapGame> {
     setState(() {
       _answered++;
       if (isCorrect) {
+        HapticFeedback.lightImpact();
         _correct++;
         _streak++;
         _bestStreak = max(_bestStreak, _streak);
         _score += 150 + (_streak * 15);
         _totalReactionMs += reactionMs.toDouble();
       } else {
+        HapticFeedback.heavyImpact();
         _wrong++;
         _streak = 0;
         _hearts = max(0, _hearts - 1);

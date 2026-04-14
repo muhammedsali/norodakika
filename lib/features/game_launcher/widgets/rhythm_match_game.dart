@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RhythmMatchGame extends StatefulWidget {
@@ -108,13 +109,16 @@ class _RhythmMatchGameState extends State<RhythmMatchGame> {
 
     final expected = _sequence[_inputStep];
     if (index == expected) {
+      HapticFeedback.selectionClick();
       _inputStep++;
       if (_inputStep >= _sequence.length) {
+        HapticFeedback.lightImpact();
         _correctRounds++;
         _score += 150;
         _nextRound();
       }
     } else {
+      HapticFeedback.heavyImpact();
       _wrongRounds++;
       _score = max(0, _score - 80);
       _nextRound();

@@ -31,6 +31,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _showOnboarding = false;
   int _onboardingStep = 0;
   final TextEditingController _gamesSearchController = TextEditingController();
+  final ScrollController _homeScrollController = ScrollController();
+  final ScrollController _gamesScrollController = ScrollController();
   String _gamesQuery = '';
   String _gamesFilter = 'all';
 
@@ -66,6 +68,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void dispose() {
     _gamesSearchController.dispose();
+    _homeScrollController.dispose();
+    _gamesScrollController.dispose();
     super.dispose();
   }
 
@@ -81,8 +85,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   // YENİ TASARIM: Premium Card Yardımcısı
   BoxDecoration _getNeuDecoration(
       {required bool isDarkMode, bool isCircle = false}) {
-    final bgColor = isDarkMode 
-        ? const Color(0xFF1E293B).withValues(alpha: 0.7) 
+    final bgColor = isDarkMode
+        ? const Color(0xFF1E293B).withValues(alpha: 0.7)
         : Colors.white.withValues(alpha: 0.9);
     final borderColor = isDarkMode
         ? Colors.white.withValues(alpha: 0.1)
@@ -111,8 +115,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final s = AppStrings(appLanguage);
     final isDarkMode = ref.watch(themeProvider);
     final customName = ref.watch(customNameProvider).value;
-    final userName =
-        customName ?? user?.displayName ?? user?.email?.split('@').first ?? s.userFallback;
+    final userName = customName ??
+        user?.displayName ??
+        user?.email?.split('@').first ??
+        s.userFallback;
 
     final overlayStyle = isDarkMode
         ? const SystemUiOverlayStyle(
@@ -200,6 +206,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               setState(() {
                 _selectedTab = index;
               });
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (index == 0 && _homeScrollController.hasClients) {
+                  _homeScrollController.jumpTo(0);
+                } else if (index == 1 && _gamesScrollController.hasClients) {
+                  _gamesScrollController.jumpTo(0);
+                }
+              });
             },
           ),
         ),
@@ -230,7 +243,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 4),
       child: Row(
         children: [
           GestureDetector(
@@ -240,8 +253,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 final selectedAvatar = ref.watch(avatarProvider);
                 final avatarData = AvatarData.getAvatar(selectedAvatar);
                 return Container(
-                  width: 48,
-                  height: 48,
+                  width: 44,
+                  height: 44,
                   decoration:
                       _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true)
                           .copyWith(
@@ -298,10 +311,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Container(
                 width: 44,
                 height: 44,
-                decoration: _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
+                decoration:
+                    _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true),
                 child: IconButton(
                   onPressed: () => showLeaderboardSheet(context, ref),
-                  icon: Icon(Icons.emoji_events_outlined, color: titleColor, size: 22),
+                  icon: Icon(Icons.emoji_events_outlined,
+                      color: titleColor, size: 22),
                 ),
               ),
             ],
@@ -319,15 +334,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     // Kullanıcının en zayıf olduğu yetenek alanını bulup o alana yönelik oyun öneren zeki kurgu
     GameModel getRecommendedGame() {
       final stats = ref.watch(userStatsProvider).value;
-      
+
       if (stats != null && stats.isNotEmpty) {
         final entries = stats.entries.toList();
         if (entries.isNotEmpty) {
           entries.sort((a, b) => (a.value as num).compareTo(b.value as num));
-          final weakestArea = entries.first.key; 
-          
+          final weakestArea = entries.first.key;
+
           // Bu yetenek alanına ait oyunları bul
-          final candidateGames = games.where((g) => g.area == weakestArea).toList();
+          final candidateGames =
+              games.where((g) => g.area == weakestArea).toList();
           if (candidateGames.isNotEmpty) {
             // Rebuild'lerde oyunun sürekli değişmesini (flicker) engellemek için gün tabanlı sabit seçim
             final daySeed = DateTime.now().day + DateTime.now().month;
@@ -335,7 +351,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           }
         }
       }
-      
+
       // Kullanıcının hiç verisi yoksa veya hesaplanamadıysa bugünün oyununu rastgele seç
       final daySeed = DateTime.now().day + DateTime.now().year;
       return games[daySeed % games.length];
@@ -345,21 +361,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     final completedTodayAsync = ref.watch(todayGameCountProvider);
     final completedToday = completedTodayAsync.value ?? 0;
-    
+
     // Günde en az 5 oyun oynamasını hedefleyelim
     const plannedToday = 5;
-    
+
     // Progress en fazla 1.0 (yani %100) olabilir, sınırlandıralım
     double dailyProgress = completedToday / plannedToday;
     if (dailyProgress > 1.0) dailyProgress = 1.0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+      controller: _homeScrollController,
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionLabel(s.homeDailyProgress.toUpperCase(), isDarkMode),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _buildDailyProgressCard(
             isDarkMode: isDarkMode,
             completedToday: completedToday,
@@ -372,18 +389,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               });
             },
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
           _buildSectionLabel(s.homeUpNext.toUpperCase(), isDarkMode),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _buildUpNextCard(
             context: context,
             isDarkMode: isDarkMode,
             game: recommendedGame,
             s: s,
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
           _buildSectionLabel(s.homeInsights.toUpperCase(), isDarkMode),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _buildCognitiveScoreCard(isDarkMode: isDarkMode, s: s),
         ],
       ),
@@ -419,7 +436,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: _getNeuDecoration(isDarkMode: isDarkMode),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -430,22 +447,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Text(
                 s.homeDailyGoalTitle,
                 style: GoogleFonts.inter(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: titleColor),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               Text(
                 s.dailyGoalCompleted(completedToday, plannedToday),
                 style: GoogleFonts.inter(fontSize: 12, color: subtitleColor),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 10),
               InkWell(
                 onTap: onViewDetails,
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration:
                       _getNeuDecoration(isDarkMode: isDarkMode).copyWith(
                     borderRadius: BorderRadius.circular(8),
@@ -462,8 +479,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ],
           ),
           SizedBox(
-            width: 72,
-            height: 72,
+            width: 56,
+            height: 56,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -510,7 +527,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: 120,
+            height: 80,
             width: double.infinity,
             decoration: BoxDecoration(
               borderRadius:
@@ -518,19 +535,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               color: stitchPrimary.withValues(alpha: 0.1),
             ),
             child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
               child: Image.asset(
                 'assets/games/${game.id.toLowerCase()}.png',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Icon(Icons.psychology_outlined,
-                      size: 48, color: stitchPrimary.withValues(alpha: 0.5));
+                      size: 40, color: stitchPrimary.withValues(alpha: 0.5));
                 },
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -544,16 +562,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           Text(game.name,
                               style: GoogleFonts.inter(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: titleColor)),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Text(
                             game.description.isNotEmpty
                                 ? game.description
                                 : game.area,
                             style: GoogleFonts.inter(
-                                fontSize: 12, color: subtitleColor),
+                                fontSize: 11, color: subtitleColor),
                           ),
                         ],
                       ),
@@ -570,7 +588,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: Row(
                         children: [
                           const Icon(Icons.timer_outlined,
-                              size: 12, color: stitchPrimary),
+                              size: 10, color: stitchPrimary),
                           const SizedBox(width: 4),
                           Text('2 ${s.homeMinutesShort}',
                               style: GoogleFonts.inter(
@@ -582,10 +600,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  height: 48,
+                  height: 40,
                   child: ElevatedButton.icon(
                     onPressed: () {
                       _showGameStartSheet(
@@ -620,7 +638,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildCognitiveScoreCard({required bool isDarkMode, required AppStrings s}) {
+  Widget _buildCognitiveScoreCard(
+      {required bool isDarkMode, required AppStrings s}) {
     final titleColor = isDarkMode ? Colors.white : const Color(0xFF0F172A);
     final statsAsync = ref.watch(userStatsProvider);
 
@@ -633,7 +652,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final globalPts = (total * 10).round();
 
         return Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
           decoration: _getNeuDecoration(isDarkMode: isDarkMode),
           child: Column(
             children: [
@@ -642,7 +661,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   Text(s.cognitiveScore,
                       style: GoogleFonts.inter(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: titleColor)),
                   Container(
@@ -654,11 +673,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Row(
                       children: [
                         const Icon(Icons.trending_up,
-                            size: 14, color: Color(0xFF16A34A)),
+                            size: 12, color: Color(0xFF16A34A)),
                         const SizedBox(width: 4),
                         Text('+12%',
                             style: GoogleFonts.inter(
-                                fontSize: 12,
+                                fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF16A34A))),
                       ],
@@ -666,16 +685,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
               Row(
                 children: [
                   Container(
-                    width: 120,
-                    height: 120,
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.5), width: 4),
+                          color: Colors.white.withValues(alpha: 0.5), width: 3),
                       color:
                           isDarkMode ? const Color(0xFF1E293B) : stitchBgLight,
                     ),
@@ -684,18 +703,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         Text('$globalPts',
                             style: GoogleFonts.inter(
-                                fontSize: 28,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w900,
                                 color: titleColor)),
                         Text(s.globalPts,
                             style: GoogleFonts.inter(
-                                fontSize: 10,
+                                fontSize: 9,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey)),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 24),
+                  const SizedBox(width: 20),
                   Expanded(
                     child: Column(
                       children: [
@@ -780,6 +799,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }).toList();
 
     return SingleChildScrollView(
+      controller: _gamesScrollController,
       physics: const ClampingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
       child: Column(
@@ -791,7 +811,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(height: 18),
           GridView.builder(
             shrinkWrap: true,
-            padding: EdgeInsets.zero, // MediaQuery padding'inin otomatik eklenmesini engelle
+            padding: EdgeInsets
+                .zero, // MediaQuery padding'inin otomatik eklenmesini engelle
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -875,11 +896,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
         onTap: () {
+          HapticFeedback.selectionClick();
           setState(() {
             _gamesFilter = filterKey;
           });
         },
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.fastOutSlowIn,
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
             color: isActive ? activeBg : inactiveBg,
@@ -960,6 +984,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
         onTap: () {
+          HapticFeedback.lightImpact();
           _showGameStartSheet(
             context: context,
             gameId: game.id,
@@ -979,7 +1004,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: intelColor.withValues(alpha: isDarkMode ? 0.25 : 0.15),
+                    color:
+                        intelColor.withValues(alpha: isDarkMode ? 0.25 : 0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Stack(
@@ -1557,7 +1583,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () => Navigator.of(ctx).pop(),
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.of(ctx).pop();
+                            },
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               width: 36,
@@ -1636,6 +1665,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: () {
+                              HapticFeedback.mediumImpact();
                               Navigator.of(ctx).pop();
                               final allGames = MemoryBank.games
                                   .map((g) => GameModel.fromMap(g))

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../settings/providers/language_provider.dart';
 
 class HomeBottomNav extends StatelessWidget {
@@ -29,7 +30,8 @@ class HomeBottomNav extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDarkMode
                   ? const Color(0xFF1F2937).withValues(alpha: 0.6) // Dark glass
-                  : const Color(0xFFFFFFFF).withValues(alpha: 0.6), // Light glass
+                  : const Color(0xFFFFFFFF)
+                      .withValues(alpha: 0.6), // Light glass
               borderRadius: BorderRadius.circular(40),
               border: Border.all(
                 color: isDarkMode
@@ -56,7 +58,10 @@ class HomeBottomNav extends StatelessWidget {
     final bool isActive = selectedTab == index;
 
     return GestureDetector(
-      onTap: () => onTabSelected(index),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTabSelected(index);
+      },
       child: Container(
         width: 48,
         height: 48,

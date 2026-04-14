@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 
@@ -100,6 +101,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
     }
 
     setState(() {
+      HapticFeedback.selectionClick();
       _gameCards[index].isFlipped = true;
     });
 
@@ -111,6 +113,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
 
       if (_gameCards[_firstCardIndex!].value == _gameCards[index].value) {
         setState(() {
+          HapticFeedback.lightImpact();
           _gameCards[_firstCardIndex!].isMatched = true;
           _gameCards[index].isMatched = true;
           _matches++;
@@ -128,6 +131,7 @@ class _MemoryBoardGameState extends State<MemoryBoardGame> {
         Future.delayed(const Duration(milliseconds: 800), () {
           if (mounted) {
             setState(() {
+              HapticFeedback.heavyImpact();
               _gameCards[_firstCardIndex!].isFlipped = false;
               _gameCards[index].isFlipped = false;
               _firstCardIndex = null;

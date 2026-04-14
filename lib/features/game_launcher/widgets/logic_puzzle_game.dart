@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 
@@ -156,6 +157,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame>
     _totalQuestions++;
 
     if (answer == _missingShape) {
+      HapticFeedback.lightImpact();
       _correctAnswers++;
       _combo++;
       if (_combo > _bestCombo) _bestCombo = _combo;
@@ -172,6 +174,7 @@ class _LogicPuzzleGameState extends State<LogicPuzzleGame>
         }
       });
     } else {
+      HapticFeedback.heavyImpact();
       _lives--;
       _combo = 0;
       _score = (_score - 10).clamp(0, 999999);
