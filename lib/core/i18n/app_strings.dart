@@ -211,7 +211,10 @@ class AppStrings {
       isEn ? 'Task: $current/$total' : 'Görev: $current/$total';
 
   // Home - Stitch home UI
+  String get homeHello => isEn ? 'HELLO,' : 'MERHABA,';
   String get homeWelcomeBack => isEn ? 'WELCOME BACK,' : 'TEKRAR HOŞ GELDİN,';
+  String get homeDiscover => isEn ? 'DISCOVER' : 'KEŞFET';
+  String get homeAllGames => isEn ? 'All Games' : 'Tüm Oyunlar';
   String get homeDailyProgress => isEn ? 'DAILY PROGRESS' : 'GÜNLÜK İLERLEME';
   String get homeDailyGoalTitle => isEn ? 'Daily Goal' : 'Günlük Hedef';
   String dailyGoalCompleted(int completed, int planned) => isEn
@@ -303,7 +306,7 @@ class AppStrings {
     }
   }
 
-  // Game play
+  // Game play - sonuç ekranı
   String get gameCompleted => isEn ? 'Game completed' : 'Oyun tamamlandı';
   String get successRate => isEn ? 'Success rate' : 'Başarı oranı';
   String durationSeconds(int seconds) =>
@@ -323,6 +326,39 @@ class AppStrings {
   String get emotionQuestion => isEn
       ? 'Does the emoji match the word?'
       : 'Emoji ile kelime aynı duyguyu anlatıyor mu?';
+
+  // Oyun sonuç dialog - tebrik metinleri
+  String get congratsExcellent => isEn ? 'EXCELLENT!' : 'MÜKEMMEL!';
+  String get congratsGreat => isEn ? 'GREAT!' : 'HARİKA!';
+  String get congratsCanImprove =>
+      isEn ? 'KEEP TRYING' : 'DAHA İYİ OLABİLİR';
+
+  // Oyun sonuç dialog - istatistik etiketleri
+  String get resultScoreLabel => isEn ? 'SCORE' : 'SKOR';
+  String get resultSuccessLabel => isEn ? 'SUCCESS' : 'BAŞARI';
+
+  // Oyun içi genel etiketler
+  String get gameOverLabel => isEn ? 'GAME OVER' : 'OYUN BİTTİ';
+  String get pointsLabel => isEn ? 'POINTS' : 'PUAN';
+  String get timeLabel => isEn ? 'TIME' : 'SÜRE';
+  String get comboLabel => isEn ? 'COMBO' : 'KOMBO';
+
+  // Reflex Tap oyun içi geri bildirimler
+  String get reflexTapPress => isEn ? 'TAP!' : 'BAS!';
+  String get reflexWait => isEn ? 'WAIT' : 'BEKLE';
+  String get reflexTooEarly => isEn ? 'TOO EARLY!' : 'ÇOK ERKEN!';
+  String get reflexLegendary => isEn ? 'LEGENDARY!' : 'EFSANE!';
+  String get reflexPerfect => isEn ? 'PERFECT!' : 'MÜKEMMEL!';
+  String get reflexGood => isEn ? 'GOOD!' : 'İYİ!';
+  String get reflexSlow => isEn ? 'SLOW...' : 'YAVAŞ...';
+
+  // Reflex Tap sonuç ekranı istatistikleri
+  String get reflexBest => isEn ? 'Best' : 'En İyi';
+  String get reflexAverage => isEn ? 'Average' : 'Ortalama';
+  String get reflexCombo => isEn ? 'Combo' : 'Kombo';
+  String get reflexAccuracy => isEn ? 'Accuracy' : 'İsabet';
+  String get reflexStreakLabel => isEn ? 'Streak: ' : 'Seri: ';
+  String get reflexAverageLabel => isEn ? 'Average: ' : 'Ortalama: ';
 
   // Generic
   String errorPrefix(Object error) => isEn ? 'Error: $error' : 'Hata: $error';

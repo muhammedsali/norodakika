@@ -3,15 +3,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/i18n/app_strings.dart';
 
 class ReflexTapGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
   final bool isPaused;
+  final AppStrings? strings;
 
   const ReflexTapGame({
     super.key,
     required this.onComplete,
     required this.isPaused,
+    this.strings,
   });
 
   @override
@@ -203,7 +206,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
         _score = max(0, _score - 500);
         _combo = 0;
         _multiplier = 1.0;
-        _feedbackText = "ÇOK ERKEN!";
+        _feedbackText = widget.strings?.reflexTooEarly ?? "ÇOK ERKEN!";
         _feedbackColor = Colors.redAccent;
       });
 
@@ -251,16 +254,16 @@ class _ReflexTapGameState extends State<ReflexTapGame>
       _score += (baseScore * _multiplier).toInt();
 
       if (ms < 200) {
-        _feedbackText = "EFSANE!";
+        _feedbackText = widget.strings?.reflexLegendary ?? "EFSANE!";
         _feedbackColor = Colors.purpleAccent;
       } else if (ms < 300) {
-        _feedbackText = "MÜKEMMEL!";
+        _feedbackText = widget.strings?.reflexPerfect ?? "MÜKEMMEL!";
         _feedbackColor = Colors.greenAccent;
       } else if (ms < 400) {
-        _feedbackText = "İYİ!";
+        _feedbackText = widget.strings?.reflexGood ?? "İYİ!";
         _feedbackColor = Colors.blueAccent;
       } else {
-        _feedbackText = "YAVAŞ...";
+        _feedbackText = widget.strings?.reflexSlow ?? "YAVAŞ...";
         _feedbackColor = Colors.orangeAccent;
       }
     });
@@ -336,7 +339,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Ortalama: ',
+                                 'Ortalama: ',
                                         style: GoogleFonts.spaceGrotesk(
                                           fontSize: 13,
                                           color: textSecondary,
@@ -408,7 +411,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
           ValueListenableBuilder<int>(
             valueListenable: _timeRemainingNotifier,
             builder: (context, timeRemaining, child) {
-              return _buildStatItem("SÜRE", "$timeRemaining", Icons.timer, titleColor,
+              return _buildStatItem(widget.strings?.timeLabel ?? "SÜRE", "$timeRemaining", Icons.timer, titleColor,
                   textSecondary);
             },
           ),
@@ -417,7 +420,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
             opacity: _combo > 1 ? 1.0 : 0.0,
             child: Column(
               children: [
-                Text("COMBO",
+                Text(widget.strings?.comboLabel ?? "COMBO",
                     style: GoogleFonts.spaceGrotesk(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -432,7 +435,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
             ),
           ),
           _buildStatItem(
-              "SKOR", "$_score", Icons.emoji_events, titleColor, textSecondary),
+              widget.strings?.resultScoreLabel ?? "SKOR", "$_score", Icons.emoji_events, titleColor, textSecondary),
         ],
       ),
     );
@@ -514,7 +517,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
               child: Center(
                 child: _isTargetVisible
                     ? Text(
-                        "BAS!",
+                        widget.strings?.reflexTapPress ?? "BAS!",
                         style: GoogleFonts.spaceGrotesk(
                           fontSize: 40,
                           fontWeight: FontWeight.w900,
@@ -528,7 +531,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
                           Icon(Icons.bolt, color: textSecondary, size: 32),
                           const SizedBox(height: 8),
                           Text(
-                            "BEKLE",
+                            widget.strings?.reflexWait ?? "BEKLE",
                             style: GoogleFonts.spaceGrotesk(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -567,7 +570,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text("OYUN BİTTİ",
+           Text(widget.strings?.gameOverLabel ?? "OYUN BİTTİ",
               style: GoogleFonts.spaceGrotesk(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -579,7 +582,7 @@ class _ReflexTapGameState extends State<ReflexTapGame>
                   fontWeight: FontWeight.w900,
                   color: Colors.indigo,
                   height: 1)),
-          Text("PUAN",
+           Text(widget.strings?.pointsLabel ?? "PUAN",
               style: GoogleFonts.spaceGrotesk(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -590,12 +593,13 @@ class _ReflexTapGameState extends State<ReflexTapGame>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _statBox(
-                  "En İyi",
+               widget.strings?.reflexBest ?? "En İyi",
                   "${_bestReactionTime == 9999 ? 0 : _bestReactionTime}ms",
                   isDark,
                   titleColor,
                   textSecondary),
-              _statBox("Ortalama", "${avgSpeed}ms", isDark, titleColor,
+              _statBox(
+                  widget.strings?.reflexAverage ?? "Ortalama", "${avgSpeed}ms", isDark, titleColor,
                   textSecondary),
             ],
           ),
@@ -604,9 +608,9 @@ class _ReflexTapGameState extends State<ReflexTapGame>
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _statBox(
-                  "Kombo", "x$_maxCombo", isDark, titleColor, textSecondary),
+               widget.strings?.reflexCombo ?? "Kombo", "x$_maxCombo", isDark, titleColor, textSecondary),
               _statBox(
-                  "İsabet",
+               widget.strings?.reflexAccuracy ?? "İsabet",
                   "${_totalTaps == 0 ? 0 : ((_correctTaps / _totalTaps) * 100).round()}%",
                   isDark,
                   titleColor,

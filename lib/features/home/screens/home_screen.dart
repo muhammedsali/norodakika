@@ -217,11 +217,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String bottomText = "";
 
     if (_selectedTab == 0) {
-      topText = "MERHABA,";
+      topText = s.homeHello;
       bottomText = userName;
     } else if (_selectedTab == 1) {
-      topText = "KEŞFET";
-      bottomText = "Tüm Oyunlar";
+      topText = s.homeDiscover;
+      bottomText = s.homeAllGames;
     } else if (_selectedTab == 2) {
       topText = s.statsTitle.toUpperCase();
       bottomText = s.statsSubtitle;

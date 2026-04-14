@@ -241,15 +241,15 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
         if (successRate >= 0.8) {
           successColor = const Color(0xFF10B981); // Zümrüt Yeşili
           medalIcon = Icons.military_tech;
-          congratsText = "MÜKEMMEL!";
+          congratsText = s.congratsExcellent;
         } else if (successRate >= 0.5) {
           successColor = const Color(0xFFF59E0B); // Turuncu
           medalIcon = Icons.thumb_up_alt;
-          congratsText = "HARİKA!";
+          congratsText = s.congratsGreat;
         } else {
           successColor = const Color(0xFFEF4444); // Kırmızı
           medalIcon = Icons.fitness_center;
-          congratsText = "DAHA İYİ OLABİLİR";
+          congratsText = s.congratsCanImprove;
         }
 
         return Center(
@@ -333,7 +333,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                           child: Column(
                             children: [
                               Text(
-                                "SKOR",
+                                s.resultScoreLabel,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -358,7 +358,7 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                           child: Column(
                             children: [
                               Text(
-                                "BAŞARI",
+                                s.resultSuccessLabel,
                                 style: GoogleFonts.inter(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
