@@ -7,6 +7,7 @@ import '../../../services/local_storage_service.dart';
 import '../../settings/providers/language_provider.dart';
 import '../../auth/screens/auth_gate_screen.dart';
 import 'onboarding_screen.dart';
+import '../../../core/widgets/neuron_background.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -94,23 +95,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isDark
-                    ? [
-                        const Color(0xFF111827),
-                        const Color(0xFF1F2937),
-                      ]
-                    : [
-                        const Color(0xFFF3F4F6),
-                        Colors.white,
-                      ],
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: NeuronBackground(isDarkMode: isDark),
               ),
-            ),
-            child: Center(
+              Positioned.fill(
+                child: Center(
               child: Opacity(
                 opacity: _fadeAnimation.value,
                 child: Transform.scale(
@@ -219,7 +210,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                 ),
               ),
-            ),
+            ],
           );
         },
       ),
