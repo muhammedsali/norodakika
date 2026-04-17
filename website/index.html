@@ -2256,7 +2256,7 @@
     <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-content">
-            <div class="footer-brand">
+                <div class="footer-brand">
                 <div class="footer-logo"><img src="app_icon.png" alt="NöroDakika"
                         style="width:100%;height:100%;object-fit:cover;border-radius:10px;"></div>
                 <span class="footer-name">NöroDakika</span>
@@ -2283,28 +2283,25 @@
         const cursorDot = document.getElementById('cursorDot');
         const cursorGlow = document.getElementById('cursorGlow');
         const pageGlow = document.getElementById('pageGlow');
-
+        
         const isMobile = window.matchMedia('(max-width: 768px)').matches || 'ontouchstart' in window;
 
         if (!isMobile && cursorDot && cursorGlow) {
             document.addEventListener('mousemove', (e) => {
-                // Dot follows precisely
-                gsap.to(cursorDot, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.1,
+                gsap.to(cursorDot, { 
+                    x: e.clientX, 
+                    y: e.clientY, 
+                    duration: 0.08,
                     xPercent: -50,
                     yPercent: -50
                 });
-                // Glow follows with lag
-                gsap.to(cursorGlow, {
-                    x: e.clientX,
-                    y: e.clientY,
-                    duration: 0.2,
+                gsap.to(cursorGlow, { 
+                    x: e.clientX, 
+                    y: e.clientY, 
+                    duration: 0.15,
                     xPercent: -50,
                     yPercent: -50
                 });
-                // Background glow
                 if (pageGlow) {
                     gsap.to(pageGlow, {
                         x: e.clientX - 300,
@@ -2314,7 +2311,6 @@
                 }
             });
 
-            // Hover effects for interactive elements
             document.querySelectorAll('a, button, .feature-card, .game-card, .btn-primary, .btn-secondary, .phone-mockup, .domain-item').forEach(el => {
                 el.addEventListener('mouseenter', () => {
                     cursorGlow.classList.add('hovering');
@@ -2325,11 +2321,6 @@
                     gsap.to(cursorDot, { scale: 1, background: 'white', duration: 0.3 });
                 });
             });
-        } else {
-            // Mobile compatibility
-            if (cursorDot) cursorDot.style.display = 'none';
-            if (cursorGlow) cursorGlow.style.display = 'none';
-            document.body.style.cursor = 'auto';
         }
 
         // ===== OYUN VERİLERİ =====
@@ -2361,14 +2352,6 @@
                 const card = document.createElement('div');
                 card.className = 'game-card reveal';
                 card.setAttribute('data-tilt', '');
-                card.setAttribute('data-tilt-max', '12');
-                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-                const navLinks = document.getElementById('navLinks');
-                if (mobileMenuBtn) {
-                    mobileMenuBtn.addEventListener('click', () => {
-                        navLinks.classList.toggle('mobile-open');
-                        mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
-                    });
                 }
     </script>
 </body>
