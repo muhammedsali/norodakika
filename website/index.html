@@ -1457,9 +1457,8 @@
         }
 
         .reveal {
-            opacity: 0;
-            transform: translateY(50px) rotateX(5deg);
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1; /* JS yüklenene kadar görünür kalsın, GSAP otomatik olarak 0'dan başlatacak */
+            transform: translateY(0);
         }
 
         .reveal.visible {
@@ -2279,14 +2278,15 @@
 
             // Scroll Reveal
             gsap.utils.toArray('.reveal').forEach((el, i) => {
-                gsap.from(el, {
+                gsap.set(el, { opacity: 0, y: 40 }); // Başlangıç durumunu burada belirle
+                gsap.to(el, {
                     scrollTrigger: {
                         trigger: el,
                         start: "top 85%",
                         toggleActions: "play none none none"
                     },
-                    y: 40,
-                    opacity: 0,
+                    y: 0,
+                    opacity: 1,
                     duration: 1,
                     ease: "power3.out",
                     delay: (i % 3) * 0.1
