@@ -23,6 +23,12 @@
 
     <!-- Three.js (3D efektler için) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP & Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <!-- VanillaTilt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
 
     <style>
         /* ===== RESET & BASE ===== */
@@ -2264,311 +2270,66 @@
     </footer>
 
     <!-- Custom Cursor UI -->
-    <div class="custom-cursor" id="cursor"></div>
-    <div class="cursor-outer" id="cursorOuter"></div>
+    <div class="custom-cursor" id="cursorDot"></div>
+    <div class="cursor-outer" id="cursorGlow"></div>
+    <div class="page-glow" id="pageGlow"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
-    <script>
-        // GSAP Register
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-        // ===== CUSTOM CURSOR LOGIC =====
-        const cursor = document.getElementById('cursor');
-        const cursorOuter = document.getElementById('cursorOuter');
-
-        document.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0.1,
-                xPercent: -50,
-                yPercent: -50
-            });
-            gsap.to(cursorOuter, {
-                x: e.clientX,
-                y: e.clientY,
-                duration: 0.15,
-                xPercent: -50,
-                yPercent: -50
-            });
-        });
-
-        document.querySelectorAll('a, button, .feature-card, .game-card, .btn-primary, .btn-secondary, .phone-mockup').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                gsap.to(cursor, { scale: 1.5, background: 'var(--accent)', duration: 0.3 });
-                gsap.to(cursorOuter, { scale: 1.5, borderColor: 'var(--primary-light)', borderWidth: '1px', duration: 0.3 });
-            });
-            el.addEventListener('mouseleave', () => {
-                gsap.to(cursor, { scale: 1, background: 'var(--primary-light)', duration: 0.3 });
-                gsap.to(cursorOuter, { scale: 1, borderColor: 'var(--accent)', borderWidth: '2px', duration: 0.3 });
-            });
-        });
-
-        // ===== OYUN VERİLERİ =====
-        const gamesData = [
-            { id: "REF01", name: "Reflex Tap", area: "Refleks", icon: "⚡", color: "linear-gradient(135deg,#EF4444,#F87171)", desc: "Tepki süresi ölçümü + Go/No-Go" },
-            { id: "REF02", name: "Reflex Dash", area: "Refleks", icon: "🏃", color: "linear-gradient(135deg,#DC2626,#EF4444)", desc: "Şeritlerde hızlı hedef yakalama" },
-            { id: "ATT01", name: "Stroop Tap", area: "Dikkat", icon: "🎯", color: "linear-gradient(135deg,#F59E0B,#FBBF24)", desc: "Renk-kelime uyumsuzluğu testi" },
-            { id: "ATT02", name: "Focus Line", area: "Dikkat + Görsel", icon: "👁️", color: "linear-gradient(135deg,#D97706,#F59E0B)", desc: "Çizgi üzerinde hedef noktaları tak" },
-            { id: "MEM01", name: "Path Tracker", area: "Mantık + Hafıza", icon: "🗺️", color: "linear-gradient(135deg,#3B82F6,#60A5FA)", desc: "Görünmez nesneyi zihninde takip et" },
-            { id: "MEM02", name: "Memory Board", area: "Hafıza + Görsel", icon: "🧩", color: "linear-gradient(135deg,#2563EB,#3B82F6)", desc: "Kart eşleştirme + görsel hafıza" },
-            { id: "MEM03", name: "Recall Phase", area: "Dil + Hafıza", icon: "📋", color: "linear-gradient(135deg,#7C3AED,#8B5CF6)", desc: "Kelimeleri göster ve hatırla" },
-            { id: "MEM04", name: "Sequence Echo", area: "Hafıza + Dikkat", icon: "🔁", color: "linear-gradient(135deg,#6D28D9,#7C3AED)", desc: "Gösterilen sırayı aynen tekrala" },
-            { id: "LOG01", name: "Logic Puzzle", area: "Mantık + Görsel", icon: "🔮", color: "linear-gradient(135deg,#8B5CF6,#A78BFA)", desc: "Mantık dizisi çözme oyunu" },
-            { id: "NUM01", name: "Quick Math", area: "Sayısal Zeka", icon: "🔢", color: "linear-gradient(135deg,#10B981,#34D399)", desc: "Zaman baskılı mental aritmetik" },
-            { id: "VIS02", name: "Odd One Out", area: "Görsel Algı", icon: "🃏", color: "linear-gradient(135deg,#14B8A6,#2DD4BF)", desc: "Farklı kartı hızlıca bul" },
-            { id: "LANG02", name: "Word Sprint", area: "Dil", icon: "📝", color: "linear-gradient(135deg,#EC4899,#F472B6)", desc: "Gerçek-uydurma kelime ayırt et" },
-            { id: "MUS01", name: "Rhythm Match", area: "Dikkat + Refleks", icon: "🎵", color: "linear-gradient(135deg,#F43F5E,#FB7185)", desc: "Ritim dizilerini doğru sırayla yakala" },
-            { id: "SOC01", name: "Emotion Mirror", area: "Dil + Dikkat", icon: "😊", color: "linear-gradient(135deg,#E11D48,#F43F5E)", desc: "Duygu ifadelerini eşleştir" },
-            { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "🌿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
-            { id: "KIN01", name: "Balance Tap", area: "Refleks", icon: "⚖️", color: "linear-gradient(135deg,#0891B2,#06B6D4)", desc: "Dengeyi koru, hızlı dokunuşlar" },
-            { id: "SPA01", name: "Route Builder", area: "Mantık + Görsel", icon: "🛤️", color: "linear-gradient(135deg,#0284C7,#0EA5E9)", desc: "En kısa rotayı planla" },
-            { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "🧘", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
-        ];
-
-        // Oyun kartlarını oluştur
-        const gamesGrid = document.getElementById('gamesGrid');
-        if (gamesGrid) {
-            gamesData.forEach((game, i) => {
-                const card = document.createElement('div');
-                card.className = 'game-card reveal';
-                card.setAttribute('data-tilt', '');
-                card.setAttribute('data-tilt-max', '15');
-                card.setAttribute('data-tilt-speed', '400');
-                card.setAttribute('data-tilt-perspective', '1000');
-                card.innerHTML = `
-                <div class="game-card-icon" style="background:${game.color}; transform: translateZ(30px);">${game.icon}</div>
-                <div class="game-card-name" style="transform: translateZ(50px);">${game.name}</div>
-                <div class="game-card-area" style="transform: translateZ(40px);">${game.area}</div>
-                <div class="game-card-desc" style="transform: translateZ(20px);">${game.desc}</div>
-            `;
-                gamesGrid.appendChild(card);
-            });
-        }
-
-        // Initialize Tilt
-        VanillaTilt.init(document.querySelectorAll("[data-tilt], .feature-card, .phone-mockup"));
-
-        // ===== NAVBAR SCROLL ETKİSİ =====
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                if (!navbar.classList.contains('scrolled')) {
-                    navbar.classList.add('scrolled');
-                    gsap.to(navbar, { backgroundColor: 'rgba(3, 7, 18, 0.95)', height: '70px', duration: 0.3 });
-                }
-            } else {
-                if (navbar.classList.contains('scrolled')) {
-                    navbar.classList.remove('scrolled');
-                    gsap.to(navbar, { backgroundColor: 'rgba(3, 7, 18, 0.6)', height: '80px', duration: 0.3 });
-                }
-            }
-        });
-
-        // ===== GSAP SCROLL ANIMATIONS =====
-        gsap.utils.toArray('.reveal').forEach((el, i) => {
-            gsap.from(el, {
-                scrollTrigger: {
-                    trigger: el,
-                    start: "top 90%",
-                    toggleActions: "play none none none"
-                },
-                y: 60,
-                opacity: 0,
-                scale: 0.95,
-                duration: 1,
-                ease: "power3.out",
-                delay: (i % 3) * 0.1
-            });
-        });
-
-        // Hero Parallax
-        gsap.to(".hero-content", {
-            scrollTrigger: {
-                trigger: ".hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            },
-            y: 150,
-            opacity: 0.5
-        });
-
-        // ===== THREE.JS — ADVANCED NEURAL NETWORK =====
-        (function initNeuralNetwork() {
-            const canvas = document.getElementById('neural-canvas');
-            if (!canvas || typeof THREE === 'undefined') return;
-
-            const renderer = new THREE.WebGLRenderer({
-                canvas,
-                alpha: true,
-                antialias: true,
-                powerPreference: "high-performance"
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2500);
-            camera.position.z = 150;
-
-            const particlesCount = 3500;
-            const positions = new Float32Array(particlesCount * 3);
-            const colors = new Float32Array(particlesCount * 3);
-
-            const colorPalette = [
-                new THREE.Color(0x4F46E5),
-                new THREE.Color(0x06B6D4),
-                new THREE.Color(0x818CF8),
-                new THREE.Color(0xA78BFA)
-            ];
-
-            for (let i = 0; i < particlesCount; i++) {
-                const r = 120 + Math.random() * 80;
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos((Math.random() * 2) - 1);
-
-                positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-                positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-                positions[i * 3 + 2] = r * Math.cos(phi);
-
-                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-                colors[i * 3] = color.r;
-                colors[i * 3 + 1] = color.g;
-                colors[i * 3 + 2] = color.b;
-            }
-
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 3.5,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true
-            });
-
-            const points = new THREE.Points(geometry, material);
-            scene.add(points);
-
-            // Sinaps lines
-            const lineMaterial = new THREE.LineBasicMaterial({
-                color: 0x4F46E5,
-                transparent: true,
-                opacity: 0.15,
-                blending: THREE.AdditiveBlending
-            });
-            const lineGroup = new THREE.Group();
-            for (let i = 0; i < 400; i++) {
-                const lineGeo = new THREE.BufferGeometry();
-                const p1 = new THREE.Vector3((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
-                const p2 = p1.clone().add(new THREE.Vector3((Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120));
-                lineGeo.setFromPoints([p1, p2]);
-                lineGroup.add(new THREE.Line(lineGeo, lineMaterial));
-            }
-            scene.add(lineGroup);
-
-            let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-                mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
-            });
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            const clock = new THREE.Clock();
-            function animate() {
-                requestAnimationFrame(animate);
-                const time = clock.getElapsedTime();
-
-                points.rotation.y = time * 0.03 + mouseX * 0.1;
-                points.rotation.x = time * 0.015 + mouseY * 0.05;
-                lineGroup.rotation.y = points.rotation.y;
-                lineGroup.rotation.x = points.rotation.x;
-
-                material.opacity = 0.6 + Math.sin(time) * 0.2;
-
-                const scrollY = window.scrollY;
-                camera.position.z = 150 + (scrollY * 0.12);
-                camera.position.y = -(scrollY * 0.06);
-
-                renderer.render(scene, camera);
-            }
-            animate();
-        })();
-
-        // Smooth anchors
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId && targetId !== '#') {
-                    const target = document.querySelector(targetId);
-                    if (target) {
-                        gsap.to(window, { duration: 1.5, scrollTo: target, ease: "power4.inOut" });
-                    }
-                }
-            });
-        });
-
-        // Mobile Menu
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => {
-                navLinks.classList.toggle('mobile-open');
-                mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
-            });
-        }
-    <!-- Custom Cursor UI -->
-    <div class="custom-cursor" id="cursor"></div>
-    <div class="cursor-outer" id="cursorOuter"></div>
-
     <script>
         // GSAP Kütüphanesini Hazırla
         gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
         // ===== CUSTOM CURSOR LOGIC =====
-        const cursor = document.getElementById('cursor');
-        const cursorOuter = document.getElementById('cursorOuter');
-        
+        const cursorDot = document.getElementById('cursorDot');
+        const cursorGlow = document.getElementById('cursorGlow');
+        const pageGlow = document.getElementById('pageGlow');
+
         const isMobile = window.matchMedia('(max-width: 768px)').matches || 'ontouchstart' in window;
 
-        if (!isMobile && cursor && cursorOuter) {
+        if (!isMobile && cursorDot && cursorGlow) {
             document.addEventListener('mousemove', (e) => {
-                gsap.to(cursor, { 
-                    x: e.clientX, 
-                    y: e.clientY, 
+                // Dot follows precisely
+                gsap.to(cursorDot, {
+                    x: e.clientX,
+                    y: e.clientY,
                     duration: 0.1,
                     xPercent: -50,
                     yPercent: -50
                 });
-                gsap.to(cursorOuter, { 
-                    x: e.clientX, 
-                    y: e.clientY, 
-                    duration: 0.15,
+                // Glow follows with lag
+                gsap.to(cursorGlow, {
+                    x: e.clientX,
+                    y: e.clientY,
+                    duration: 0.2,
                     xPercent: -50,
                     yPercent: -50
                 });
+                // Background glow
+                if (pageGlow) {
+                    gsap.to(pageGlow, {
+                        x: e.clientX - 300,
+                        y: e.clientY - 300,
+                        duration: 0.6
+                    });
+                }
             });
 
-            document.querySelectorAll('a, button, .feature-card, .game-card, .btn-primary, .btn-secondary, .phone-mockup').forEach(el => {
+            // Hover effects for interactive elements
+            document.querySelectorAll('a, button, .feature-card, .game-card, .btn-primary, .btn-secondary, .phone-mockup, .domain-item').forEach(el => {
                 el.addEventListener('mouseenter', () => {
-                    cursorOuter.classList.add('hovering');
-                    gsap.to(cursor, { scale: 1.5, background: 'var(--accent-glow)', duration: 0.3 });
+                    cursorGlow.classList.add('hovering');
+                    gsap.to(cursorDot, { scale: 1.5, background: 'var(--accent-glow)', duration: 0.3 });
                 });
                 el.addEventListener('mouseleave', () => {
-                    cursorOuter.classList.remove('hovering');
-                    gsap.to(cursor, { scale: 1, background: 'white', duration: 0.3 });
+                    cursorGlow.classList.remove('hovering');
+                    gsap.to(cursorDot, { scale: 1, background: 'white', duration: 0.3 });
                 });
             });
+        } else {
+            // Mobile compatibility
+            if (cursorDot) cursorDot.style.display = 'none';
+            if (cursorGlow) cursorGlow.style.display = 'none';
+            document.body.style.cursor = 'auto';
         }
 
         // ===== OYUN VERİLERİ =====
@@ -2601,203 +2362,17 @@
                 card.className = 'game-card reveal';
                 card.setAttribute('data-tilt', '');
                 card.setAttribute('data-tilt-max', '12');
-                card.setAttribute('data-tilt-speed', '400');
-                card.setAttribute('data-tilt-perspective', '1000');
-                card.innerHTML = `
-                <div class="game-card-icon" style="background:${game.color}; transform: translateZ(20px);">${game.icon}</div>
-                <div class="game-card-name" style="transform: translateZ(30px);">${game.name}</div>
-                <div class="game-card-area" style="transform: translateZ(25px);">${game.area}</div>
-                <div class="game-card-desc" style="transform: translateZ(15px);">${game.desc}</div>
-            `;
-                gamesGrid.appendChild(card);
-            });
-        }
-
-        // Initialize Tilt
-        if (typeof VanillaTilt !== 'undefined') {
-            VanillaTilt.init(document.querySelectorAll("[data-tilt], .feature-card, .phone-mockup"));
-        }
-
-        // ===== NAVBAR SCROLL ETKİSİ =====
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                if (!navbar.classList.contains('scrolled')) {
-                    navbar.classList.add('scrolled');
-                    gsap.to(navbar, { backgroundColor: 'rgba(3, 7, 18, 0.95)', height: '70px', duration: 0.3 });
+                const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+                const navLinks = document.getElementById('navLinks');
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.addEventListener('click', () => {
+                        navLinks.classList.toggle('mobile-open');
+                        mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
+                    });
                 }
-            } else {
-                if (navbar.classList.contains('scrolled')) {
-                    navbar.classList.remove('scrolled');
-                    gsap.to(navbar, { backgroundColor: 'rgba(3, 7, 18, 0.6)', height: '80px', duration: 0.3 });
-                }
-            }
-        });
-
-        // ===== GSAP SCROLL ANIMATIONS =====
-        gsap.utils.toArray('.reveal').forEach((el, i) => {
-            gsap.from(el, {
-                scrollTrigger: {
-                    trigger: el,
-                    start: "top 90%",
-                    toggleActions: "play none none none"
-                },
-                y: 60,
-                opacity: 0,
-                scale: 0.95,
-                duration: 1,
-                ease: "power3.out",
-                delay: (i % 3) * 0.1
-            });
-        });
-
-        // Hero Parallax
-        gsap.to(".hero-content", {
-            scrollTrigger: {
-                trigger: ".hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            },
-            y: 150,
-            opacity: 0.5
-        });
-
-        // ===== THREE.JS — ADVANCED NEURAL NETWORK =====
-        (function initNeuralNetwork() {
-            const canvas = document.getElementById('neural-canvas');
-            if (!canvas || typeof THREE === 'undefined') return;
-
-            const renderer = new THREE.WebGLRenderer({
-                canvas,
-                alpha: true,
-                antialias: true,
-                powerPreference: "high-performance"
-            });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2500);
-            camera.position.z = 150;
-
-            const particlesCount = 3500;
-            const positions = new Float32Array(particlesCount * 3);
-            const colors = new Float32Array(particlesCount * 3);
-            
-            const colorPalette = [
-                new THREE.Color(0x4F46E5),
-                new THREE.Color(0x06B6D4),
-                new THREE.Color(0x818CF8),
-                new THREE.Color(0xA78BFA)
-            ];
-
-            for (let i = 0; i < particlesCount; i++) {
-                const r = 120 + Math.random() * 80;
-                const theta = Math.random() * Math.PI * 2;
-                const phi = Math.acos((Math.random() * 2) - 1);
-                
-                positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-                positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-                positions[i * 3 + 2] = r * Math.cos(phi);
-
-                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
-                colors[i * 3] = color.r;
-                colors[i * 3 + 1] = color.g;
-                colors[i * 3 + 2] = color.b;
-            }
-
-            const geometry = new THREE.BufferGeometry();
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-            const material = new THREE.PointsMaterial({
-                size: 3.5,
-                vertexColors: true,
-                transparent: true,
-                opacity: 0.8,
-                blending: THREE.AdditiveBlending,
-                sizeAttenuation: true
-            });
-
-            const points = new THREE.Points(geometry, material);
-            scene.add(points);
-
-            // Sinaps lines
-            const lineMaterial = new THREE.LineBasicMaterial({ 
-                color: 0x4F46E5, 
-                transparent: true, 
-                opacity: 0.15,
-                blending: THREE.AdditiveBlending
-            });
-            const lineGroup = new THREE.Group();
-            for (let i = 0; i < 400; i++) {
-                const lineGeo = new THREE.BufferGeometry();
-                const p1 = new THREE.Vector3((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
-                const p2 = p1.clone().add(new THREE.Vector3((Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120));
-                lineGeo.setFromPoints([p1, p2]);
-                lineGroup.add(new THREE.Line(lineGeo, lineMaterial));
-            }
-            scene.add(lineGroup);
-
-            let mouseX = 0, mouseY = 0;
-            document.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-                mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
-            });
-
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-
-            const clock = new THREE.Clock();
-            function animate() {
-                requestAnimationFrame(animate);
-                const time = clock.getElapsedTime();
-
-                points.rotation.y = time * 0.03 + mouseX * 0.1;
-                points.rotation.x = time * 0.015 + mouseY * 0.05;
-                lineGroup.rotation.y = points.rotation.y;
-                lineGroup.rotation.x = points.rotation.x;
-
-                material.opacity = 0.6 + Math.sin(time) * 0.2;
-
-                const scrollY = window.scrollY;
-                camera.position.z = 150 + (scrollY * 0.12);
-                camera.position.y = -(scrollY * 0.06);
-
-                renderer.render(scene, camera);
-            }
-            animate();
-        })();
-
-        // Smooth anchors
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if (targetId && targetId !== '#') {
-                    const target = document.querySelector(targetId);
-                    if (target) {
-                        gsap.to(window, { duration: 1.5, scrollTo: target, ease: "power4.inOut" });
-                    }
-                }
-            });
-        });
-
-        // Mobile Menu
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
-        if (mobileMenuBtn) {
-            mobileMenuBtn.addEventListener('click', () => {
-                navLinks.classList.toggle('mobile-open');
-                mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
-            });
-        }
     </script>
 </body>
+
 </html>
 </body>
 
