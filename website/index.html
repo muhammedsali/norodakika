@@ -1820,7 +1820,7 @@
             <li><a href="#how">Nasıl Çalışır</a></li>
             <li><a href="#download" class="nav-cta">İndir — Ücretsiz</a></li>
         </ul>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü aç">â˜°</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menüyü aç">☰</button>
     </nav>
 
     <!-- HERO -->
@@ -1932,7 +1932,7 @@
                     <img src="screenshot_stats.png" alt="NöroDakika İstatistikler"
                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                     <div class="phone-screen-placeholder" style="display:none;">
-                        <div class="phone-screen-placeholder-icon">ğŸ“Š</div>
+                        <div class="phone-screen-placeholder-icon">📊</div>
                         <div class="phone-screen-placeholder-text">İstatistikler<br><small
                                 style='opacity:0.5'>screenshot_stats.png</small></div>
                     </div>
@@ -1971,7 +1971,7 @@
 
             <div class="feature-card reveal">
                 <div class="feature-icon"
-                    style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));">ğŸ“Š</div>
+                    style="background:linear-gradient(135deg,rgba(6,182,212,0.2),rgba(6,182,212,0.05));">📊</div>
                 <h3 class="feature-title">ELO Adaptif Zorluk</h3>
                 <p class="feature-desc">
                     Satranç dünyasından esinlenen ELO puanlama sistemiyle zorluk seviyesi
@@ -1991,7 +1991,7 @@
 
             <div class="feature-card reveal">
                 <div class="feature-icon"
-                    style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05));">ğŸ“…</div>
+                    style="background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05));">📅</div>
                 <h3 class="feature-title">Günlük Plan</h3>
                 <p class="feature-desc">
                     Her gün sana özel oluşturulan kişiselleştirilmiş antrenman planıyla
@@ -2246,10 +2246,10 @@
             { id: "LANG02", name: "Word Sprint", area: "Dil", icon: "ğŸ“", color: "linear-gradient(135deg,#EC4899,#F472B6)", desc: "Gerçek-uydurma kelime ayırt et" },
             { id: "MUS01", name: "Rhythm Match", area: "Dikkat + Refleks", icon: "ğŸµ", color: "linear-gradient(135deg,#F43F5E,#FB7185)", desc: "Ritim dizilerini doğru sırayla yakala" },
             { id: "SOC01", name: "Emotion Mirror", area: "Dil + Dikkat", icon: "ğŸ˜Š", color: "linear-gradient(135deg,#E11D48,#F43F5E)", desc: "Duygu ifadelerini eşleştir" },
-            { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "ğŸŒ¿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
+            { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "🌿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
             { id: "KIN01", name: "Balance Tap", area: "Refleks", icon: "âš–ï¸", color: "linear-gradient(135deg,#0891B2,#06B6D4)", desc: "Dengeyi koru, hızlı dokunuşlar" },
             { id: "SPA01", name: "Route Builder", area: "Mantık + Görsel", icon: "ğŸ›¤ï¸", color: "linear-gradient(135deg,#0284C7,#0EA5E9)", desc: "En kısa rotayı planla" },
-            { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "ğŸ§˜", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
+            { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "🧘", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
         ];
 
         // Oyun kartlarını oluştur
@@ -2317,7 +2317,7 @@
             if (mobileMenuBtn && navLinks) {
                 mobileMenuBtn.addEventListener('click', () => {
                     navLinks.classList.toggle('mobile-open');
-                    mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? 'âœ•' : 'â˜°';
+                    mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
                 });
             }
         });
