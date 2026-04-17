@@ -40,15 +40,18 @@
             --primary-dark: #3730A3;
             --accent: #06B6D4;
             --accent-glow: #22D3EE;
+            --neon-purple: #A855F7;
+            --neon-pink: #EC4899;
             --bg-dark: #030712;
             --bg-surface: #0F172A;
-            --bg-card: rgba(15, 23, 42, 0.6);
+            --bg-card: rgba(15, 23, 42, 0.5);
             --text-primary: #F8FAFC;
             --text-secondary: #94A3B8;
             --text-muted: #64748B;
-            --border-subtle: rgba(148, 163, 184, 0.1);
+            --border-subtle: rgba(148, 163, 184, 0.08);
             --glow-primary: rgba(79, 70, 229, 0.4);
             --glow-accent: rgba(6, 182, 212, 0.3);
+            --glow-purple: rgba(168, 85, 247, 0.3);
         }
 
         html {
@@ -62,6 +65,50 @@
             color: var(--text-primary);
             overflow-x: hidden;
             line-height: 1.6;
+            cursor: none;
+        }
+
+        /* ===== ÖZEL İMLEÇ ===== */
+        .cursor-dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-glow {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(79, 70, 229, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99998;
+            transition: transform 0.15s ease, width 0.3s, height 0.3s, border-color 0.3s;
+        }
+
+        .cursor-glow.hovering {
+            width: 60px;
+            height: 60px;
+            border-color: var(--accent-glow);
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .cursor-trail {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99997;
+            background: var(--primary-light);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         /* ===== 3D CANVAS ARKA PLAN ===== */
@@ -75,6 +122,85 @@
             pointer-events: none;
         }
 
+        /* ===== ANIMASYONLU GRADIENT MESH ARKA PLAN ===== */
+        .gradient-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: orbFloat linear infinite;
+        }
+
+        .gradient-orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation-duration: 20s;
+        }
+
+        .gradient-orb:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent), transparent 70%);
+            top: 30%;
+            right: -15%;
+            animation-duration: 25s;
+            animation-delay: -5s;
+        }
+
+        .gradient-orb:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--neon-purple), transparent 70%);
+            bottom: 10%;
+            left: 20%;
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        .gradient-orb:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--neon-pink), transparent 70%);
+            top: 60%;
+            right: 30%;
+            animation-duration: 18s;
+            animation-delay: -3s;
+        }
+
+        @keyframes orbFloat {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(80px, -60px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-40px, 40px) scale(0.95);
+            }
+
+            75% {
+                transform: translate(60px, 80px) scale(1.05);
+            }
+        }
+
         /* ===== NAVBAR ===== */
         .navbar {
             position: fixed;
@@ -86,16 +212,17 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: rgba(3, 7, 18, 0.6);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--border-subtle);
+            background: rgba(3, 7, 18, 0.4);
+            backdrop-filter: blur(24px) saturate(200%);
+            -webkit-backdrop-filter: blur(24px) saturate(200%);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.06);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .navbar.scrolled {
             padding: 12px 32px;
-            background: rgba(3, 7, 18, 0.85);
+            background: rgba(3, 7, 18, 0.8);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .nav-logo {
@@ -103,6 +230,7 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
+            cursor: none;
         }
 
         .nav-logo-icon {
@@ -112,6 +240,11 @@
             overflow: hidden;
             box-shadow: 0 0 20px var(--glow-primary);
             animation: logoPulse 3s ease-in-out infinite;
+            transition: transform 0.3s;
+        }
+
+        .nav-logo:hover .nav-logo-icon {
+            transform: rotate(10deg) scale(1.1);
         }
 
         .nav-logo-icon img {
@@ -156,6 +289,7 @@
             font-weight: 500;
             transition: color 0.3s;
             position: relative;
+            cursor: none;
         }
 
         .nav-links a::after {
@@ -186,7 +320,7 @@
             font-weight: 600 !important;
             font-size: 14px;
             border: none;
-            cursor: pointer;
+            cursor: none;
             transition: all 0.3s;
             text-decoration: none;
             box-shadow: 0 4px 20px var(--glow-primary);
@@ -207,7 +341,7 @@
             border: none;
             color: var(--text-primary);
             font-size: 24px;
-            cursor: pointer;
+            cursor: none;
             padding: 8px;
         }
 
@@ -220,12 +354,20 @@
             justify-content: center;
             padding: 120px 32px 80px;
             z-index: 1;
+            perspective: 1000px;
         }
 
         .hero-content {
             max-width: 900px;
             text-align: center;
             position: relative;
+            transform-style: preserve-3d;
+        }
+
+        /* Hero 3D derinlik katmanları */
+        .hero-depth-layer {
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
         }
 
         .hero-badge {
@@ -241,6 +383,30 @@
             font-weight: 600;
             margin-bottom: 32px;
             animation: fadeInUp 0.8s 0.2s both;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.2), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 200%;
+            }
         }
 
         .hero-badge-dot {
@@ -249,6 +415,7 @@
             border-radius: 50%;
             background: var(--accent-glow);
             animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
         @keyframes blink {
@@ -256,10 +423,12 @@
             0%,
             100% {
                 opacity: 1;
+                box-shadow: 0 0 10px var(--accent-glow);
             }
 
             50% {
                 opacity: 0.3;
+                box-shadow: 0 0 3px var(--accent-glow);
             }
         }
 
@@ -269,15 +438,30 @@
             font-weight: 800;
             line-height: 1.05;
             margin-bottom: 24px;
-            animation: fadeInUp 0.8s 0.4s both;
+            animation: heroTextIn 1s 0.4s both;
+            text-shadow: 0 0 80px rgba(79, 70, 229, 0.2);
+        }
+
+        @keyframes heroTextIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) rotateX(15deg);
+                filter: blur(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+                filter: blur(0);
+            }
         }
 
         .hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--primary-light), var(--accent-glow), var(--primary));
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-glow), var(--neon-purple), var(--primary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            background-size: 200% 200%;
+            background-size: 300% 300%;
             animation: gradientShift 4s ease infinite;
         }
 
@@ -323,11 +507,12 @@
             font-weight: 700;
             text-decoration: none;
             border: none;
-            cursor: pointer;
+            cursor: none;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 8px 32px var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
         }
 
         .btn-primary::before {
@@ -337,7 +522,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.6s;
         }
 
@@ -346,8 +531,8 @@
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 40px var(--glow-primary), 0 0 80px rgba(79, 70, 229, 0.2);
+            transform: translateY(-4px) scale(1.05) rotateX(5deg);
+            box-shadow: 0 16px 48px var(--glow-primary), 0 0 100px rgba(79, 70, 229, 0.25);
         }
 
         .btn-secondary {
@@ -356,21 +541,22 @@
             gap: 10px;
             padding: 16px 36px;
             border-radius: 16px;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.4);
             color: var(--text-primary);
             font-size: 16px;
             font-weight: 600;
             text-decoration: none;
             border: 1px solid var(--border-subtle);
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(10px);
+            cursor: none;
+            transition: all 0.4s;
+            backdrop-filter: blur(16px);
         }
 
         .btn-secondary:hover {
-            background: rgba(15, 23, 42, 0.9);
+            background: rgba(15, 23, 42, 0.8);
             border-color: var(--primary-light);
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .hero-stats {
@@ -383,6 +569,19 @@
 
         .hero-stat {
             text-align: center;
+            position: relative;
+            padding: 20px 24px;
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(148, 163, 184, 0.06);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
+        }
+
+        .hero-stat:hover {
+            transform: translateY(-4px) scale(1.05);
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 12px 40px rgba(79, 70, 229, 0.15);
         }
 
         .hero-stat-value {
@@ -402,6 +601,77 @@
             margin-top: 4px;
         }
 
+        /* ===== 3D FLOATING ELEMENTS (Hero) ===== */
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            perspective: 800px;
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.08;
+            animation: floatShape linear infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 10%;
+            left: -5%;
+            animation-duration: 15s;
+            filter: blur(60px);
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: var(--accent);
+            top: 60%;
+            right: -5%;
+            animation-duration: 18s;
+            animation-delay: -3s;
+            filter: blur(50px);
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: var(--neon-purple);
+            bottom: 20%;
+            left: 15%;
+            animation-duration: 12s;
+            animation-delay: -7s;
+            filter: blur(40px);
+        }
+
+        @keyframes floatShape {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+
+            25% {
+                transform: translate(30px, -40px) rotate(90deg) scale(1.15);
+            }
+
+            50% {
+                transform: translate(-20px, 20px) rotate(180deg) scale(0.9);
+            }
+
+            75% {
+                transform: translate(40px, 30px) rotate(270deg) scale(1.1);
+            }
+        }
+
         /* ===== PARALLAX PHONE MOCKUP ===== */
         .phone-showcase {
             position: relative;
@@ -418,6 +688,7 @@
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
+            transform-style: preserve-3d;
         }
 
         .phone-mockup {
@@ -425,14 +696,14 @@
             height: 564px;
             border-radius: 36px;
             background: #0F172A;
-            border: 3px solid rgba(148, 163, 184, 0.15);
+            border: 3px solid rgba(148, 163, 184, 0.12);
             position: relative;
             overflow: hidden;
             box-shadow:
                 0 40px 80px rgba(0, 0, 0, 0.5),
                 0 0 60px var(--glow-primary),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s;
             transform-style: preserve-3d;
         }
 
@@ -454,6 +725,17 @@
         .phone-mockup:nth-child(3) {
             transform: rotateY(-15deg) rotateX(5deg);
             animation: float3 6s ease-in-out infinite;
+        }
+
+        /* Telefonlara parlama katmanı */
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 36px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 50%, rgba(79, 70, 229, 0.04) 100%);
+            z-index: 10;
+            pointer-events: none;
         }
 
         @keyframes float1 {
@@ -532,131 +814,6 @@
             font-weight: 500;
         }
 
-        .phone-notch {
-            width: 120px;
-            height: 28px;
-            background: #030712;
-            border-radius: 0 0 16px 16px;
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-        }
-
-        .phone-status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-            padding-top: 8px;
-        }
-
-        .phone-screen-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .phone-screen-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        .phone-card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-
-        .phone-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .phone-card-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .phone-card-badge {
-            font-size: 9px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            background: rgba(79, 70, 229, 0.2);
-            color: var(--primary-light);
-            font-weight: 600;
-        }
-
-        .phone-progress-bar {
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(51, 65, 85, 0.8);
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .phone-progress-fill {
-            height: 100%;
-            border-radius: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            transition: width 2s ease;
-        }
-
-        .phone-game-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .phone-game-item {
-            background: rgba(30, 41, 59, 0.6);
-            border: 1px solid rgba(148, 163, 184, 0.08);
-            border-radius: 14px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .phone-game-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            margin: 0 auto 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .phone-game-name {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .phone-game-area {
-            font-size: 8px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        /* Radar grafik (SVG) */
-        .phone-radar {
-            display: flex;
-            justify-content: center;
-            margin: 12px 0;
-        }
-
         /* ===== FEATURES (Özellikler) ===== */
         .features {
             position: relative;
@@ -709,6 +866,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+            perspective: 1000px;
         }
 
         .feature-card {
@@ -720,8 +878,11 @@
             backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
+            cursor: none;
         }
 
+        /* 3D Kart üst parlama çizgisi */
         .feature-card::before {
             content: '';
             position: absolute;
@@ -734,13 +895,34 @@
             transition: opacity 0.5s;
         }
 
+        /* Kart ışık yansıması efekti */
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(79, 70, 229, 0.06), transparent 60%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-8px) rotateX(calc(var(--tilt-x, 0) * 1deg)) rotateY(calc(var(--tilt-y, 0) * 1deg));
             border-color: rgba(79, 70, 229, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--glow-primary);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 40px var(--glow-primary),
+                inset 0 0 60px rgba(79, 70, 229, 0.03);
         }
 
         .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover::after {
             opacity: 1;
         }
 
@@ -754,6 +936,11 @@
             font-size: 26px;
             margin-bottom: 24px;
             position: relative;
+            transition: transform 0.4s;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: translateZ(20px) scale(1.1) rotate(5deg);
         }
 
         .feature-icon::after {
@@ -772,6 +959,11 @@
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 12px;
+            transition: transform 0.4s;
+        }
+
+        .feature-card:hover .feature-title {
+            transform: translateZ(10px);
         }
 
         .feature-desc {
@@ -793,6 +985,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
+            perspective: 1000px;
         }
 
         .game-card {
@@ -803,28 +996,56 @@
             text-align: center;
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             backdrop-filter: blur(10px);
-            cursor: default;
+            cursor: none;
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        /* Animasyonlu kenar çizgisi */
+        .game-card::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 21px;
+            background: conic-gradient(from var(--border-angle, 0deg), transparent 40%, var(--primary) 50%, var(--accent) 55%, transparent 65%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.5s;
         }
 
         .game-card::after {
             content: '';
             position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            background: radial-gradient(circle at 50% 0%, var(--glow-primary), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.5s;
+            inset: 1px;
+            border-radius: 19px;
+            background: var(--bg-surface);
+            z-index: -1;
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            to {
+                --border-angle: 360deg;
+            }
+        }
+
+        @property --border-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
         }
 
         .game-card:hover {
-            transform: translateY(-6px) scale(1.02);
-            border-color: rgba(79, 70, 229, 0.4);
-        }
-
-        .game-card:hover::after {
-            opacity: 0.15;
+            transform: translateY(-8px) scale(1.03) rotateX(5deg);
+            border-color: transparent;
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.4),
+                0 0 30px var(--glow-primary);
         }
 
         .game-card-icon {
@@ -838,6 +1059,11 @@
             font-size: 28px;
             position: relative;
             z-index: 1;
+            transition: transform 0.4s;
+        }
+
+        .game-card:hover .game-card-icon {
+            transform: translateZ(30px) scale(1.15) rotate(8deg);
         }
 
         .game-card-name {
@@ -879,6 +1105,7 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 16px;
+            perspective: 800px;
         }
 
         .domain-item {
@@ -888,19 +1115,26 @@
             border: 1px solid var(--border-subtle);
             border-radius: 20px;
             backdrop-filter: blur(10px);
-            transition: all 0.4s;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: none;
         }
 
         .domain-item:hover {
-            transform: translateY(-6px);
+            transform: translateY(-8px) rotateY(10deg) scale(1.05);
             border-color: rgba(79, 70, 229, 0.3);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 20px var(--glow-primary);
         }
 
         .domain-icon {
             font-size: 32px;
             margin-bottom: 12px;
             display: block;
+            transition: transform 0.4s;
+        }
+
+        .domain-item:hover .domain-icon {
+            transform: translateZ(15px) scale(1.2) rotate(10deg);
         }
 
         .domain-name {
@@ -933,13 +1167,30 @@
             left: 60px;
             right: 60px;
             height: 2px;
-            background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
-            opacity: 0.3;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--neon-purple), var(--primary));
+            background-size: 200% 100%;
+            animation: flowLine 4s linear infinite;
+            opacity: 0.4;
+        }
+
+        @keyframes flowLine {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 200% 50%;
+            }
         }
 
         .how-step {
             text-align: center;
             position: relative;
+            transition: all 0.4s;
+        }
+
+        .how-step:hover {
+            transform: translateY(-6px);
         }
 
         .how-step-num {
@@ -957,6 +1208,12 @@
             box-shadow: 0 8px 32px var(--glow-primary);
             position: relative;
             z-index: 2;
+            transition: all 0.4s;
+        }
+
+        .how-step:hover .how-step-num {
+            transform: scale(1.15) rotateZ(5deg);
+            box-shadow: 0 12px 40px var(--glow-primary), 0 0 60px rgba(79, 70, 229, 0.2);
         }
 
         .how-step-title {
@@ -985,6 +1242,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
+            perspective: 800px;
         }
 
         .tech-item {
@@ -994,18 +1252,26 @@
             padding: 28px;
             text-align: center;
             backdrop-filter: blur(10px);
-            transition: all 0.4s;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            cursor: none;
         }
 
         .tech-item:hover {
-            transform: translateY(-4px);
+            transform: translateY(-6px) rotateX(8deg) scale(1.05);
             border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 0 30px var(--glow-accent);
         }
 
         .tech-icon {
             font-size: 36px;
             margin-bottom: 12px;
             display: block;
+            transition: transform 0.4s;
+        }
+
+        .tech-item:hover .tech-icon {
+            transform: translateZ(20px) scale(1.2);
         }
 
         .tech-name {
@@ -1032,12 +1298,19 @@
             max-width: 800px;
             margin: 0 auto;
             padding: 80px 48px;
-            background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(6, 182, 212, 0.08));
-            border: 1px solid rgba(79, 70, 229, 0.2);
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(6, 182, 212, 0.06));
+            border: 1px solid rgba(79, 70, 229, 0.15);
             border-radius: 32px;
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(24px);
             position: relative;
             overflow: hidden;
+            transform-style: preserve-3d;
+            transition: all 0.5s;
+        }
+
+        .cta-box:hover {
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 20px 80px rgba(79, 70, 229, 0.1);
         }
 
         .cta-box::before {
@@ -1049,7 +1322,7 @@
             height: 200%;
             background: conic-gradient(from 0deg at 50% 50%, transparent, var(--glow-primary), transparent, var(--glow-accent), transparent);
             animation: ctaRotate 8s linear infinite;
-            opacity: 0.1;
+            opacity: 0.08;
         }
 
         @keyframes ctaRotate {
@@ -1101,12 +1374,39 @@
             transition: all 0.4s;
             box-shadow: 0 8px 40px var(--glow-primary);
             border: none;
-            cursor: pointer;
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-download::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: btnShine 3s ease-in-out infinite;
+        }
+
+        @keyframes btnShine {
+            0% {
+                left: -100%;
+            }
+
+            50% {
+                left: 100%;
+            }
+
+            100% {
+                left: 100%;
+            }
         }
 
         .btn-download:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 12px 60px var(--glow-primary);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 16px 60px var(--glow-primary), 0 0 80px rgba(79, 70, 229, 0.15);
         }
 
         .btn-download svg {
@@ -1171,6 +1471,7 @@
             text-decoration: none;
             font-size: 13px;
             transition: color 0.3s;
+            cursor: none;
         }
 
         .footer-links a:hover {
@@ -1192,13 +1493,13 @@
 
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
+            transform: translateY(50px) rotateX(5deg);
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .reveal.visible {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) rotateX(0);
         }
 
         /* ===== FLOATING PARTICLES (CSS) ===== */
@@ -1226,7 +1527,7 @@
         @keyframes particleFloat {
             0% {
                 opacity: 0;
-                transform: translateY(100vh) scale(0);
+                transform: translateY(100vh) scale(0) rotate(0deg);
             }
 
             10% {
@@ -1239,7 +1540,73 @@
 
             100% {
                 opacity: 0;
-                transform: translateY(-100px) scale(1);
+                transform: translateY(-100px) scale(1) rotate(360deg);
+            }
+        }
+
+        /* ===== 3D WAVE DIVIDER ===== */
+        .glow-divider {
+            width: 100%;
+            height: 2px;
+            position: relative;
+            margin: 0;
+            overflow: visible;
+        }
+
+        .glow-divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--neon-purple), transparent);
+            background-size: 200% 100%;
+            animation: dividerFlow 4s linear infinite;
+        }
+
+        .glow-divider::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            right: 0;
+            height: 16px;
+            background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.15), rgba(6, 182, 212, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: dividerFlow 4s linear infinite;
+            filter: blur(8px);
+        }
+
+        @keyframes dividerFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        /* ===== CLICK RIPPLE ===== */
+        .click-ripple {
+            position: fixed;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.3), transparent 70%);
+            pointer-events: none;
+            z-index: 99996;
+            animation: rippleExpand 0.6s ease-out forwards;
+        }
+
+        @keyframes rippleExpand {
+            to {
+                width: 150px;
+                height: 150px;
+                margin-left: -75px;
+                margin-top: -75px;
+                opacity: 0;
             }
         }
 
@@ -1268,6 +1635,23 @@
         }
 
         @media (max-width: 768px) {
+
+            /* Mobilde özel imleç devre dışı */
+            body {
+                cursor: auto;
+            }
+
+            .cursor-dot,
+            .cursor-glow,
+            .cursor-trail {
+                display: none;
+            }
+
+            a,
+            button {
+                cursor: auto;
+            }
+
             .navbar {
                 padding: 12px 20px;
             }
@@ -1299,7 +1683,13 @@
             }
 
             .hero-stats {
-                gap: 24px;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .hero-stat {
+                flex: 1;
+                min-width: 80px;
             }
 
             .hero-stat-value {
@@ -1424,18 +1814,37 @@
             }
         }
 
-        /* ===== GLOW DIVIDER ===== */
-        .glow-divider {
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
-            opacity: 0.3;
-            margin: 0;
+        /* ===== MOUSE GLOW EFEKTİ (sayfa arkası) ===== */
+        .page-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.06), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.3s ease-out;
+            filter: blur(20px);
         }
     </style>
 </head>
 
 <body>
+
+    <!-- Özel İmleç -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+
+    <!-- Sayfa Fare Işığı -->
+    <div class="page-glow" id="pageGlow"></div>
+
+    <!-- Gradient Mesh Arka Plan -->
+    <div class="gradient-mesh">
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+    </div>
 
     <!-- 3D Nöral Ağ Arka Plan (Three.js Canvas) -->
     <canvas id="neural-canvas"></canvas>
@@ -1461,57 +1870,73 @@
 
     <!-- HERO -->
     <section class="hero" id="hero">
-        <div class="hero-content">
-            <div class="hero-badge">
-                <span class="hero-badge-dot"></span>
-                Bilişsel Eğitim Platformu
+        <div class="floating-shapes">
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+        </div>
+
+        <div class="hero-content" id="heroContent">
+            <div class="hero-depth-layer" data-depth="0.03">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    Bilişsel Eğitim Platformu
+                </div>
             </div>
 
-            <h1>
-                Beynini Eğit,<br>
-                <span class="gradient-text">Her Dakika Güçlen.</span>
-            </h1>
-
-            <p class="hero-subtitle">
-                18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle
-                kişiselleştirilmiş beyin antrenmanı. Günde sadece birkaç dakika ayır,
-                bilişsel kapasiteni kat kat artır.
-            </p>
-
-            <div class="hero-actions">
-                <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk"
-                    class="btn-primary" id="hero-download-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" width="20" height="20">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    APK İndir
-                </a>
-                <a href="#features" class="btn-secondary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" width="20" height="20">
-                        <circle cx="12" cy="12" r="10" />
-                        <polyline points="12 16 16 12 12 8" />
-                        <line x1="8" y1="12" x2="16" y2="12" />
-                    </svg>
-                    Keşfet
-                </a>
+            <div class="hero-depth-layer" data-depth="0.05">
+                <h1>
+                    Beynini Eğit,<br>
+                    <span class="gradient-text">Her Dakika Güçlen.</span>
+                </h1>
             </div>
 
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <div class="hero-stat-value" id="stat-games">18</div>
-                    <div class="hero-stat-label">Mini Oyun</div>
+            <div class="hero-depth-layer" data-depth="0.02">
+                <p class="hero-subtitle">
+                    18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle
+                    kişiselleştirilmiş beyin antrenmanı. Günde sadece birkaç dakika ayır,
+                    bilişsel kapasiteni kat kat artır.
+                </p>
+            </div>
+
+            <div class="hero-depth-layer" data-depth="0.04">
+                <div class="hero-actions">
+                    <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk"
+                        class="btn-primary" id="hero-download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        APK İndir
+                    </a>
+                    <a href="#features" class="btn-secondary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 16 16 12 12 8" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                        Keşfet
+                    </a>
                 </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-value" id="stat-domains">7</div>
-                    <div class="hero-stat-label">Bilişsel Alan</div>
-                </div>
-                <div class="hero-stat">
-                    <div class="hero-stat-value" id="stat-intel">8</div>
-                    <div class="hero-stat-label">Zeka Türü</div>
+            </div>
+
+            <div class="hero-depth-layer" data-depth="0.01">
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value" id="stat-games">18</div>
+                        <div class="hero-stat-label">Mini Oyun</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value" id="stat-domains">7</div>
+                        <div class="hero-stat-label">Bilişsel Alan</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value" id="stat-intel">8</div>
+                        <div class="hero-stat-label">Zeka Türü</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1519,7 +1944,7 @@
 
     <!-- TELEFON SHOWCASE (3D Perspektif) -->
     <section class="phone-showcase reveal">
-        <div class="phone-3d-wrapper">
+        <div class="phone-3d-wrapper" id="phoneWrapper">
             <!-- Telefon 1: Ana Sayfa -->
             <div class="phone-mockup">
                 <div class="phone-screen">
@@ -1578,7 +2003,7 @@
             </p>
         </div>
 
-        <div class="features-grid">
+        <div class="features-grid" id="featuresGrid">
             <div class="feature-card reveal">
                 <div class="feature-icon"
                     style="background:linear-gradient(135deg,rgba(79,70,229,0.2),rgba(79,70,229,0.05));">🎮</div>
@@ -1838,8 +2263,47 @@
         </div>
     </footer>
 
+    <!-- Custom Cursor UI -->
+    <div class="custom-cursor" id="cursor"></div>
+    <div class="cursor-outer" id="cursorOuter"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
     <script>
+        // GSAP Register
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // ===== CUSTOM CURSOR LOGIC =====
+        const cursor = document.getElementById('cursor');
+        const cursorOuter = document.getElementById('cursorOuter');
+
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.1,
+                xPercent: -50,
+                yPercent: -50
+            });
+            gsap.to(cursorOuter, {
+                x: e.clientX,
+                y: e.clientY,
+                duration: 0.15,
+                xPercent: -50,
+                yPercent: -50
+            });
+        });
+
+        document.querySelectorAll('a, button, .feature-card, .game-card, .btn-primary, .btn-secondary, .phone-mockup').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursor, { scale: 1.5, background: 'var(--accent)', duration: 0.3 });
+                gsap.to(cursorOuter, { scale: 1.5, borderColor: 'var(--primary-light)', borderWidth: '1px', duration: 0.3 });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, background: 'var(--primary-light)', duration: 0.3 });
+                gsap.to(cursorOuter, { scale: 1, borderColor: 'var(--accent)', borderWidth: '2px', duration: 0.3 });
+            });
+        });
+
         // ===== OYUN VERİLERİ =====
         const gamesData = [
             { id: "REF01", name: "Reflex Tap", area: "Refleks", icon: "⚡", color: "linear-gradient(135deg,#EF4444,#F87171)", desc: "Tepki süresi ölçümü + Go/No-Go" },
@@ -1864,119 +2328,73 @@
 
         // Oyun kartlarını oluştur
         const gamesGrid = document.getElementById('gamesGrid');
-        gamesData.forEach((game, i) => {
-            const card = document.createElement('div');
-            card.className = 'game-card reveal';
-            card.innerHTML = `
-            <div class="game-card-icon" style="background:${game.color};">${game.icon}</div>
-            <div class="game-card-name">${game.name}</div>
-            <div class="game-card-area">${game.area}</div>
-            <div class="game-card-desc">${game.desc}</div>
-        `;
-            gamesGrid.appendChild(card);
-        });
-
-        // ===== CSS PARÇACIKLARI =====
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = (8 + Math.random() * 12) + 's';
-            particle.style.animationDelay = Math.random() * 10 + 's';
-            particle.style.width = (2 + Math.random() * 4) + 'px';
-            particle.style.height = particle.style.width;
-            // Rastgele renk çeşitliliği
-            const colors = ['#818CF8', '#06B6D4', '#A78BFA', '#60A5FA', '#22D3EE'];
-            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-            particlesContainer.appendChild(particle);
+        if (gamesGrid) {
+            gamesData.forEach((game, i) => {
+                const card = document.createElement('div');
+                card.className = 'game-card reveal';
+                card.setAttribute('data-tilt', '');
+                card.setAttribute('data-tilt-max', '15');
+                card.setAttribute('data-tilt-speed', '400');
+                card.setAttribute('data-tilt-perspective', '1000');
+                card.innerHTML = `
+                <div class="game-card-icon" style="background:${game.color}; transform: translateZ(30px);">${game.icon}</div>
+                <div class="game-card-name" style="transform: translateZ(50px);">${game.name}</div>
+                <div class="game-card-area" style="transform: translateZ(40px);">${game.area}</div>
+                <div class="game-card-desc" style="transform: translateZ(20px);">${game.desc}</div>
+            `;
+                gamesGrid.appendChild(card);
+            });
         }
+
+        // Initialize Tilt
+        VanillaTilt.init(document.querySelectorAll("[data-tilt], .feature-card, .phone-mockup"));
 
         // ===== NAVBAR SCROLL ETKİSİ =====
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
+                if (!navbar.classList.contains('scrolled')) {
+                    navbar.classList.add('scrolled');
+                    gsap.to(navbar, { backgroundColor: 'rgba(3, 7, 18, 0.95)', height: '70px', duration: 0.3 });
+                }
             } else {
-                navbar.classList.remove('scrolled');
+                if (navbar.classList.contains('scrolled')) {
+                    navbar.classList.remove('scrolled');
+                    gsap.to(navbar, { backgroundColor: 'rgba(3, 7, 18, 0.6)', height: '80px', duration: 0.3 });
+                }
             }
         });
 
-        // ===== MOBİL MENÜ =====
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.getElementById('navLinks');
-        mobileMenuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('mobile-open');
-            mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
-        });
-
-        // Mobil menüde link tıklanınca menüyü kapat
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('mobile-open');
-                mobileMenuBtn.textContent = '☰';
+        // ===== GSAP SCROLL ANIMATIONS =====
+        gsap.utils.toArray('.reveal').forEach((el, i) => {
+            gsap.from(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 90%",
+                    toggleActions: "play none none none"
+                },
+                y: 60,
+                opacity: 0,
+                scale: 0.95,
+                duration: 1,
+                ease: "power3.out",
+                delay: (i % 3) * 0.1
             });
         });
 
-        // ===== SCROLL ANİMASYONLARI (Intersection Observer) =====
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    // Kademeli gecikme ekle
-                    const delay = entry.target.dataset.delay || 0;
-                    setTimeout(() => {
-                        entry.target.classList.add('visible');
-                    }, delay);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.reveal').forEach((el, i) => {
-            el.dataset.delay = Math.min(i * 80, 400);
-            observer.observe(el);
+        // Hero Parallax
+        gsap.to(".hero-content", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: 150,
+            opacity: 0.5
         });
 
-        // ===== SAYAÇ ANİMASYONU (Hero Stats) =====
-        function animateCounter(elementId, target, duration = 2000) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-
-            let start = 0;
-            const startTime = performance.now();
-
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-
-                // easeOutExpo efekti
-                const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-                const current = Math.round(eased * target);
-
-                el.textContent = current;
-
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                }
-            }
-
-            requestAnimationFrame(update);
-        }
-
-        // Sayfa yüklenince sayaçları başlat
-        setTimeout(() => {
-            animateCounter('stat-games', 18, 1500);
-            animateCounter('stat-domains', 7, 1200);
-            animateCounter('stat-intel', 8, 1300);
-        }, 1000);
-
-
-        // ===== THREE.JS — 3D NÖRAL AĞ ARKA PLANI =====
+        // ===== THREE.JS — ADVANCED NEURAL NETWORK =====
         (function initNeuralNetwork() {
             const canvas = document.getElementById('neural-canvas');
             if (!canvas || typeof THREE === 'undefined') return;
@@ -1984,182 +2402,693 @@
             const renderer = new THREE.WebGLRenderer({
                 canvas,
                 alpha: true,
-                antialias: true
+                antialias: true,
+                powerPreference: "high-performance"
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
             const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.z = 50;
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2500);
+            camera.position.z = 150;
 
-            // Nöron noktaları oluştur
-            const nodeCount = 120;
-            const nodePositions = [];
-            const nodeGeometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(nodeCount * 3);
-            const colors = new Float32Array(nodeCount * 3);
-            const sizes = new Float32Array(nodeCount);
+            const particlesCount = 3500;
+            const positions = new Float32Array(particlesCount * 3);
+            const colors = new Float32Array(particlesCount * 3);
 
-            const primaryColor = new THREE.Color(0x4F46E5);
-            const accentColor = new THREE.Color(0x06B6D4);
-            const softColor = new THREE.Color(0x818CF8);
+            const colorPalette = [
+                new THREE.Color(0x4F46E5),
+                new THREE.Color(0x06B6D4),
+                new THREE.Color(0x818CF8),
+                new THREE.Color(0xA78BFA)
+            ];
 
-            for (let i = 0; i < nodeCount; i++) {
-                const x = (Math.random() - 0.5) * 80;
-                const y = (Math.random() - 0.5) * 60;
-                const z = (Math.random() - 0.5) * 40;
+            for (let i = 0; i < particlesCount; i++) {
+                const r = 120 + Math.random() * 80;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
 
-                positions[i * 3] = x;
-                positions[i * 3 + 1] = y;
-                positions[i * 3 + 2] = z;
+                positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+                positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+                positions[i * 3 + 2] = r * Math.cos(phi);
 
-                nodePositions.push(new THREE.Vector3(x, y, z));
-
-                // Renk çeşitliliği
-                const colorChoice = Math.random();
-                let c;
-                if (colorChoice < 0.4) c = primaryColor;
-                else if (colorChoice < 0.7) c = accentColor;
-                else c = softColor;
-
-                colors[i * 3] = c.r;
-                colors[i * 3 + 1] = c.g;
-                colors[i * 3 + 2] = c.b;
-
-                sizes[i] = 1.5 + Math.random() * 2.5;
+                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
             }
 
-            nodeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            nodeGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-            nodeGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-            // Özel nöron shader materyali
-            const nodeMaterial = new THREE.ShaderMaterial({
-                uniforms: {
-                    uTime: { value: 0 }
-                },
-                vertexShader: `
-                attribute float size;
-                attribute vec3 color;
-                varying vec3 vColor;
-                uniform float uTime;
-                void main() {
-                    vColor = color;
-                    vec3 pos = position;
-                    pos.y += sin(uTime * 0.5 + position.x * 0.1) * 0.5;
-                    pos.x += cos(uTime * 0.3 + position.z * 0.1) * 0.3;
-                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-                    gl_PointSize = size * (50.0 / -mvPosition.z);
-                    gl_Position = projectionMatrix * mvPosition;
-                }
-            `,
-                fragmentShader: `
-                varying vec3 vColor;
-                void main() {
-                    float d = length(gl_PointCoord - vec2(0.5));
-                    if (d > 0.5) discard;
-                    float alpha = 1.0 - smoothstep(0.2, 0.5, d);
-                    gl_FragColor = vec4(vColor, alpha * 0.7);
-                }
-            `,
-                transparent: true,
-                depthWrite: false,
-                blending: THREE.AdditiveBlending,
-                vertexColors: true
-            });
-
-            const nodePoints = new THREE.Points(nodeGeometry, nodeMaterial);
-            scene.add(nodePoints);
-
-            // Bağlantı çizgileri (Sinaps efekti)
-            const linePositions = [];
-            const lineColors = [];
-            const maxDist = 18;
-
-            for (let i = 0; i < nodeCount; i++) {
-                for (let j = i + 1; j < nodeCount; j++) {
-                    const dist = nodePositions[i].distanceTo(nodePositions[j]);
-                    if (dist < maxDist) {
-                        linePositions.push(
-                            nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
-                            nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
-                        );
-
-                        const alpha = 1 - (dist / maxDist);
-                        lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
-                        lineColors.push(alpha * 0.15, alpha * 0.12, alpha * 0.35);
-                    }
-                }
-            }
-
-            const lineGeometry = new THREE.BufferGeometry();
-            lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-            lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
-
-            const lineMaterial = new THREE.LineBasicMaterial({
+            const material = new THREE.PointsMaterial({
+                size: 3.5,
                 vertexColors: true,
                 transparent: true,
-                opacity: 0.6,
+                opacity: 0.8,
                 blending: THREE.AdditiveBlending,
-                depthWrite: false
+                sizeAttenuation: true
             });
 
-            const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
-            scene.add(lines);
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
 
-            // Fare takibi
+            // Sinaps lines
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0x4F46E5,
+                transparent: true,
+                opacity: 0.15,
+                blending: THREE.AdditiveBlending
+            });
+            const lineGroup = new THREE.Group();
+            for (let i = 0; i < 400; i++) {
+                const lineGeo = new THREE.BufferGeometry();
+                const p1 = new THREE.Vector3((Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500, (Math.random() - 0.5) * 500);
+                const p2 = p1.clone().add(new THREE.Vector3((Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120, (Math.random() - 0.5) * 120));
+                lineGeo.setFromPoints([p1, p2]);
+                lineGroup.add(new THREE.Line(lineGeo, lineMaterial));
+            }
+            scene.add(lineGroup);
+
             let mouseX = 0, mouseY = 0;
             document.addEventListener('mousemove', (e) => {
                 mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
                 mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
             });
 
-            // Pencere boyutlandırma
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize(window.innerWidth, window.innerHeight);
             });
 
-            // Animasyon döngüsü
             const clock = new THREE.Clock();
-
             function animate() {
                 requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
 
-                const elapsed = clock.getElapsedTime();
-                nodeMaterial.uniforms.uTime.value = elapsed;
+                points.rotation.y = time * 0.03 + mouseX * 0.1;
+                points.rotation.x = time * 0.015 + mouseY * 0.05;
+                lineGroup.rotation.y = points.rotation.y;
+                lineGroup.rotation.x = points.rotation.x;
 
-                // Yavaş, organik döndürme + fare takibi
-                nodePoints.rotation.y = elapsed * 0.03 + mouseX * 0.15;
-                nodePoints.rotation.x = elapsed * 0.02 + mouseY * 0.1;
-                lines.rotation.y = nodePoints.rotation.y;
-                lines.rotation.x = nodePoints.rotation.x;
+                material.opacity = 0.6 + Math.sin(time) * 0.2;
 
-                // Scroll bazlı parallax
-                const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-                camera.position.z = 50 + scrollProgress * 30;
-                camera.position.y = scrollProgress * -10;
+                const scrollY = window.scrollY;
+                camera.position.z = 150 + (scrollY * 0.12);
+                camera.position.y = -(scrollY * 0.06);
 
                 renderer.render(scene, camera);
             }
-
             animate();
         })();
 
-        // ===== SMOOTH SCROLL =====
+        // Smooth anchors
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const targetId = this.getAttribute('href');
+                if (targetId && targetId !== '#') {
+                    const target = document.querySelector(targetId);
+                    if (target) {
+                        gsap.to(window, { duration: 1.5, scrollTo: target, ease: "power4.inOut" });
+                    }
                 }
             });
         });
 
+        // Mobile Menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navLinks = document.getElementById('navLinks');
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('mobile-open');
+                mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
+            });
+        }
     </script>
+</body>
+
+</html>
+
+
+<script>
+    // ===== OYUN VERİLERİ =====
+    const gamesData = [
+        { id: "REF01", name: "Reflex Tap", area: "Refleks", icon: "⚡", color: "linear-gradient(135deg,#EF4444,#F87171)", desc: "Tepki süresi ölçümü + Go/No-Go" },
+        { id: "REF02", name: "Reflex Dash", area: "Refleks", icon: "🏃", color: "linear-gradient(135deg,#DC2626,#EF4444)", desc: "Şeritlerde hızlı hedef yakalama" },
+        { id: "ATT01", name: "Stroop Tap", area: "Dikkat", icon: "🎯", color: "linear-gradient(135deg,#F59E0B,#FBBF24)", desc: "Renk-kelime uyumsuzluğu testi" },
+        { id: "ATT02", name: "Focus Line", area: "Dikkat + Görsel", icon: "👁️", color: "linear-gradient(135deg,#D97706,#F59E0B)", desc: "Çizgi üzerinde hedef noktaları tak" },
+        { id: "MEM01", name: "Path Tracker", area: "Mantık + Hafıza", icon: "🗺️", color: "linear-gradient(135deg,#3B82F6,#60A5FA)", desc: "Görünmez nesneyi zihninde takip et" },
+        { id: "MEM02", name: "Memory Board", area: "Hafıza + Görsel", icon: "🧩", color: "linear-gradient(135deg,#2563EB,#3B82F6)", desc: "Kart eşleştirme + görsel hafıza" },
+        { id: "MEM03", name: "Recall Phase", area: "Dil + Hafıza", icon: "📋", color: "linear-gradient(135deg,#7C3AED,#8B5CF6)", desc: "Kelimeleri göster ve hatırla" },
+        { id: "MEM04", name: "Sequence Echo", area: "Hafıza + Dikkat", icon: "🔁", color: "linear-gradient(135deg,#6D28D9,#7C3AED)", desc: "Gösterilen sırayı aynen tekrala" },
+        { id: "LOG01", name: "Logic Puzzle", area: "Mantık + Görsel", icon: "🔮", color: "linear-gradient(135deg,#8B5CF6,#A78BFA)", desc: "Mantık dizisi çözme oyunu" },
+        { id: "NUM01", name: "Quick Math", area: "Sayısal Zeka", icon: "🔢", color: "linear-gradient(135deg,#10B981,#34D399)", desc: "Zaman baskılı mental aritmetik" },
+        { id: "VIS02", name: "Odd One Out", area: "Görsel Algı", icon: "🃏", color: "linear-gradient(135deg,#14B8A6,#2DD4BF)", desc: "Farklı kartı hızlıca bul" },
+        { id: "LANG02", name: "Word Sprint", area: "Dil", icon: "📝", color: "linear-gradient(135deg,#EC4899,#F472B6)", desc: "Gerçek-uydurma kelime ayırt et" },
+        { id: "MUS01", name: "Rhythm Match", area: "Dikkat + Refleks", icon: "🎵", color: "linear-gradient(135deg,#F43F5E,#FB7185)", desc: "Ritim dizilerini doğru sırayla yakala" },
+        { id: "SOC01", name: "Emotion Mirror", area: "Dil + Dikkat", icon: "😊", color: "linear-gradient(135deg,#E11D48,#F43F5E)", desc: "Duygu ifadelerini eşleştir" },
+        { id: "NAT01", name: "Nature Sort", area: "Mantık + Görsel", icon: "🌿", color: "linear-gradient(135deg,#059669,#10B981)", desc: "Doğa temalı nesneleri kategorile" },
+        { id: "KIN01", name: "Balance Tap", area: "Refleks", icon: "⚖️", color: "linear-gradient(135deg,#0891B2,#06B6D4)", desc: "Dengeyi koru, hızlı dokunuşlar" },
+        { id: "SPA01", name: "Route Builder", area: "Mantık + Görsel", icon: "🛤️", color: "linear-gradient(135deg,#0284C7,#0EA5E9)", desc: "En kısa rotayı planla" },
+        { id: "INT01", name: "Focus Check-In", area: "Dikkat", icon: "🧘", color: "linear-gradient(135deg,#7C3AED,#A78BFA)", desc: "Kısa odak check-in ve hedef" },
+    ];
+
+    // Oyun kartlarını oluştur
+    const gamesGrid = document.getElementById('gamesGrid');
+    gamesData.forEach((game, i) => {
+        const card = document.createElement('div');
+        card.className = 'game-card reveal';
+        card.innerHTML = `
+            <div class="game-card-icon" style="background:${game.color};">${game.icon}</div>
+            <div class="game-card-name">${game.name}</div>
+            <div class="game-card-area">${game.area}</div>
+            <div class="game-card-desc">${game.desc}</div>
+        `;
+        gamesGrid.appendChild(card);
+    });
+
+    // ===== CSS PARÇACIKLARI =====
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 40; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+        particle.style.animationDelay = Math.random() * 10 + 's';
+        particle.style.width = (2 + Math.random() * 4) + 'px';
+        particle.style.height = particle.style.width;
+        // Rastgele renk çeşitliliği
+        const colors = ['#818CF8', '#06B6D4', '#A78BFA', '#60A5FA', '#22D3EE', '#A855F7', '#EC4899'];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particlesContainer.appendChild(particle);
+    }
+
+    // ===== ÖZEL İMLEÇ SİSTEMİ =====
+    const cursorDot = document.getElementById('cursorDot');
+    const cursorGlow = document.getElementById('cursorGlow');
+    const pageGlow = document.getElementById('pageGlow');
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+    let glowX = 0, glowY = 0;
+
+    // Mobil cihaz kontrolü
+    const isMobile = window.matchMedia('(max-width: 768px)').matches || 'ontouchstart' in window;
+
+    if (!isMobile) {
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // İmleç animasyon döngüsü (yumuşak takip)
+        function updateCursor() {
+            // Nokta imleci - hızlı takip
+            cursorX += (mouseX - cursorX) * 0.2;
+            cursorY += (mouseY - cursorY) * 0.2;
+            cursorDot.style.transform = `translate(${mouseX - 4}px, ${mouseY - 4}px)`;
+            cursorGlow.style.transform = `translate(${cursorX - 20}px, ${cursorY - 20}px)`;
+
+            // Sayfa arka plan ışığı
+            glowX += (mouseX - glowX) * 0.05;
+            glowY += (mouseY - glowY) * 0.05;
+            pageGlow.style.transform = `translate(${glowX - 300}px, ${glowY - 300}px)`;
+
+            requestAnimationFrame(updateCursor);
+        }
+        updateCursor();
+
+        // Hover durumunda imleç büyüsün
+        document.querySelectorAll('a, button, .feature-card, .game-card, .domain-item, .tech-item, .hero-stat').forEach(el => {
+            el.addEventListener('mouseenter', () => cursorGlow.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursorGlow.classList.remove('hovering'));
+        });
+
+        // Tıklama efekti
+        document.addEventListener('click', (e) => {
+            const ripple = document.createElement('div');
+            ripple.className = 'click-ripple';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    }
+
+    // ===== HERO 3D PARALLAX (Fare takibi) =====
+    const heroContent = document.getElementById('heroContent');
+    if (!isMobile && heroContent) {
+        document.addEventListener('mousemove', (e) => {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const percentX = (e.clientX - centerX) / centerX;
+            const percentY = (e.clientY - centerY) / centerY;
+
+            // Her derinlik katmanına farklı parallax uygula
+            const layers = heroContent.querySelectorAll('.hero-depth-layer');
+            layers.forEach(layer => {
+                const depth = parseFloat(layer.dataset.depth) || 0.02;
+                const moveX = percentX * depth * 100;
+                const moveY = percentY * depth * 80;
+                layer.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+            });
+        });
+    }
+
+    // ===== 3D KART TILT EFEKTİ =====
+    function addTiltEffect(selector) {
+        if (isMobile) return;
+        document.querySelectorAll(selector).forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+
+                const tiltX = (y - centerY) / centerY * -8;
+                const tiltY = (x - centerX) / centerX * 8;
+
+                card.style.setProperty('--tilt-x', tiltX);
+                card.style.setProperty('--tilt-y', tiltY);
+                card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
+                card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.setProperty('--tilt-x', 0);
+                card.style.setProperty('--tilt-y', 0);
+            });
+        });
+    }
+
+    // Tilt efektini başlat (dinamik olarak oluşturulan kartlar için de)
+    setTimeout(() => {
+        addTiltEffect('.feature-card');
+        addTiltEffect('.game-card');
+        addTiltEffect('.tech-item');
+        addTiltEffect('.domain-item');
+    }, 100);
+
+    // ===== NAVBAR SCROLL ETKİSİ =====
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // ===== MOBİL MENÜ =====
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+    mobileMenuBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('mobile-open');
+        mobileMenuBtn.textContent = navLinks.classList.contains('mobile-open') ? '✕' : '☰';
+    });
+
+    // Mobil menüde link tıklanınca menüyü kapat
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('mobile-open');
+            mobileMenuBtn.textContent = '☰';
+        });
+    });
+
+    // ===== SCROLL ANİMASYONLARI (Intersection Observer) =====
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                // Kademeli gecikme ekle
+                const delay = entry.target.dataset.delay || 0;
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, delay);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach((el, i) => {
+        el.dataset.delay = Math.min(i * 80, 400);
+        observer.observe(el);
+    });
+
+    // ===== SAYAÇ ANİMASYONU (Hero Stats) =====
+    function animateCounter(elementId, target, duration = 2000) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        let start = 0;
+        const startTime = performance.now();
+
+        function update(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // easeOutExpo efekti
+            const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            const current = Math.round(eased * target);
+
+            el.textContent = current;
+
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    // Sayfa yüklenince sayaçları başlat
+    setTimeout(() => {
+        animateCounter('stat-games', 18, 1500);
+        animateCounter('stat-domains', 7, 1200);
+        animateCounter('stat-intel', 8, 1300);
+    }, 1000);
+
+
+    // ===== THREE.JS — GELİŞMİŞ 3D NÖRAL AĞ + DNA HELİKS + SİNYAL AKIŞI =====
+    (function initNeuralNetwork() {
+        const canvas = document.getElementById('neural-canvas');
+        if (!canvas || typeof THREE === 'undefined') return;
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 50;
+
+        // ===== NÖRON NOKTALARI =====
+        const nodeCount = 180;
+        const nodePositions = [];
+        const nodeGeometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(nodeCount * 3);
+        const colors = new Float32Array(nodeCount * 3);
+        const sizes = new Float32Array(nodeCount);
+
+        const primaryColor = new THREE.Color(0x4F46E5);
+        const accentColor = new THREE.Color(0x06B6D4);
+        const softColor = new THREE.Color(0x818CF8);
+        const purpleColor = new THREE.Color(0xA855F7);
+        const pinkColor = new THREE.Color(0xEC4899);
+
+        for (let i = 0; i < nodeCount; i++) {
+            const x = (Math.random() - 0.5) * 100;
+            const y = (Math.random() - 0.5) * 70;
+            const z = (Math.random() - 0.5) * 50;
+
+            positions[i * 3] = x;
+            positions[i * 3 + 1] = y;
+            positions[i * 3 + 2] = z;
+
+            nodePositions.push(new THREE.Vector3(x, y, z));
+
+            // Renk çeşitliliği
+            const colorChoice = Math.random();
+            let c;
+            if (colorChoice < 0.3) c = primaryColor;
+            else if (colorChoice < 0.5) c = accentColor;
+            else if (colorChoice < 0.7) c = softColor;
+            else if (colorChoice < 0.85) c = purpleColor;
+            else c = pinkColor;
+
+            colors[i * 3] = c.r;
+            colors[i * 3 + 1] = c.g;
+            colors[i * 3 + 2] = c.b;
+
+            sizes[i] = 1.5 + Math.random() * 3;
+        }
+
+        nodeGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        nodeGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        nodeGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+        // Özel nöron shader materyali (nabız efekti ile)
+        const nodeMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 }
+            },
+            vertexShader: `
+                attribute float size;
+                attribute vec3 color;
+                varying vec3 vColor;
+                varying float vAlpha;
+                uniform float uTime;
+                void main() {
+                    vColor = color;
+                    vec3 pos = position;
+                    // Organik dalga hareketi
+                    pos.y += sin(uTime * 0.4 + position.x * 0.08 + position.z * 0.05) * 1.2;
+                    pos.x += cos(uTime * 0.3 + position.z * 0.06 + position.y * 0.04) * 0.8;
+                    pos.z += sin(uTime * 0.25 + position.y * 0.07) * 0.6;
+
+                    // Nabız efekti
+                    float pulse = sin(uTime * 2.0 + length(position) * 0.08) * 0.5 + 0.5;
+                    vAlpha = 0.5 + pulse * 0.5;
+
+                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                    gl_PointSize = (size + pulse * 1.5) * (55.0 / -mvPosition.z);
+                    gl_Position = projectionMatrix * mvPosition;
+                }
+            `,
+            fragmentShader: `
+                varying vec3 vColor;
+                varying float vAlpha;
+                void main() {
+                    float d = length(gl_PointCoord - vec2(0.5));
+                    if (d > 0.5) discard;
+                    // Yumuşak parıltı efekti
+                    float glow = exp(-d * 4.0);
+                    float core = 1.0 - smoothstep(0.0, 0.2, d);
+                    float alpha = (glow * 0.4 + core * 0.6) * vAlpha * 0.8;
+                    vec3 finalColor = vColor + vec3(core * 0.3);
+                    gl_FragColor = vec4(finalColor, alpha);
+                }
+            `,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: true
+        });
+
+        const nodePoints = new THREE.Points(nodeGeometry, nodeMaterial);
+        scene.add(nodePoints);
+
+        // ===== BAĞLANTI ÇİZGİLERİ (Sinaps efekti) =====
+        const linePositions = [];
+        const lineColors = [];
+        const maxDist = 20;
+        const connections = []; // Bağlantı bilgileri (sinyal akışı için)
+
+        for (let i = 0; i < nodeCount; i++) {
+            for (let j = i + 1; j < nodeCount; j++) {
+                const dist = nodePositions[i].distanceTo(nodePositions[j]);
+                if (dist < maxDist) {
+                    linePositions.push(
+                        nodePositions[i].x, nodePositions[i].y, nodePositions[i].z,
+                        nodePositions[j].x, nodePositions[j].y, nodePositions[j].z
+                    );
+
+                    const alpha = 1 - (dist / maxDist);
+                    lineColors.push(alpha * 0.12, alpha * 0.1, alpha * 0.3);
+                    lineColors.push(alpha * 0.12, alpha * 0.1, alpha * 0.3);
+
+                    connections.push({ from: i, to: j, dist });
+                }
+            }
+        }
+
+        const lineGeometry = new THREE.BufferGeometry();
+        lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+        lineGeometry.setAttribute('color', new THREE.Float32BufferAttribute(lineColors, 3));
+
+        const lineMaterial = new THREE.LineBasicMaterial({
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+        scene.add(lines);
+
+        // ===== DNA HELİKS PARÇACIKLARı =====
+        const helixCount = 100;
+        const helixGeometry = new THREE.BufferGeometry();
+        const helixPos = new Float32Array(helixCount * 3);
+        const helixColors = new Float32Array(helixCount * 3);
+        const helixSizes = new Float32Array(helixCount);
+
+        for (let i = 0; i < helixCount; i++) {
+            const t = (i / helixCount) * Math.PI * 6;
+            const strand = i % 2 === 0 ? 1 : -1;
+            helixPos[i * 3] = Math.cos(t) * 8 * strand;
+            helixPos[i * 3 + 1] = (i / helixCount - 0.5) * 60;
+            helixPos[i * 3 + 2] = Math.sin(t) * 8 * strand;
+
+            const c = i % 2 === 0 ? accentColor : purpleColor;
+            helixColors[i * 3] = c.r;
+            helixColors[i * 3 + 1] = c.g;
+            helixColors[i * 3 + 2] = c.b;
+
+            helixSizes[i] = 1 + Math.random() * 1.5;
+        }
+
+        helixGeometry.setAttribute('position', new THREE.BufferAttribute(helixPos, 3));
+        helixGeometry.setAttribute('color', new THREE.BufferAttribute(helixColors, 3));
+        helixGeometry.setAttribute('size', new THREE.BufferAttribute(helixSizes, 1));
+
+        const helixMaterial = new THREE.ShaderMaterial({
+            uniforms: { uTime: { value: 0 } },
+            vertexShader: `
+                    attribute float size;
+                    attribute vec3 color;
+                    varying vec3 vColor;
+                    uniform float uTime;
+                    void main() {
+                        vColor = color;
+                        vec3 pos = position;
+                        // DNA dönüşü
+                        float angle = uTime * 0.3;
+                        float cosA = cos(angle), sinA = sin(angle);
+                        vec3 rotated = vec3(
+                            pos.x * cosA - pos.z * sinA,
+                            pos.y,
+                            pos.x * sinA + pos.z * cosA
+                        );
+                        // Dalga efekti
+                        rotated.y += sin(uTime * 0.5 + rotated.x * 0.3) * 2.0;
+                        vec4 mvPosition = modelViewMatrix * vec4(rotated, 1.0);
+                        gl_PointSize = size * (40.0 / -mvPosition.z);
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                `,
+            fragmentShader: `
+                    varying vec3 vColor;
+                    void main() {
+                        float d = length(gl_PointCoord - vec2(0.5));
+                        if (d > 0.5) discard;
+                        float alpha = exp(-d * 5.0) * 0.5;
+                        gl_FragColor = vec4(vColor, alpha);
+                    }
+                `,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+            vertexColors: true
+        });
+
+        const helixPoints = new THREE.Points(helixGeometry, helixMaterial);
+        helixPoints.position.x = 35;
+        scene.add(helixPoints);
+
+        // ===== YÖRÜNGE HALKALARI =====
+        for (let r = 0; r < 3; r++) {
+            const ringGeo = new THREE.RingGeometry(15 + r * 8, 15.1 + r * 8, 128);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: r === 0 ? 0x4F46E5 : r === 1 ? 0x06B6D4 : 0xA855F7,
+                transparent: true,
+                opacity: 0.04,
+                side: THREE.DoubleSide,
+                blending: THREE.AdditiveBlending
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI * 0.35 + r * 0.2;
+            ring.rotation.y = r * 0.3;
+            ring.userData = { speed: 0.1 + r * 0.05, axis: r };
+            scene.add(ring);
+        }
+
+        // Fare takibi
+        let sceneMouseX = 0, sceneMouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            sceneMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            sceneMouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        // Pencere boyutlandırma
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Animasyon döngüsü
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsed = clock.getElapsedTime();
+            nodeMaterial.uniforms.uTime.value = elapsed;
+            helixMaterial.uniforms.uTime.value = elapsed;
+
+            // Yavaş, organik döndürme + fare takibi
+            nodePoints.rotation.y = elapsed * 0.025 + sceneMouseX * 0.2;
+            nodePoints.rotation.x = elapsed * 0.015 + sceneMouseY * 0.12;
+            lines.rotation.y = nodePoints.rotation.y;
+            lines.rotation.x = nodePoints.rotation.x;
+
+            // Yörünge halkaları döndürme
+            scene.children.forEach(child => {
+                if (child.userData && child.userData.speed) {
+                    child.rotation.z = elapsed * child.userData.speed;
+                }
+            });
+
+            // Scroll bazlı parallax
+            const scrollProgress = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+            camera.position.z = 50 + scrollProgress * 35;
+            camera.position.y = scrollProgress * -12;
+            camera.position.x = Math.sin(scrollProgress * Math.PI) * 5;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    })();
+
+    // ===== SMOOTH SCROLL =====
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // ===== TELEFON FARE PARALLAX =====
+    const phoneWrapper = document.getElementById('phoneWrapper');
+    if (!isMobile && phoneWrapper) {
+        document.addEventListener('mousemove', (e) => {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const percentX = (e.clientX - centerX) / centerX * 0.5;
+            const percentY = (e.clientY - centerY) / centerY * 0.3;
+
+            phoneWrapper.style.transform = `rotateY(${percentX * 5}deg) rotateX(${-percentY * 3}deg)`;
+        });
+    }
+
+</script>
 </body>
 
 </html>
