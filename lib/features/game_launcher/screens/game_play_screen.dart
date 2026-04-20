@@ -23,7 +23,7 @@ import '../widgets/recall_phase_game.dart';
 import '../widgets/word_sprint_game.dart';
 import '../widgets/sequence_memory_game.dart';
 import '../widgets/odd_one_out_game.dart';
-import '../widgets/rhythm_match_game.dart';
+import '../widgets/shape_swipe_game.dart';
 import '../widgets/emotion_mirror_game.dart';
 import '../widgets/nature_sort_game.dart';
 import '../widgets/balance_tap_game.dart';
@@ -746,9 +746,9 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
           onComplete: _onGameComplete,
           isPaused: _isPaused,
         );
-      case 'MUS01':
-        return RhythmMatchGame(
-          key: ValueKey('rhythm_$_runId'),
+      case 'VIS03':
+        return ShapeSwipeGame(
+          key: ValueKey('shapeswipe_$_runId'),
           onComplete: _onGameComplete,
           isPaused: _isPaused,
         );
