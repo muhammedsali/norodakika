@@ -99,11 +99,11 @@ class MemoryBank {
       "description": "Gerçek ve uydurma kelimeleri ayırt etme oyunu."
     },
     {
-      "id": "MUS01",
-      "name": "Rhythm Match",
-      "area": "Dikkat + Refleks",
-      "intelligence": "musical",
-      "description": "Ritmi tekrar et: kısa ses/ritim dizilerini doğru sırayla yakala."
+      "id": "VIS03",
+      "name": "Shape Swipe",
+      "area": "Görsel Algı + Refleks",
+      "intelligence": "visual",
+      "description": "Gösterilen şekil ve yönergelere göre hızla doğru yöne kaydır."
     },
     {
       "id": "SOC01",

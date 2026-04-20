@@ -281,7 +281,7 @@ Bu projede yayın/ürün kontrolü için her zeka türü en az 1 oyunla ilişkil
 - **Mantıksal/Matematiksel Zeka**: Quick Math (`NUM01`), Logic Puzzle (`LOG01`)
 - **Görsel/Uzamsal Zeka**: Route Builder (`SPA01`), Odd One Out (`VIS02`)
 - **Bedensel/Kinestetik Zeka**: Balance Tap (`KIN01`)
-- **Müziksel/Ritmik Zeka**: Rhythm Match (`MUS01`)
+- **Müziksel/Ritmik Zeka**: (Şu an aktif oyun yok, önceki oyun Shape Swipe ile değiştirildi)
 - **Sosyal/İlişkisel (Interpersonal) Zeka**: Emotion Mirror (`SOC01`)
 - **İçsel/Öz-farkındalık (Intrapersonal) Zeka**: Focus Check-In (`INT01`)
 - **Doğacı (Naturalist) Zeka**: Nature Sort (`NAT01`)
@@ -312,7 +312,7 @@ Bu projede yayın/ürün kontrolü için her zeka türü en az 1 oyunla ilişkil
 - Proje yapısı
 - Temel UI ekranları
 - Flutter mini oyunları (MemoryBank + game widgets altında)
-- Yeni oyunlar eklendi ve entegre edildi: MUS01, SOC01, NAT01, KIN01, SPA01, INT01 (GamePlayScreen switch-case + Home ikon eşlemesi)
+- Yeni oyunlar eklendi ve entegre edildi: VIS03, SOC01, NAT01, KIN01, SPA01, INT01 (GamePlayScreen switch-case + Home ikon eşlemesi)
 - Local storage sistemi
 - Firebase Auth sistemi
 - Firestore veri altyapısı
