@@ -175,8 +175,8 @@
             background:linear-gradient(90deg,var(--primary),var(--accent));
             transition:width 0.3s; border-radius:2px;
         }
-        .nav-links a:hover { color:var(--text-primary); }
-        .nav-links a:hover::after { width:100%; }
+        .nav-links a:hover, .nav-links a.active { color:var(--text-primary); }
+        .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
 
         .nav-cta {
             padding:10px 24px; border-radius:12px;
@@ -1010,8 +1010,8 @@ const gamesData = [
       icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>` },
     { name:"Word Sprint",    area:"Dil",              desc:"Gerçek-uydurma kelime ayırt et",    color:"linear-gradient(135deg,#EC4899,#F472B6)",
       icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>` },
-    { name:"Rhythm Match",   area:"Dikkat + Refleks", desc:"Ritim dizilerini doğru sırayla",    color:"linear-gradient(135deg,#F43F5E,#FB7185)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>` },
+    { name:"Shape Swipe",    area:"Görsel Algı + Refleks", desc:"Şekle uyumlu yöne hızlıca kaydır", color:"linear-gradient(135deg,#0284C7,#0EA5E9)",
+      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 20 4-4 4 4"/><path d="M12 16V4"/><path d="M4 12h16"/></svg>` },
     { name:"Emotion Mirror", area:"Dil + Dikkat",     desc:"Duygu ifadelerini eşleştir",        color:"linear-gradient(135deg,#E11D48,#F43F5E)",
       icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>` },
     { name:"Nature Sort",    area:"Mantık + Görsel",  desc:"Doğa temalı nesneleri kategorile",  color:"linear-gradient(135deg,#059669,#10B981)",
@@ -1090,16 +1090,40 @@ window.addEventListener('DOMContentLoaded', () => {
         navbar.classList.toggle('scrolled', window.scrollY > 50);
     }, { passive:true });
 
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    // Smooth scroll & Active state
+    const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+    navAnchors.forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
             if (href === '#') return;
             e.preventDefault();
+            
+            navAnchors.forEach(a => a.classList.remove('active'));
+            this.classList.add('active');
+
             const target = document.querySelector(href);
             if (target) gsap.to(window, { duration:1.1, scrollTo:target, ease:'power3.inOut' });
         });
     });
+
+    // ScrollSpy for Active Nav Links
+    const sections = document.querySelectorAll('section[id]');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navAnchors.forEach(a => {
+            a.classList.remove('active');
+            if (a.getAttribute('href') === `#${current}`) {
+                a.classList.add('active');
+            }
+        });
+    }, { passive:true });
 
     // Mobile menu
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
