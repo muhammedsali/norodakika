@@ -23,15 +23,14 @@ class TargetShape {
 }
 
 class ShapeSwipeGame extends ConsumerStatefulWidget {
-  final ValueKey? key;
   final Function(Map<String, dynamic> result) onComplete;
   final bool isPaused;
 
   const ShapeSwipeGame({
-    this.key,
+    super.key,
     required this.onComplete,
     this.isPaused = false,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<ShapeSwipeGame> createState() => _ShapeSwipeGameState();
