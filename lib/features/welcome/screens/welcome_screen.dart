@@ -179,17 +179,17 @@ _GameCardData _cardDataForGame(Map<String, dynamic> game) {
         gradientColorLight: const Color(0xFF06B6D4).withValues(alpha: 0.2),
         gradientColorDark: const Color(0xFF06B6D4).withValues(alpha: 0.2),
       );
-    case 'MUS01':
+    case 'VIS03':
       return _GameCardData(
-        icon: Icons.music_note_rounded,
-        iconColorLight: const Color(0xFFD97706),
-        iconColorDark: const Color(0xFFFBBF24),
+        icon: Icons.swipe_rounded,
+        iconColorLight: const Color(0xFF0EA5E9),
+        iconColorDark: const Color(0xFF38BDF8),
         title: game['name'],
-        subtitle: 'Ritim & Dikkat',
-        backgroundColorLight: const Color(0xFFFEF3C7),
-        backgroundColorDark: const Color(0xFF78350F).withValues(alpha: 0.3),
-        gradientColorLight: const Color(0xFFF59E0B).withValues(alpha: 0.2),
-        gradientColorDark: const Color(0xFFF59E0B).withValues(alpha: 0.2),
+        subtitle: 'Refleks & Algı',
+        backgroundColorLight: const Color(0xFFE0F2FE),
+        backgroundColorDark: const Color(0xFF0C4A6E).withValues(alpha: 0.3),
+        gradientColorLight: const Color(0xFF0284C7).withValues(alpha: 0.2),
+        gradientColorDark: const Color(0xFF0284C7).withValues(alpha: 0.2),
       );
     case 'SOC01':
       return _GameCardData(

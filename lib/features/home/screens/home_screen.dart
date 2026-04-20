@@ -1404,11 +1404,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           'color': const Color(0xFF06B6D4),
           'emoji': '💨'
         };
-      case 'MUS01':
+      case 'VIS03':
         return {
-          'icon': Icons.music_note,
-          'color': const Color(0xFFF59E0B),
-          'emoji': '🎵'
+          'icon': Icons.swipe_rounded,
+          'color': const Color(0xFF0EA5E9),
+          'emoji': '👆'
         };
       case 'SOC01':
         return {
