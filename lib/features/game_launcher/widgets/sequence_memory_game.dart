@@ -173,10 +173,14 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   bool get _inputBlocked =>
       _isFinished || _isPlaying || _timeNotifier.value <= 0 || widget.isPaused;
 
-  void _handleTap(int index) {
+  void _handleTapDown(int index) {
     if (_inputBlocked) return;
-    HapticFeedback.selectionClick();
+    
+    // Tıklandığında güçlü dokunsal geri bildirim veriyoruz
+    HapticFeedback.heavyImpact();
 
+    // Butonun yanık kalmasını sağlıyoruz
+    _activeNotifier.value = index;
 
     final expected = _sequence[_input.length];
     if (index == expected) {
@@ -186,9 +190,18 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     }
   }
 
-  void _onCorrectTap(int index) {
+  void _handleTapUp(int index) {
+    if (!_isPlaying) {
+      // Çok hızlı tıklamalarda bile ışığın görünmesi için parmak kalktıktan sonra hafif bir gecikme ile söndürüyoruz
+      Future.delayed(const Duration(milliseconds: 150), () {
+        if (mounted && _activeNotifier.value == index) {
+          _activeNotifier.value = -1;
+        }
+      });
+    }
+  }
 
-    HapticFeedback.lightImpact();
+  void _onCorrectTap(int index) {
     _input.add(index);
 
     final newScore = _gs.score + _tapPoints;
@@ -216,8 +229,9 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   }
 
   void _onWrongTap() {
+    // Yanlış cevapta ekstra dikkat çekici titreşim ekliyoruz
+    HapticFeedback.vibrate();
 
-    HapticFeedback.mediumImpact();
     final newHearts = max(0, _gs.hearts - 1);
     setState(() {
       _gs = _gs.copyWith(
@@ -287,7 +301,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
                   isDark: isDark,
                   panel: panel,
                   activeNotifier: _activeNotifier,
-                  onTap: _handleTap,
+                  onTapDown: _handleTapDown,
+                  onTapUp: _handleTapUp,
                 ),
               ),
               const SizedBox(height: 12),
@@ -441,13 +456,15 @@ class _Grid extends StatelessWidget {
   final bool isDark;
   final Color panel;
   final ValueNotifier<int> activeNotifier;
-  final void Function(int) onTap;
+  final void Function(int) onTapDown;
+  final void Function(int) onTapUp;
 
   const _Grid({
     required this.isDark,
     required this.panel,
     required this.activeNotifier,
-    required this.onTap,
+    required this.onTapDown,
+    required this.onTapUp,
   });
 
   @override
@@ -492,9 +509,11 @@ class _Grid extends StatelessWidget {
                     builder: (_, active, __) {
                       final isActive = index == active;
                       return GestureDetector(
-                        onTap: () => onTap(index),
+                        onTapDown: (_) => onTapDown(index),
+                        onTapUp: (_) => onTapUp(index),
+                        onTapCancel: () => onTapUp(index),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 160),
+                          duration: const Duration(milliseconds: 80), // Daha hızlı tepki için süreyi düşürdük
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
                             color: isActive ? highlight : cellBg,
