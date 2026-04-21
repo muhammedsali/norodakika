@@ -98,6 +98,8 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   bool _sequenceCancelled = false;
 
   Timer? _gameTimer;
+  Timer? _comboTimer;
+  String? _comboMessage;
 
   // ── Lifecycle ──────────────────────────────
   @override
@@ -126,9 +128,20 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
   @override
   void dispose() {
     _gameTimer?.cancel();
+    _comboTimer?.cancel();
     _timeNotifier.dispose();
     _activeNotifier.dispose();
     super.dispose();
+  }
+
+  void _showComboMessage(String message) {
+    setState(() => _comboMessage = message);
+    _comboTimer?.cancel();
+    _comboTimer = Timer(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        setState(() => _comboMessage = null);
+      }
+    });
   }
 
   // ── Timer ──────────────────────────────────
@@ -215,6 +228,19 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     // Tur tamamlandı
     final newStreak = _gs.streak + 1;
 
+    // Seriye (streak) göre ekranda combo yazısı çıkart
+    if (newStreak >= 2) {
+      if (newStreak == 2) {
+        _showComboMessage('🔥 x2');
+      } else if (newStreak == 3) {
+        _showComboMessage('⚡ x3');
+      } else if (newStreak == 4) {
+        _showComboMessage('🚀 x4');
+      } else {
+        _showComboMessage('🤯 x$newStreak');
+      }
+    }
+
     setState(() {
       _isTransitioning = true; // Geçiş süresince tıklamaları engelle
       _gs = _gs.copyWith(
@@ -297,43 +323,59 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              _Header(
-                isDark: isDark,
-                panel: panel,
-                timeNotifier: _timeNotifier,
-                score: _gs.score,
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  _Header(
+                    isDark: isDark,
+                    panel: panel,
+                    timeNotifier: _timeNotifier,
+                    score: _gs.score,
+                  ),
+                  const SizedBox(height: 12),
+                  _TimerBar(
+                    isDark: isDark,
+                    timeNotifier: _timeNotifier,
+                    totalSeconds: totalSeconds,
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: _Grid(
+                      isDark: isDark,
+                      panel: panel,
+                      activeNotifier: _activeNotifier,
+                      onTapDown: _handleTapDown,
+                      onTapUp: _handleTapUp,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _StatsBar(
+                    panel: panel,
+                    isDark: isDark,
+                    hearts: _gs.hearts,
+                    streak: _gs.streak,
+                    completed: _gs.completed,
+                    bestStreak: _gs.bestStreak,
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              _TimerBar(
-                isDark: isDark,
-                timeNotifier: _timeNotifier,
-                totalSeconds: totalSeconds,
-              ),
-              const SizedBox(height: 12),
-              Expanded(
-                child: _Grid(
-                  isDark: isDark,
-                  panel: panel,
-                  activeNotifier: _activeNotifier,
-                  onTapDown: _handleTapDown,
-                  onTapUp: _handleTapUp,
+            ),
+            // Combo animasyon yazısı
+            if (_comboMessage != null)
+              Positioned.fill(
+                child: Center(
+                  child: IgnorePointer(
+                    child: _ComboText(
+                      text: _comboMessage!,
+                      isDark: isDark,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              _StatsBar(
-                panel: panel,
-                isDark: isDark,
-                hearts: _gs.hearts,
-                streak: _gs.streak,
-                completed: _gs.completed,
-                bestStreak: _gs.bestStreak,
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -660,6 +702,63 @@ class _StatChip extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
+// Ekranda beliren Combo (x2, x3 vs) metin animasyonu
+// ─────────────────────────────────────────────
+class _ComboText extends StatelessWidget {
+  final String text;
+  final bool isDark;
+
+  const _ComboText({required this.text, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(text), // Metin değiştiğinde animasyonu baştan başlatır
+      duration: const Duration(milliseconds: 900),
+      tween: Tween<double>(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        double opacity = 1.0;
+        double scale = 1.0;
+        double offsetY = value * -50.0; // Yukarı doğru süzülme efekti
+
+        if (value < 0.2) {
+          scale = value / 0.2;
+          opacity = value / 0.2;
+        } else if (value > 0.7) {
+          opacity = (1.0 - value) / 0.3;
+        }
+
+        return Transform.translate(
+          offset: Offset(0, offsetY),
+          child: Transform.scale(
+            scale: scale,
+            child: Opacity(
+              opacity: opacity,
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: Text(
+        text,
+        style: GoogleFonts.spaceGrotesk(
+          fontSize: 52,
+          fontWeight: FontWeight.w900,
+          color: const Color(0xFFF59E0B), // Şık bir altın sarısı / turuncu
+          shadows: [
+            Shadow(
+              color: isDark ? Colors.black87 : Colors.black26,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
