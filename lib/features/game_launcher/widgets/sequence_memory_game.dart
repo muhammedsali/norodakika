@@ -94,6 +94,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
   bool _isPlaying = false;
   bool _isFinished = false;
+  bool _isTransitioning = false; // Turlar arası geçişi yönetmek için
   bool _sequenceCancelled = false;
 
   Timer? _gameTimer;
@@ -171,7 +172,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
   // ── Input ──────────────────────────────────
   bool get _inputBlocked =>
-      _isFinished || _isPlaying || _timeNotifier.value <= 0 || widget.isPaused;
+      _isFinished || _isPlaying || _isTransitioning || _timeNotifier.value <= 0 || widget.isPaused;
 
   void _handleTapDown(int index) {
     if (_inputBlocked) return;
@@ -215,6 +216,7 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
     final newStreak = _gs.streak + 1;
 
     setState(() {
+      _isTransitioning = true; // Geçiş süresince tıklamaları engelle
       _gs = _gs.copyWith(
         score: newScore +
             _roundCompleteBase +
@@ -225,7 +227,14 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
         bestStreak: max(_gs.bestStreak, newStreak),
       );
     });
-    _startRound();
+    
+    // Yeni bulmacanın hemen çıkmaması için araya biraz bekleme süresi ekliyoruz
+    Future.delayed(const Duration(milliseconds: 700), () {
+      if (mounted && !_isFinished) {
+        _isTransitioning = false;
+        _startRound();
+      }
+    });
   }
 
   void _onWrongTap() {
@@ -234,16 +243,25 @@ class _SequenceMemoryGameState extends State<SequenceMemoryGame> {
 
     final newHearts = max(0, _gs.hearts - 1);
     setState(() {
+      _isTransitioning = true; // Geçiş süresince tıklamaları engelle
       _gs = _gs.copyWith(
         hearts: newHearts,
         score: max(0, _gs.score - _wrongPenalty),
         streak: 0,
       );
     });
+    
     if (newHearts == 0) {
+      _isTransitioning = false;
       _finish();
     } else {
-      _startRound();
+      // Hatalı durumda da hızlıca yeni bölüme geçmeyip bir süre bekliyoruz
+      Future.delayed(const Duration(milliseconds: 800), () {
+        if (mounted && !_isFinished) {
+          _isTransitioning = false;
+          _startRound();
+        }
+      });
     }
   }
 
