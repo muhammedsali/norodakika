@@ -1,8 +1,7 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../controllers/focus_checkin_game_controller.dart';
 
 class FocusCheckInGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
@@ -19,38 +18,18 @@ class FocusCheckInGame extends StatefulWidget {
 }
 
 class _FocusCheckInGameState extends State<FocusCheckInGame> {
-  static const int totalSeconds = 45;
-  static const int trials = 18;
-
-  final Random _rng = Random();
-  Timer? _timer;
-  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
-
-  int _trial = 0;
-  bool _isTarget = false;
-  bool _locked = false;
-
-  int _correct = 0;
-  int _wrong = 0;
-  int _score = 0;
-
-  DateTime? _stimulusAt;
-  int _bestMs = 9999;
+  late final FocusCheckInGameController _controller;
 
   @override
   void initState() {
     super.initState();
-    if (!widget.isPaused) _startTimer();
-    _nextTrial();
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      _timeRemainingNotifier.value--;
-      if (_timeRemainingNotifier.value <= 0) _finish();
-    });
+    _controller = FocusCheckInGameController();
+    if (!widget.isPaused) {
+      _controller.start(
+        onStateChanged: _refresh,
+        onComplete: widget.onComplete,
+      );
+    }
   }
 
   @override
@@ -58,91 +37,31 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isPaused != widget.isPaused) {
       if (widget.isPaused) {
-        _timer?.cancel();
+        _controller.pause();
       } else {
-        _startTimer();
+        _controller.start(
+          onStateChanged: _refresh,
+          onComplete: widget.onComplete,
+        );
       }
     }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _timeRemainingNotifier.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
-  Future<void> _nextTrial() async {
-    if (!mounted) return;
-    if (_trial >= trials) {
-      _finish();
-      return;
-    }
-
-    setState(() {
-      _locked = true;
-      _isTarget = false;
-      _stimulusAt = null;
-    });
-
-    await Future.delayed(Duration(milliseconds: 500 + _rng.nextInt(700)));
-    if (!mounted) return;
-
-    setState(() {
-      _locked = false;
-      _isTarget = _rng.nextDouble() < 0.45;
-      _stimulusAt = DateTime.now();
-      _trial++;
-    });
-
-    await Future.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-
-    if (_stimulusAt != null && _isTarget) {
-      setState(() {
-        _wrong++;
-        _score = max(0, _score - 60);
-        _locked = true;
-      });
-      await Future.delayed(const Duration(milliseconds: 250));
-      _nextTrial();
-    } else if (_stimulusAt != null && !_isTarget) {
-      setState(() {
-        _locked = true;
-      });
-      await Future.delayed(const Duration(milliseconds: 250));
-      _nextTrial();
-    }
+  void _refresh() {
+    if (mounted) setState(() {});
   }
 
   void _tap() {
-    if (_locked || _stimulusAt == null || widget.isPaused) return;
-
-    final rt = DateTime.now().difference(_stimulusAt!).inMilliseconds;
-
-    setState(() {
-      if (_isTarget) {
-        _correct++;
-        _score += 130;
-        if (rt < _bestMs) _bestMs = rt;
-      } else {
-        _wrong++;
-        _score = max(0, _score - 70);
-      }
-      _locked = true;
-    });
-
-    Future.delayed(const Duration(milliseconds: 250), _nextTrial);
-  }
-
-  void _finish() {
-    _timer?.cancel();
-    final total = max(1, _correct + _wrong);
-    widget.onComplete({
-      'score': _score.toDouble(),
-      'successRate': _correct / total,
-      'duration': (totalSeconds - _timeRemainingNotifier.value),
-    });
+    _controller.tap(
+      onStateChanged: _refresh,
+      onComplete: widget.onComplete,
+    );
   }
 
   @override
@@ -151,9 +70,9 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
     final titleColor = isDark ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
     final textColor = isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
 
-    final bg = _stimulusAt == null
+    final bg = _controller.stimulusAt == null
         ? (isDark ? const Color(0xFF1F2937) : Colors.white)
-        : (_isTarget ? const Color(0xFF10B981) : const Color(0xFFEF4444));
+        : (_controller.isTarget ? const Color(0xFF10B981) : const Color(0xFFEF4444));
 
     return SafeArea(
       child: Padding(
@@ -172,7 +91,7 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
                   ),
                 ),
                 ValueListenableBuilder<int>(
-                  valueListenable: _timeRemainingNotifier,
+                  valueListenable: _controller.timeRemainingNotifier,
                   builder: (context, time, _) => _Pill(text: '$time s', isDark: isDark),
                 ),
               ],
@@ -205,33 +124,33 @@ class _FocusCheckInGameState extends State<FocusCheckInGame> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          _stimulusAt == null
+                          _controller.stimulusAt == null
                               ? 'Hazır…'
-                              : (_isTarget ? 'DOKUN!' : 'DOKUNMA'),
+                              : (_controller.isTarget ? 'DOKUN!' : 'DOKUNMA'),
                           style: GoogleFonts.spaceGrotesk(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
-                            color: _stimulusAt == null
+                            color: _controller.stimulusAt == null
                                 ? titleColor
                                 : Colors.white,
                           ),
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          'Deneme: $_trial/$trials',
+                          'Deneme: ${_controller.trial}/${FocusCheckInGameController.trials}',
                           style: GoogleFonts.robotoMono(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: _stimulusAt == null ? textColor : Colors.white,
+                            color: _controller.stimulusAt == null ? textColor : Colors.white,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Skor: $_score   En iyi: ${_bestMs == 9999 ? '-' : '${_bestMs}ms'}',
+                          'Skor: ${_controller.score}   En iyi: ${_controller.bestMs == 9999 ? '-' : '${_controller.bestMs}ms'}',
                           style: GoogleFonts.robotoMono(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: _stimulusAt == null ? textColor : Colors.white,
+                            color: _controller.stimulusAt == null ? textColor : Colors.white,
                           ),
                         ),
                       ],
