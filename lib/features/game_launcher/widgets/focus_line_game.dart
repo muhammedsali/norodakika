@@ -6,14 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ══════════════════════════════════════════════════════════════════════════════
-// ENUMS
+// ENUM (SABİT) DEĞERLER
 // ══════════════════════════════════════════════════════════════════════════════
 
 enum DotType { normal, ghost, bomb, shield, timeBoost, doubleScore }
 enum LaneRow { top, mid, bottom }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// MODELS
+// MODELLER
 // ══════════════════════════════════════════════════════════════════════════════
 
 class _FocusDot {
@@ -49,7 +49,6 @@ class _Particle {
     required this.velocity,
     required this.color,
     required this.radius,
-    this.life = 1.0,
   });
 }
 
@@ -68,7 +67,7 @@ class _FloatingText {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// PARTICLE PAINTER
+// PARÇACIK ÇİZİCİ (PAINTER)
 // ══════════════════════════════════════════════════════════════════════════════
 
 class _ParticlePainter extends CustomPainter {
@@ -90,7 +89,7 @@ class _ParticlePainter extends CustomPainter {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// MAIN GAME WIDGET
+// ANA OYUN WIDGET'I
 // ══════════════════════════════════════════════════════════════════════════════
 
 class FocusLineGame extends StatefulWidget {
@@ -110,7 +109,7 @@ class FocusLineGame extends StatefulWidget {
 class _FocusLineGameState extends State<FocusLineGame>
     with TickerProviderStateMixin {
 
-  // ── Constants ───────────────────────────────────────────────────────────────
+  // ── Sabitler ────────────────────────────────────────────────────────────────
   static const int _initialSeconds    = 45;
   static const int _levelBonusSec     = 10;
   static const int _maxLives          = 3;
@@ -136,7 +135,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     Color(0xFFFB923C),
   ];
 
-  // ── Animation Controllers ───────────────────────────────────────────────────
+  // ── Animasyon Kontrolcüleri ─────────────────────────────────────────────────
   late AnimationController _pulseCtrl;
   late AnimationController _shakeCtrl;
   late Animation<double>   _shakeAnim;
@@ -146,13 +145,13 @@ class _FocusLineGameState extends State<FocusLineGame>
   late AnimationController _dangerCtrl;
   late AnimationController _doubleCtrl;
 
-  // ── Timers ──────────────────────────────────────────────────────────────────
+  // ── Zamanlayıcılar ──────────────────────────────────────────────────────────
   Timer? _countdownTimer;
   Timer? _spawnTimer;
   Timer? _expiryTimer;
   Timer? _doubleScoreTimer;
 
-  // ── Notifiers / State ───────────────────────────────────────────────────────
+  // ── Bildiriciler ve Durum Yönetimi ──────────────────────────────────────────
   final Random _rng = Random();
   late ValueNotifier<int> _timeNotifier;
 
@@ -180,7 +179,7 @@ class _FocusLineGameState extends State<FocusLineGame>
   final List<_ComboPopup>  _comboPopups  = [];
   final List<_FloatingText> _floatTexts  = [];
 
-  // ── Init ────────────────────────────────────────────────────────────────────
+  // ── Başlatma (Init) ─────────────────────────────────────────────────────────
 
   @override
   void initState() {
@@ -239,7 +238,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     super.dispose();
   }
 
-  // ── Helpers ─────────────────────────────────────────────────────────────────
+  // ── Yardımcı Fonksiyonlar ───────────────────────────────────────────────────
 
   void _pickTargetColor() {
     final prev = _targetColor;
@@ -283,7 +282,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     });
   }
 
-  // ── Particles ────────────────────────────────────────────────────────────────
+  // ── Parçacıklar ─────────────────────────────────────────────────────────────
 
   void _tickParticles() {
     if (_particles.isEmpty) return;
@@ -313,7 +312,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     }
   }
 
-  // ── Spawn ────────────────────────────────────────────────────────────────────
+  // ── Üretim (Spawn) ──────────────────────────────────────────────────────────
 
   void _spawnDot() {
     final roll = _rng.nextDouble();
@@ -420,7 +419,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     if (_lives <= 0) _finishGame();
   }
 
-  // ── Tap ─────────────────────────────────────────────────────────────────────
+  // ── Dokunma İşlemleri ───────────────────────────────────────────────────────
 
   void _onTap(_FocusDot dot, Offset globalPos) {
     if (_timeNotifier.value <= 0 || widget.isPaused || dot.popped) return;
@@ -464,7 +463,7 @@ class _FocusLineGameState extends State<FocusLineGame>
           _wrongHits++;
           _combo = 0;
           _score = max(0, _score - 80);
-          _addFloat('-80 👻 TUZAK!', Colors.white70, globalPos);
+          _addFloat('-80 👻 TUZAK!', Colors.white.withValues(alpha: 0.7), globalPos);
           _shakeCtrl.forward(from: 0.0);
           _lives--;
           if (_lives <= 0) _finishGame();
@@ -589,7 +588,7 @@ class _FocusLineGameState extends State<FocusLineGame>
   }
 
   // ══════════════════════════════════════════════════════════════════════════
-  // BUILD
+  // ARAYÜZ (BUILD)
   // ══════════════════════════════════════════════════════════════════════════
 
   @override
@@ -606,14 +605,14 @@ class _FocusLineGameState extends State<FocusLineGame>
       body: SafeArea(
         child: Stack(
           children: [
-            // Particle layer
+            // Parçacık katmanı
             Positioned.fill(
               child: IgnorePointer(
                 child: CustomPaint(painter: _ParticlePainter(_particles)),
               ),
             ),
 
-            // Content
+            // İçerik
             Padding(
               padding: const EdgeInsets.all(12),
               child: Column(
@@ -629,24 +628,24 @@ class _FocusLineGameState extends State<FocusLineGame>
               ),
             ),
 
-            // Combo popups
+            // Kombo açılır pencereleri
             ..._comboPopups.map((p) => Positioned(
                   left: p.position.dx - 70,
                   top:  p.position.dy - 70,
                   child: IgnorePointer(child: _ComboPopupWidget(popup: p)),
                 )),
 
-            // Floating texts
+            // Yüzen metinler
             ..._floatTexts.map((ft) => Positioned(
                   left: ft.position.dx - 40,
                   top:  ft.position.dy - 30,
                   child: IgnorePointer(child: _FloatingTextWidget(ft: ft)),
                 )),
 
-            // Level banner
+            // Seviye banner'ı
             if (_showLevelBanner) _buildLevelBanner(),
 
-            // Danger border
+            // Tehlike sınırı
             if (isLow)
               Positioned.fill(
                 child: IgnorePointer(
@@ -670,7 +669,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     );
   }
 
-  // ── Header ──────────────────────────────────────────────────────────────────
+  // ── Üst Kısım (Header) ──────────────────────────────────────────────────────
 
   Widget _buildHeader(Color panel, Color tPri, Color tMut, bool isDark, bool isLow) {
     return Container(
@@ -889,7 +888,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     return const Color(0xFF4ADE80);
   }
 
-  // ── Powerup Legend ──────────────────────────────────────────────────────────
+  // ── Güçlendirici Açıklamaları ───────────────────────────────────────────────
 
   Widget _buildPowerupLegend(bool isDark) {
     final items = [
@@ -929,7 +928,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     );
   }
 
-  // ── Target Bar ──────────────────────────────────────────────────────────────
+  // ── Hedef Çubuğu ────────────────────────────────────────────────────────────
 
   Widget _buildTargetBar() {
     return AnimatedBuilder(
@@ -976,7 +975,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     );
   }
 
-  // ── Game Area ────────────────────────────────────────────────────────────────
+  // ── Oyun Alanı ──────────────────────────────────────────────────────────────
 
   Widget _buildGameArea(bool isDark) {
     return AnimatedBuilder(
@@ -1009,7 +1008,7 @@ class _FocusLineGameState extends State<FocusLineGame>
           return Stack(
             clipBehavior: Clip.hardEdge,
             children: [
-              // Lane glow lines
+              // Şerit parlama çizgileri
               for (final e in laneY.entries)
                 Positioned(
                   left: 18, right: 18,
@@ -1029,7 +1028,7 @@ class _FocusLineGameState extends State<FocusLineGame>
                   ),
                 ),
 
-              // Lane labels
+              // Şerit etiketleri
               for (final e in laneY.entries)
                 Positioned(
                   left: 5, top: e.value - 7,
@@ -1043,7 +1042,7 @@ class _FocusLineGameState extends State<FocusLineGame>
                   ),
                 ),
 
-              // Dots
+              // Noktalar
               for (final dot in List<_FocusDot>.from(_dots))
                 _buildDotWidget(dot, W, laneY[dot.lane]!),
             ],
@@ -1084,7 +1083,7 @@ class _FocusLineGameState extends State<FocusLineGame>
           child: Stack(
             alignment: Alignment.center,
             children: [
-              // Timer ring
+              // Zamanlayıcı halkası
               if (dot.isTarget || isSpecial)
                 SizedBox(
                   width:  _dotSize + 10.0,
@@ -1098,7 +1097,7 @@ class _FocusLineGameState extends State<FocusLineGame>
                     ),
                   ),
                 ),
-              // Dot body
+              // Nokta gövdesi
               Container(
                 width:  _dotSize.toDouble(),
                 height: _dotSize.toDouble(),
@@ -1117,14 +1116,14 @@ class _FocusLineGameState extends State<FocusLineGame>
                   ],
                 ),
                 child: emoji != null
-                    ? Center(child: Text(emoji, style: TextStyle(fontSize: _dotSize * 0.5)))
+                    ? Center(child: Text(emoji, style: const TextStyle(fontSize: _dotSize * 0.5)))
                     : dot.isTarget
                         ? Center(
                             child: Container(
                               width: 10, height: 10,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white38,
+                                color: Colors.white.withValues(alpha: 0.38),
                               ),
                             ),
                           )
@@ -1137,7 +1136,7 @@ class _FocusLineGameState extends State<FocusLineGame>
     );
   }
 
-  // ── Level Banner ─────────────────────────────────────────────────────────────
+  // ── Seviye Banner'ı ─────────────────────────────────────────────────────────
 
   Widget _buildLevelBanner() {
     return Positioned.fill(
@@ -1175,7 +1174,7 @@ class _FocusLineGameState extends State<FocusLineGame>
                   Text(
                     '+$_levelBonusSec sn  ·  Hız arttı  ·  +❤️',
                     style: GoogleFonts.orbitron(
-                      fontSize: 11, color: Colors.white70, fontWeight: FontWeight.w500,
+                      fontSize: 11, color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
@@ -1189,7 +1188,7 @@ class _FocusLineGameState extends State<FocusLineGame>
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// COMBO POPUP WIDGET
+// KOMBO AÇILIR PENCERE WIDGET'I
 // ══════════════════════════════════════════════════════════════════════════════
 
 class _ComboPopupWidget extends StatefulWidget {
@@ -1255,7 +1254,7 @@ class _ComboPopupWidgetState extends State<_ComboPopupWidget>
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// FLOATING TEXT WIDGET
+// YÜZEN METİN WIDGET'I
 // ══════════════════════════════════════════════════════════════════════════════
 
 class _FloatingTextWidget extends StatefulWidget {
