@@ -1,8 +1,7 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../controllers/balance_tap_game_controller.dart';
 
 class BalanceTapGame extends StatefulWidget {
   final Function(Map<String, dynamic>) onComplete;
@@ -19,50 +18,15 @@ class BalanceTapGame extends StatefulWidget {
 }
 
 class _BalanceTapGameState extends State<BalanceTapGame> {
-  static const int totalSeconds = 45;
-  static const double maxOffset = 1.2;
-  static const double driftPerTick = 0.03;
-
-  Timer? _timer;
-  Timer? _tick;
-
-  final ValueNotifier<int> _timeRemainingNotifier = ValueNotifier<int>(totalSeconds);
-  final ValueNotifier<double> _offsetNotifier = ValueNotifier<double>(0.0);
-
-  final ValueNotifier<int> _scoreNotifier = ValueNotifier<int>(0);
-  int _ticksInZone = 0;
-  int _ticksTotal = 0;
-
-  final Random _rng = Random();
+  late final BalanceTapGameController _controller;
 
   @override
   void initState() {
     super.initState();
-    if (!widget.isPaused) _startTimers();
-  }
-
-  void _startTimers() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      _timeRemainingNotifier.value--;
-      if (_timeRemainingNotifier.value <= 0) _finish();
-    });
-
-    _tick?.cancel();
-    _tick = Timer.periodic(const Duration(milliseconds: 70), (_) {
-      if (!mounted) return;
-      _ticksTotal++;
-      final drift = (_rng.nextDouble() - 0.5) * 2 * driftPerTick;
-      _offsetNotifier.value = (_offsetNotifier.value + drift).clamp(-maxOffset, maxOffset);
-      final inZone = _offsetNotifier.value.abs() <= 0.25;
-      if (inZone) {
-        _ticksInZone++;
-        _scoreNotifier.value += 2;
-      } else {
-        _scoreNotifier.value = max(0, _scoreNotifier.value - 1);
-      }
-    });
+    _controller = BalanceTapGameController();
+    if (!widget.isPaused) {
+      _controller.start(onComplete: widget.onComplete);
+    }
   }
 
   @override
@@ -70,45 +34,31 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.isPaused != widget.isPaused) {
       if (widget.isPaused) {
-        _timer?.cancel();
-        _tick?.cancel();
+        _controller.pause();
       } else {
-        _startTimers();
+        _controller.start(onComplete: widget.onComplete);
       }
     }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
-    _tick?.cancel();
-    _timeRemainingNotifier.dispose();
-    _offsetNotifier.dispose();
-    _scoreNotifier.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   void _tapLeft() {
     if (widget.isPaused) return;
-    _offsetNotifier.value = (_offsetNotifier.value - 0.18).clamp(-maxOffset, maxOffset);
+    _controller.tapLeft();
   }
 
   void _tapRight() {
     if (widget.isPaused) return;
-    _offsetNotifier.value = (_offsetNotifier.value + 0.18).clamp(-maxOffset, maxOffset);
+    _controller.tapRight();
   }
 
   void _finish() {
-    _timer?.cancel();
-    _tick?.cancel();
-
-    final successRate = _ticksTotal == 0 ? 0.0 : (_ticksInZone / _ticksTotal);
-
-    widget.onComplete({
-      'score': _scoreNotifier.value.toDouble(),
-      'successRate': successRate,
-      'duration': (totalSeconds - _timeRemainingNotifier.value),
-    });
+    _controller.finish(onComplete: widget.onComplete);
   }
 
   @override
@@ -138,7 +88,7 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                   ),
                 ),
                 ValueListenableBuilder<int>(
-                  valueListenable: _timeRemainingNotifier,
+                  valueListenable: _controller.timeRemainingNotifier,
                   builder: (context, time, _) => _Pill(text: '$time s', isDark: isDark),
                 ),
               ],
@@ -172,9 +122,9 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                       builder: (context, c) {
                         final width = c.maxWidth;
                         return ValueListenableBuilder<double>(
-                          valueListenable: _offsetNotifier,
+                          valueListenable: _controller.offsetNotifier,
                           builder: (context, offsetValue, child) {
-                            final dotX = (centerX + (offsetValue / (maxOffset * 2))).clamp(0.0, 1.0);
+                            final dotX = (centerX + (offsetValue / (BalanceTapGameController.maxOffset * 2))).clamp(0.0, 1.0);
                             final x = dotX * width;
                             return Stack(
                               children: [
@@ -226,7 +176,7 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                   ),
                   const SizedBox(height: 8),
                   ValueListenableBuilder<int>(
-                    valueListenable: _scoreNotifier,
+                    valueListenable: _controller.scoreNotifier,
                     builder: (context, score, _) {
                       return Text(
                         'Skor: $score',
