@@ -57,10 +57,6 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
     _controller.tapRight();
   }
 
-  void _finish() {
-    _controller.finish(onComplete: widget.onComplete);
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -89,7 +85,8 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                 ),
                 ValueListenableBuilder<int>(
                   valueListenable: _controller.timeRemainingNotifier,
-                  builder: (context, time, _) => _Pill(text: '$time s', isDark: isDark),
+                  builder: (context, time, _) =>
+                      _Pill(text: '$time s', isDark: isDark),
                 ),
               ],
             ),
@@ -124,7 +121,11 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                         return ValueListenableBuilder<double>(
                           valueListenable: _controller.offsetNotifier,
                           builder: (context, offsetValue, child) {
-                            final dotX = (centerX + (offsetValue / (BalanceTapGameController.maxOffset * 2))).clamp(0.0, 1.0);
+                            final dotX = (centerX +
+                                    (offsetValue /
+                                        (BalanceTapGameController.maxOffset *
+                                            2)))
+                                .clamp(0.0, 1.0);
                             final x = dotX * width;
                             return Stack(
                               children: [
@@ -158,8 +159,8 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color:
-                                              Colors.black.withValues(alpha: 0.15),
+                                          color: Colors.black
+                                              .withValues(alpha: 0.15),
                                           blurRadius: 12,
                                           offset: const Offset(0, 6),
                                         )
@@ -180,8 +181,8 @@ class _BalanceTapGameState extends State<BalanceTapGame> {
                     builder: (context, score, _) {
                       return Text(
                         'Skor: $score',
-                        style:
-                            GoogleFonts.robotoMono(fontSize: 12, color: textColor),
+                        style: GoogleFonts.robotoMono(
+                            fontSize: 12, color: textColor),
                       );
                     },
                   ),
