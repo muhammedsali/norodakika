@@ -42,7 +42,7 @@ class _Particle {
   Offset velocity;
   Color color;
   double radius;
-  double life;
+  double life = 1.0;
 
   _Particle({
     required this.position,
@@ -1123,7 +1123,7 @@ class _FocusLineGameState extends State<FocusLineGame>
                               width: 10, height: 10,
                               decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.white.withValues(alpha: 0.38),
+                                color: Color(0x61FFFFFF),
                               ),
                             ),
                           )
