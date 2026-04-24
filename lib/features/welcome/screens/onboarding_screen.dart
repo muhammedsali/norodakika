@@ -29,14 +29,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   late Animation<double> _pulseScale;
 
   // ─── Aydınlık tema renk sabitleri ─────────────────────────
-  static const Color _bgColor       = Color(0xFFF0F4FF);
-  static const Color _titleColor    = Color(0xFF0F172A);
+  static const Color _bgColor = Color(0xFFF0F4FF);
+  static const Color _titleColor = Color(0xFF0F172A);
   static const Color _subtitleColor = Color(0xFF475569);
-  static const Color _chipBg        = Color(0xFFE8EEFF);
-  static const Color _chipBorder    = Color(0xFFD1D9FF);
-  static const Color _chipText      = Color(0xFF334155);
-  static const Color _dotInactive   = Color(0xFFCBD5E1);
-  static const Color _progressBg    = Color(0xFFE2E8F0);
+  static const Color _chipBg = Color(0xFFE8EEFF);
+  static const Color _chipBorder = Color(0xFFD1D9FF);
+  static const Color _chipText = Color(0xFF334155);
+  static const Color _dotInactive = Color(0xFFCBD5E1);
+  static const Color _progressBg = Color(0xFFE2E8F0);
 
   @override
   void initState() {
@@ -276,8 +276,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             onPressed: _goToWelcome,
             style: TextButton.styleFrom(
               foregroundColor: _subtitleColor,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -328,7 +327,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 400),
               curve: Curves.easeInOutCubic,
-              width: state.isLastPage ? 160 : 64,
+              width: state.isLastPage ? 140 : 64,
               height: 56,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -346,31 +345,37 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 ],
               ),
               child: Center(
-                child: state.isLastPage
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Başla',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Icon(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: state.isLastPage
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Başla',
+                                style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                color: Colors.white,
+                                size: 22,
+                              ),
+                            ],
+                          )
+                        : const Icon(
                             Icons.arrow_forward_rounded,
                             color: Colors.white,
-                            size: 22,
+                            size: 26,
                           ),
-                        ],
-                      )
-                    : const Icon(
-                        Icons.arrow_forward_rounded,
-                        color: Colors.white,
-                        size: 26,
-                      ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -517,8 +522,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
         return Padding(
           padding: const EdgeInsets.only(right: 10),
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: _chipBg,
               borderRadius: BorderRadius.circular(20),
