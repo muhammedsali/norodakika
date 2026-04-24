@@ -579,8 +579,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
   }
 
   Widget _dirChip(TargetShape s, bool isDark) {
-    // Aktif kılavuz: mevcut şeklin kılavuzu parlasın
-    final isActive = _currentShape == s;
+    // Hepsi sabit görünüm — aktif şekli ele vermemek için highlight yok
     IconData arrowIcon;
     String label;
     switch (s.correctDirection) {
@@ -602,35 +601,21 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
         break;
     }
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 250),
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-      decoration: BoxDecoration(
-        color: isActive
-            ? s.color.withValues(alpha: 0.15)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isActive ? s.color.withValues(alpha: 0.5) : Colors.transparent,
-        ),
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(s.icon,
-              size: 22,
-              color: isActive ? s.color : s.color.withValues(alpha: 0.45)),
+          Icon(s.icon, size: 22, color: s.color.withValues(alpha: 0.5)),
           const SizedBox(height: 3),
-          Icon(arrowIcon,
-              size: 14,
-              color: isActive ? s.color : s.color.withValues(alpha: 0.35)),
+          Icon(arrowIcon, size: 14, color: s.color.withValues(alpha: 0.4)),
           const SizedBox(height: 2),
           Text(
             label,
             style: GoogleFonts.inter(
               fontSize: 9,
               fontWeight: FontWeight.w700,
-              color: isActive ? s.color : s.color.withValues(alpha: 0.35),
+              color: s.color.withValues(alpha: 0.4),
             ),
           ),
         ],
