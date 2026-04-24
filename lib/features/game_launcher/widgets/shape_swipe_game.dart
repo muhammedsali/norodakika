@@ -101,7 +101,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
   late AnimationController _cardController;
   late Animation<double> _cardScale;
 
-
   // Doğru/Yanlış flaş animasyonu
   late AnimationController _flashController;
   late Animation<double> _flashAnim;
@@ -127,7 +126,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     _cardScale = Tween<double>(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(parent: _cardController, curve: Curves.easeOutBack),
     );
-
 
     // Flaş
     _flashController = AnimationController(
@@ -306,7 +304,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
       });
     }
   }
-
 
   // ─── Pan/Swipe algıla ─────────────────────────────────────
   void _onPanEnd(DragEndDetails d) {
