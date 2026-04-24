@@ -105,7 +105,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
   late AnimationController _swipeController;
   late Animation<Offset> _swipeOffset;
   late Animation<double> _swipeFade;
-  SwipeDirection _swipeDir = SwipeDirection.up;
 
   // Doğru/Yanlış flaş animasyonu
   late AnimationController _flashController;
