@@ -600,16 +600,16 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(s.icon, size: 22, color: s.color.withValues(alpha: 0.5)),
+          Icon(s.icon, size: 22, color: s.color),
           const SizedBox(height: 3),
-          Icon(arrowIcon, size: 14, color: s.color.withValues(alpha: 0.4)),
+          Icon(arrowIcon, size: 14, color: s.color),
           const SizedBox(height: 2),
           Text(
             label,
             style: GoogleFonts.inter(
               fontSize: 9,
               fontWeight: FontWeight.w700,
-              color: s.color.withValues(alpha: 0.4),
+              color: s.color,
             ),
           ),
         ],
