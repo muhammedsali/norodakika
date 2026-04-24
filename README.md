@@ -1,7 +1,7 @@
 # 🧠 NöroDakika
 
-**Bilişsel Eğitim Mobil Uygulaması**
-*Beyninizi her gün bir dakikada eğitin.*
+**Cognitive Training Mobile Application**
+*Train your brain in a minute every day.*
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.0+-02569B?logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart&logoColor=white)
@@ -12,137 +12,137 @@
 
 ---
 
-## 📖 Genel Bakış
+## 📖 Overview
 
-**NöroDakika**, Flutter ile geliştirilmiş, bilişsel becerileri etkileşimli mini oyunlarla eğiten bir mobil uygulamadır. **8 farklı zeka türü** ve **7 bilişsel alan** üzerinden çalışan uygulama, **18 özgün mini oyun** içerir.
+**NöroDakika** is a mobile application developed with Flutter that trains cognitive skills through interactive mini-games. Operating across **8 different intelligence types** and **7 cognitive domains**, the app features **18 unique mini-games**.
 
-Platform, her oyuncu performansına göre kişiselleştirme yapan **ELO tabanlı adaptif zorluk sistemine** sahiptir. İlerleme, **radar grafiği** ile görselleştirilerek kullanıcıya bilişsel profilinin net bir resmini sunar.
+The platform incorporates an **ELO-based adaptive difficulty system** that personalizes the experience based on each player's performance. Progress is visualized through a **radar chart**, providing users with a clear picture of their cognitive profile.
 
-### 🖼️ Ekran Görüntüleri
+### 🖼️ Screenshots
 
-![Ana Ekran](website/screenshot_home.png)
-![Oyunlar](website/screenshot_games.png)
-![İstatistikler](website/screenshot_stats.png)
+![Home Screen](website/screenshot_home.png)
+![Games](website/screenshot_games.png)
+![Statistics](website/screenshot_stats.png)
 
 ---
 
-## ✨ Özellikler
+## ✨ Features
 
-| Özellik | Açıklama |
+| Feature | Description |
 | --- | --- |
-| 🧠 **7 Bilişsel Kategori** | Hafıza, Dikkat, Refleks, Mantık, Sayısal Zeka, Görsel Algı, Dil |
-| 🎯 **8 Zeka Türü** | Bedensel, Görsel, Sözel, Mantıksal, Müzikal, Sosyal, İçsel, Doğacı |
-| 🎮 **18 Mini Oyun** | Tüm oyunlar Flutter widget'ları olarak native yazılmıştır — WebView yok |
-| 📊 **Adaptif Zorluk** | ELO tabanlı puanlama sistemi performansa göre zorluk ayarlar |
-| 📈 **Radar Grafiği** | `fl_chart` ile bilişsel profil takibi |
-| 📅 **Günlük Plan** | Zayıf alanları hedefleyen kişiselleştirilmiş günlük eğitim planları |
-| 🔥 **Firebase Backend** | Authentication (E-posta/Şifre + Google Sign-In) + Cloud Firestore |
-| 🔔 **Bildirimler** | Firebase Messaging + yerel bildirimler ile hatırlatma sistemi |
-| 📝 **Oyun Anketleri** | Oyun öncesi ve sonrası duygu/düşünce anketleri |
-| 🏆 **Liderlik Tablosu** | Kullanıcılar arası sıralama ve rekabet |
-| 🎨 **Material 3 UI** | Modern tasarım sistemi + Google Fonts + nöron animasyonlu arkaplan |
-| 🌙 **Karanlık Mod** | Tema sağlayıcı ile açık / koyu mod desteği |
-| 💾 **Yerel Depolama** | SharedPreferences ile çevrimdışı oturum ve ayar kayıtları |
-| 👤 **Kullanıcı Profilleri** | Özelleştirilebilir avatarlar ve kişiye özel istatistikler |
-| 🌐 **Türkçe Dil Desteği** | Riverpod tabanlı dil sağlayıcı ile çoklu dil altyapısı |
+| 🧠 **7 Cognitive Domains** | Memory, Attention, Reflex, Logic, Numerical Intelligence, Visual Perception, Language |
+| 🎯 **8 Intelligence Types** | Bodily-Kinesthetic, Visual-Spatial, Verbal-Linguistic, Logical-Mathematical, Musical, Interpersonal, Intrapersonal, Naturalistic |
+| 🎮 **18 Mini-Games** | All games are written natively as Flutter widgets — no WebViews |
+| 📊 **Adaptive Difficulty** | ELO-based scoring system adjusts difficulty according to performance |
+| 📈 **Radar Chart** | Cognitive profile tracking using `fl_chart` |
+| 📅 **Daily Plan** | Personalized daily training plans targeting weak areas |
+| 🔥 **Firebase Backend** | Authentication (Email/Password + Google Sign-In) + Cloud Firestore |
+| 🔔 **Notifications** | Reminder system powered by Firebase Messaging + local notifications |
+| 📝 **Game Surveys** | Pre- and post-game mood/thought surveys |
+| 🏆 **Leaderboard** | Ranking and competition among users |
+| 🎨 **Material 3 UI** | Modern design system + Google Fonts + animated neuron background |
+| 🌙 **Dark Mode** | Light / Dark mode support via theme provider |
+| 💾 **Local Storage** | Offline session and settings caching using SharedPreferences |
+| 👤 **User Profiles** | Customizable avatars and personalized statistics |
+| 🌐 **Localization** | Multi-language infrastructure using Riverpod-based language provider |
 
 ---
 
-## 🎮 Oyunlar
+## 🎮 Games
 
-### Refleks ve Bedensel
+### Reflex and Bodily-Kinesthetic
 
-| ID | Oyun | Alan | Zeka Türü | Açıklama |
+| ID | Game | Domain | Intelligence Type | Description |
 | --- | --- | --- | --- | --- |
-| REF01 | **Reflex Tap** | Refleks | Bedensel | Tepki süresi ölçümü + Go/No-Go mekanizması |
-| REF02 | **Reflex Dash** | Refleks | Bedensel | Şeritler üzerinde kayan hedeflere hızlı tepki |
-| KIN01 | **Balance Tap** | Refleks | Bedensel | Ekranın iki yanına dengeli dokunuşlarla hedefi ortada tut |
+| REF01 | **Reflex Tap** | Reflex | Bodily-Kinesthetic | Reaction time measurement + Go/No-Go mechanism |
+| REF02 | **Reflex Dash** | Reflex | Bodily-Kinesthetic | Quick reaction to sliding targets on lanes |
+| KIN01 | **Balance Tap** | Reflex | Bodily-Kinesthetic | Keep the target centered with balanced taps on both sides |
 
-### Dikkat ve İçsel
+### Attention and Intrapersonal
 
-| ID | Oyun | Alan | Zeka Türü | Açıklama |
+| ID | Game | Domain | Intelligence Type | Description |
 | --- | --- | --- | --- | --- |
-| ATT01 | **Stroop Tap** | Dikkat | İçsel | Renk-kelime uyumsuzluğu ile dikkat testi |
-| ATT02 | **Focus Line** | Dikkat + Görsel Algı | Görsel | Yatay çizgi üzerindeki hedef renk noktalara odaklanma |
-| INT01 | **Focus Check-In** | Dikkat | İçsel | Gün içi mini odak görevi ile dikkat toparla |
+| ATT01 | **Stroop Tap** | Attention | Intrapersonal | Attention test using color-word mismatch |
+| ATT02 | **Focus Line** | Attention + Visual | Visual-Spatial | Focus on target color dots along a horizontal line |
+| INT01 | **Focus Check-In** | Attention | Intrapersonal | Regain attention with a short daytime focus task |
 
-### Hafıza
+### Memory
 
-| ID | Oyun | Alan | Zeka Türü | Açıklama |
+| ID | Game | Domain | Intelligence Type | Description |
 | --- | --- | --- | --- | --- |
-| MEM01 | **Path Tracker** | Mantık + Hafıza | Görsel | Görünmez nesneyi yön oklarına göre zihninde takip et |
-| MEM02 | **Memory Board** | Hafıza + Görsel Algı | Görsel | Klasik kart eşleştirme hafıza oyunu |
-| MEM03 | **Recall Phase** | Dil + Hafıza | Sözel | Kelime gösterim ve hatırlama testi |
-| MEM04 | **Sequence Echo** | Hafıza + Dikkat | Müzikal | Gösterilen hücre sırasını aynen tekrar et |
+| MEM01 | **Path Tracker** | Logic + Memory | Visual-Spatial | Track the invisible object mentally according to directional arrows |
+| MEM02 | **Memory Board** | Memory + Visual | Visual-Spatial | Classic card matching memory game |
+| MEM03 | **Recall Phase** | Language + Memory | Verbal-Linguistic | Word display and recall test |
+| MEM04 | **Sequence Echo** | Memory + Attention | Musical | Replicate the exact sequence of shown cells |
 
-### Mantık ve Görsel
+### Logic and Visual
 
-| ID | Oyun | Alan | Zeka Türü | Açıklama |
+| ID | Game | Domain | Intelligence Type | Description |
 | --- | --- | --- | --- | --- |
-| LOG01 | **Logic Puzzle** | Mantık + Görsel Algı | Mantıksal | Mantık dizisi çözme + görsel algı |
-| NUM01 | **Quick Math** | Sayısal Zeka | Mantıksal | Zaman baskılı mental aritmetik |
-| VIS02 | **Odd One Out** | Görsel Algı + Dikkat | Görsel | Farklı kartı hızlıca bulma oyunu |
-| SPA01 | **Route Builder** | Mantık + Görsel Algı | Görsel | Izgara üzerinde engelleri aşarak en kısa rota planla |
+| LOG01 | **Logic Puzzle** | Logic + Visual | Logical-Mathematical | Logic sequence solving + visual perception |
+| NUM01 | **Quick Math** | Numerical | Logical-Mathematical | Time-pressured mental arithmetic |
+| VIS02 | **Odd One Out** | Visual + Attention | Visual-Spatial | Quickly find the different card |
+| SPA01 | **Route Builder** | Logic + Visual | Visual-Spatial | Plan the shortest route by navigating obstacles on a grid |
 
-### Dil ve Sosyal
+### Language and Interpersonal
 
-| ID | Oyun | Alan | Zeka Türü | Açıklama |
+| ID | Game | Domain | Intelligence Type | Description |
 | --- | --- | --- | --- | --- |
-| LANG02 | **Word Sprint** | Dil | Sözel | Gerçek ve uydurma kelimeleri ayırt etme |
-| SOC01 | **Emotion Mirror** | Dil + Dikkat | Sosyal | Duygu ifadelerini eşleştir + sosyal ipuçlarını ayırt et |
+| LANG02 | **Word Sprint** | Language | Verbal-Linguistic | Distinguish between real and made-up words |
+| SOC01 | **Emotion Mirror** | Language + Attention | Interpersonal | Match emotional expressions + identify social cues |
 
-### Müzik ve Doğa
+### Music and Nature
 
-| ID | Oyun | Alan | Zeka Türü | Açıklama |
+| ID | Game | Domain | Intelligence Type | Description |
 | --- | --- | --- | --- | --- |
-| MUS01 | **Rhythm Match** | Dikkat + Refleks | Müzikal | Ritim dizilerini doğru sırayla tekrar et |
-| NAT01 | **Nature Sort** | Mantık + Görsel Algı | Doğacı | Doğa temalı nesneleri kategorilere ayır |
+| MUS01 | **Rhythm Match** | Attention + Reflex | Musical | Repeat rhythm sequences in the correct order |
+| NAT01 | **Nature Sort** | Logic + Visual | Naturalistic | Categorize nature-themed objects |
 
 ---
 
-## 🛠️ Teknoloji Yığını
+## 🛠️ Technology Stack
 
-| Katman | Teknoloji | Detay |
+| Layer | Technology | Details |
 | --- | --- | --- |
 | Framework | Flutter | 3.0+ |
-| Dil | Dart | >=3.0.0 <4.0.0 |
-| State Yönetimi | Riverpod | `flutter_riverpod ^2.5.1` |
-| Auth | Firebase Authentication | E-posta/Şifre + Google Sign-In |
-| Veritabanı | Cloud Firestore | Oyun sonuçları ve kullanıcı istatistikleri |
-| Bildirimler | Firebase Messaging | `firebase_messaging ^15.0.3` + `flutter_local_notifications ^21.0.0` |
-| Yerel Depolama | SharedPreferences | Oturum ve ayar önbelleği |
-| Grafikler | fl_chart | Radar grafiği ile bilişsel profil |
-| HTTP | dio / http | API iletişimi |
-| UI | Material 3 + Google Fonts | Modern tasarım sistemi |
-| İkonlar | Font Awesome | `font_awesome_flutter ^10.7.0` |
-| İzinler | Permission Handler | `permission_handler ^12.0.1` |
+| Language | Dart | >=3.0.0 <4.0.0 |
+| State Management | Riverpod | `flutter_riverpod ^2.5.1` |
+| Auth | Firebase Authentication | Email/Password + Google Sign-In |
+| Database | Cloud Firestore | Game results and user statistics |
+| Notifications | Firebase Messaging | `firebase_messaging ^15.0.3` + `flutter_local_notifications ^21.0.0` |
+| Local Storage | SharedPreferences | Session and settings cache |
+| Charts | fl_chart | Cognitive profile via radar chart |
+| HTTP | dio / http | API communication |
+| UI | Material 3 + Google Fonts | Modern design system |
+| Icons | Font Awesome | `font_awesome_flutter ^10.7.0` |
+| Permissions | Permission Handler | `permission_handler ^12.0.1` |
 
 ---
 
-## 📁 Proje Yapısı
+## 📁 Project Structure
 
 ```text
 lib/
 ├── core/
-│   ├── api/                          # API servis katmanı
-│   ├── config/                       # Uygulama konfigürasyonu
+│   ├── api/                          # API service layer
+│   ├── config/                       # Application configuration
 │   ├── i18n/
-│   │   └── app_strings.dart          # Çoklu dil metin sabitleri
+│   │   └── app_strings.dart          # Multi-language string constants
 │   ├── memory/
-│   │   └── memory_bank.dart          # Tüm oyun tanımları ve sabitler (tek kaynak)
+│   │   └── memory_bank.dart          # Single source of truth for all game definitions
 │   ├── models/
-│   │   ├── attempt_model.dart        # Oyun denemesi veri modeli
-│   │   ├── game_model.dart           # Oyun veri modeli
-│   │   └── user_model.dart           # Kullanıcı veri modeli
+│   │   ├── attempt_model.dart        # Game attempt data model
+│   │   ├── game_model.dart           # Game data model
+│   │   └── user_model.dart           # User data model
 │   ├── utils/
-│   │   └── constants.dart            # Global sabitler
+│   │   └── constants.dart            # Global constants
 │   └── widgets/
-│       └── neuron_background.dart    # Nöron animasyonlu arkaplan widget'ı
+│       └── neuron_background.dart    # Animated neuron background widget
 ├── features/
-│   ├── auth/                         # Giriş ve Kayıt ekranları + provider
+│   ├── auth/                         # Login & Register screens + providers
 │   ├── game_launcher/
-│   │   ├── screens/                  # Oyun listesi ve başlatıcı ekranları
-│   │   └── widgets/                  # 18 mini oyun widget'ı
+│   │   ├── screens/                  # Game list and launcher screens
+│   │   └── widgets/                  # 18 mini-game widgets
 │   │       ├── reflex_tap_game.dart
 │   │       ├── reflex_dash_game.dart
 │   │       ├── balance_tap_game.dart
@@ -161,59 +161,59 @@ lib/
 │   │       ├── emotion_mirror_game.dart
 │   │       ├── rhythm_match_game.dart
 │   │       └── nature_sort_game.dart
-│   ├── home/                         # Ana ekran + bottom navigation
-│   ├── leaderboard/                  # Liderlik tablosu
-│   ├── notifications/                # Bildirim yönetim ekranları
-│   ├── profile/                      # Kullanıcı profili ve avatar
-│   ├── settings/                     # Tema ve dil sağlayıcıları
-│   ├── shared/                       # Paylaşılan widget'lar
-│   ├── stats/                        # Radar grafiği ve istatistik ekranı
-│   ├── survey/                       # Oyun öncesi/sonrası anketler
-│   └── welcome/                      # Splash ve karşılama ekranları
+│   ├── home/                         # Home screen + bottom navigation
+│   ├── leaderboard/                  # Leaderboard
+│   ├── notifications/                # Notification management screens
+│   ├── profile/                      # User profile and avatar
+│   ├── settings/                     # Theme and language providers
+│   ├── shared/                       # Shared widgets
+│   ├── stats/                        # Radar chart and statistics screen
+│   ├── survey/                       # Pre/post-game surveys
+│   └── welcome/                      # Splash and onboarding screens
 ├── services/
-│   ├── auth_service.dart             # Firebase Authentication servisi
-│   ├── firestore_service.dart        # Firestore CRUD işlemleri
-│   ├── local_storage_service.dart    # SharedPreferences sarmalayıcı
-│   └── notification_service.dart     # Bildirim servisi
-├── firebase_options.dart             # Firebase konfigürasyonu
-└── main.dart                         # Uygulama giriş noktası
+│   ├── auth_service.dart             # Firebase Authentication service
+│   ├── firestore_service.dart        # Firestore CRUD operations
+│   ├── local_storage_service.dart    # SharedPreferences wrapper
+│   └── notification_service.dart     # Notification service
+├── firebase_options.dart             # Firebase configuration
+└── main.dart                         # Application entry point
 ```
 
 ---
 
-## 🚀 Başlangıç
+## 🚀 Getting Started
 
-### Gereksinimler
+### Prerequisites
 
-- Flutter SDK 3.0 veya üzeri
-- Dart SDK *(Flutter ile birlikte gelir)*
-- Android Studio veya VS Code (Flutter eklentisi ile)
-- Firebase projesi *(ücretsiz plan yeterlidir)*
-- Android emülatör veya fiziksel cihaz
+- Flutter SDK 3.0 or higher
+- Dart SDK *(Included with Flutter)*
+- Android Studio or VS Code (with Flutter extension)
+- Firebase project *(Free plan is sufficient)*
+- Android emulator or physical device
 
-### Kurulum
+### Installation
 
-1. **Depoyu klonlayın**
+1. **Clone the repository**
 
    ```bash
    git clone https://github.com/muhammedsali/norodakika.git
    cd norodakika
    ```
 
-2. **Flutter bağımlılıklarını yükleyin**
+2. **Install Flutter dependencies**
 
    ```bash
    flutter pub get
    ```
 
-3. **Firebase kurulumu**
-   - [firebase.google.com](https://firebase.google.com) üzerinden proje oluşturun
-   - **E-posta/Şifre Authentication** ve **Google Sign-In** etkinleştirin
-   - **Cloud Firestore** veritabanını oluşturun
-   - **Firebase Cloud Messaging** bildirim servisini aktifleştirin
-   - `google-services.json` dosyasını indirip `android/app/` klasörüne yerleştirin
+3. **Firebase Setup**
+   - Create a project on [firebase.google.com](https://firebase.google.com)
+   - Enable **Email/Password Authentication** and **Google Sign-In**
+   - Create a **Cloud Firestore** database
+   - Enable the **Firebase Cloud Messaging** service
+   - Download the `google-services.json` file and place it in the `android/app/` folder
 
-4. **Uygulamayı çalıştırın**
+4. **Run the application**
 
    ```bash
    flutter run
@@ -221,66 +221,66 @@ lib/
 
 ---
 
-## 📱 Kullanıcı Akışı
+## 📱 User Flow
 
 ```mermaid
 flowchart TD
-    A[🚀 Uygulama Başlatma] --> B[🧠 Nöron Animasyonlu Splash]
-    B --> C{🔐 Giriş Durumu}
-    C -->|Giriş yapılmamış| D[📝 Giriş / Kayıt Ekranı]
-    C -->|Giriş yapılmış| E[🏠 Ana Ekran]
+    A[🚀 App Launch] --> B[🧠 Animated Neuron Splash]
+    B --> C{🔐 Auth State}
+    C -->|Not logged in| D[📝 Login / Register Screen]
+    C -->|Logged in| E[🏠 Home Screen]
     D --> E
-    E --> F[📋 4 Sekmeli Gezinme]
-    F --> G[🏠 Ana Sayfa]
-    F --> H[🎮 Oyunlar]
-    F --> I[📊 İlerleme]
-    F --> J[⚙️ Ayarlar]
-    H --> K[🎯 Oyun Seçimi]
-    K --> L[📝 Oyun Öncesi Anket]
-    L --> M[▶️ Oyun Başlar]
-    M --> N[🏁 Oyun Biter]
-    N --> O[📝 Oyun Sonrası Anket]
-    O --> P[💾 Sonuç Firestore'a Kaydedilir]
-    P --> Q[📈 Zorluk Otomatik Güncellenir]
+    E --> F[📋 4-Tab Navigation]
+    F --> G[🏠 Home]
+    F --> H[🎮 Games]
+    F --> I[📊 Progress]
+    F --> J[⚙️ Settings]
+    H --> K[🎯 Game Selection]
+    K --> L[📝 Pre-game Survey]
+    L --> M[▶️ Game Starts]
+    M --> N[🏁 Game Ends]
+    N --> O[📝 Post-game Survey]
+    O --> P[💾 Result Saved to Firestore]
+    P --> Q[📈 Difficulty Automatically Updated]
 ```
 
 ---
 
-## 🏗️ Mimari Notlar
+## 🏗️ Architectural Notes
 
-- **SOLID Prensipler** — Proje boyunca SOLID tasarım ilkelerine uygun mimari kullanılmaktadır
-- **State Yönetimi** — Tüm durum yönetimi Riverpod provider'ları ile yapılır; iş mantığında ham `setState` kullanılmaz
-- **Oyunlar** — Her mini oyun `features/game_launcher/widgets/` altında kendi kendine yeten bir Flutter widget'ıdır
-- **Memory Bank** — `lib/core/memory/memory_bank.dart` uygulama sabitleri için tek doğruluk kaynağıdır
-- **Adaptif Zorluk** — ELO tarzı zorluk derecelendirmesi her oyun denemesinden sonra Firestore'da güncellenir
-- **Çevrimdışı Destek** — SharedPreferences oturum verilerini önbelleğe aldığından uygulama bağlantısız çalışabilir
-- **Nöron Arkaplanı** — Splash ekranında dinamik nöron ağı animasyonu `CustomPainter` ile çizilir
-- **Bildirim Sistemi** — Firebase Messaging + yerel bildirimler ile gün içi eğitim hatırlatmaları
-
----
-
-## 🤝 Katkıda Bulunma
-
-Katkılarınız, hata raporlarınız ve özellik istekleriniz memnuniyetle karşılanır!
-
-1. Depoyu fork edin
-2. Feature branch oluşturun: `git checkout -b feature/yeni-ozellik`
-3. Değişikliklerinizi commit edin: `git commit -m "feat: yeni özellik eklendi"`
-4. Push yapın ve Pull Request açın
+- **SOLID Principles** — The project adheres to SOLID design principles throughout its architecture.
+- **State Management** — All state management is handled by Riverpod providers; raw `setState` is not used in business logic.
+- **Games** — Each mini-game is a self-contained Flutter widget located under `features/game_launcher/widgets/`.
+- **Memory Bank** — `lib/core/memory/memory_bank.dart` serves as the single source of truth for application constants.
+- **Adaptive Difficulty** — ELO-style difficulty ratings are updated in Firestore after each game attempt.
+- **Offline Support** — SharedPreferences caches session data, allowing the application to run without connectivity.
+- **Neuron Background** — The dynamic neural network animation on the splash screen is drawn using `CustomPainter`.
+- **Notification System** — Firebase Messaging + local notifications are used for daytime training reminders.
 
 ---
 
-## 📄 Lisans
+## 🤝 Contributing
 
-Bu proje özel olarak geliştirilmektedir. Tüm haklar saklıdır.
-Kullanım izinleri için depo sahibiyle iletişime geçin.
+Contributions, bug reports, and feature requests are welcome!
+
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/new-feature`
+3. Commit your changes: `git commit -m "feat: added new feature"`
+4. Push to the branch and open a Pull Request
 
 ---
 
-## 👤 Geliştirici
+## 📄 License
+
+This project is developed privately. All rights reserved.
+Contact the repository owner for usage permissions.
+
+---
+
+## 👤 Developer
 
 **Muhammed Sali** — [github.com/muhammedsali](https://github.com/muhammedsali)
 
 ---
 
-Beyninizi her gün bir dakikada eğitin. 🧠⚡
+Train your brain in a minute every day. 🧠⚡
