@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NöroDakika — Beynini Eğit, Her Dakika Güçlen</title>
-    <meta name="description" content="NöroDakika: 18 mini oyunla 7 bilişsel alanını geliştiren, ELO tabanlı adaptif zorluk sistemine sahip mobil beyin eğitim uygulaması. Hemen indir!">
+    <meta name="description"
+        content="NöroDakika: 18 mini oyunla 7 bilişsel alanını geliştiren, ELO tabanlı adaptif zorluk sistemine sahip mobil beyin eğitim uygulaması. Hemen indir!">
     <link rel="icon" type="image/png" href="app_icon.png">
 
     <!-- Fonts: Plus Jakarta Sans (display) + Outfit (body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -18,1162 +22,2505 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
 
     <style>
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-        :root {
-            --primary:       #4F46E5;
-            --primary-light: #818CF8;
-            --primary-dark:  #3730A3;
-            --accent:        #06B6D4;
-            --accent-glow:   #22D3EE;
-            --neon-purple:   #A855F7;
-            --neon-pink:     #EC4899;
-            --bg-dark:       #030712;
-            --bg-surface:    #0F172A;
-            --bg-card:       rgba(15,23,42,0.5);
-            --text-primary:  #F8FAFC;
-            --text-secondary:#94A3B8;
-            --text-muted:    #64748B;
-            --border-subtle: rgba(148,163,184,0.08);
-            --glow-primary:  rgba(79,70,229,0.4);
-            --glow-accent:   rgba(6,182,212,0.3);
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        html { scroll-behavior:smooth; overflow-x:hidden; }
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #818CF8;
+            --primary-dark: #3730A3;
+            --accent: #06B6D4;
+            --accent-glow: #22D3EE;
+            --neon-purple: #A855F7;
+            --neon-pink: #EC4899;
+            --bg-dark: #030712;
+            --bg-surface: #0F172A;
+            --bg-card: rgba(15, 23, 42, 0.5);
+            --text-primary: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --border-subtle: rgba(148, 163, 184, 0.08);
+            --glow-primary: rgba(79, 70, 229, 0.4);
+            --glow-accent: rgba(6, 182, 212, 0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
 
         body {
-            font-family:'Outfit',-apple-system,BlinkMacSystemFont,sans-serif;
-            background:var(--bg-dark);
-            color:var(--text-primary);
-            overflow-x:hidden;
-            line-height:1.6;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
         /* ── SCROLL REVEAL BASE ── */
         .reveal {
-            opacity:0;
-            transform:translateY(32px);
-            transition:opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .reveal.revealed { opacity:1; transform:translateY(0); }
+
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         /* staggered children */
-        .stagger-children > * {
-            opacity:0;
-            transform:translateY(24px);
-            transition:opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+        .stagger-children>* {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .stagger-children.revealed > *:nth-child(1)  { opacity:1; transform:translateY(0); transition-delay:0s; }
-        .stagger-children.revealed > *:nth-child(2)  { opacity:1; transform:translateY(0); transition-delay:0.08s; }
-        .stagger-children.revealed > *:nth-child(3)  { opacity:1; transform:translateY(0); transition-delay:0.16s; }
-        .stagger-children.revealed > *:nth-child(4)  { opacity:1; transform:translateY(0); transition-delay:0.24s; }
-        .stagger-children.revealed > *:nth-child(5)  { opacity:1; transform:translateY(0); transition-delay:0.32s; }
-        .stagger-children.revealed > *:nth-child(6)  { opacity:1; transform:translateY(0); transition-delay:0.40s; }
-        .stagger-children.revealed > *:nth-child(7)  { opacity:1; transform:translateY(0); transition-delay:0.48s; }
-        .stagger-children.revealed > *:nth-child(8)  { opacity:1; transform:translateY(0); transition-delay:0.56s; }
-        .stagger-children.revealed > *:nth-child(9)  { opacity:1; transform:translateY(0); transition-delay:0.64s; }
-        .stagger-children.revealed > *:nth-child(10) { opacity:1; transform:translateY(0); transition-delay:0.72s; }
-        .stagger-children.revealed > *:nth-child(n+11) { opacity:1; transform:translateY(0); transition-delay:0.80s; }
+
+        .stagger-children.revealed>*:nth-child(1) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0s;
+        }
+
+        .stagger-children.revealed>*:nth-child(2) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.08s;
+        }
+
+        .stagger-children.revealed>*:nth-child(3) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.16s;
+        }
+
+        .stagger-children.revealed>*:nth-child(4) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.24s;
+        }
+
+        .stagger-children.revealed>*:nth-child(5) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.32s;
+        }
+
+        .stagger-children.revealed>*:nth-child(6) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.40s;
+        }
+
+        .stagger-children.revealed>*:nth-child(7) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.48s;
+        }
+
+        .stagger-children.revealed>*:nth-child(8) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.56s;
+        }
+
+        .stagger-children.revealed>*:nth-child(9) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.64s;
+        }
+
+        .stagger-children.revealed>*:nth-child(10) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.72s;
+        }
+
+        .stagger-children.revealed>*:nth-child(n+11) {
+            opacity: 1;
+            transform: translateY(0);
+            transition-delay: 0.80s;
+        }
 
         /* ── BG ── */
         #neural-canvas {
-            position:fixed; top:0; left:0;
-            width:100%; height:100%;
-            z-index:0; pointer-events:none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .gradient-mesh {
-            position:fixed; top:0; left:0;
-            width:100%; height:100%;
-            z-index:0; pointer-events:none; overflow:hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
         }
+
         .gradient-orb {
-            position:absolute; border-radius:50%;
-            filter:blur(80px); opacity:0.15;
-            animation:orbFloat linear infinite;
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: orbFloat linear infinite;
         }
-        .gradient-orb:nth-child(1){ width:600px;height:600px;background:radial-gradient(circle,var(--primary),transparent 70%);top:-10%;left:-10%;animation-duration:20s; }
-        .gradient-orb:nth-child(2){ width:500px;height:500px;background:radial-gradient(circle,var(--accent),transparent 70%);top:30%;right:-15%;animation-duration:25s;animation-delay:-5s; }
-        .gradient-orb:nth-child(3){ width:400px;height:400px;background:radial-gradient(circle,var(--neon-purple),transparent 70%);bottom:10%;left:20%;animation-duration:22s;animation-delay:-10s; }
-        .gradient-orb:nth-child(4){ width:350px;height:350px;background:radial-gradient(circle,var(--neon-pink),transparent 70%);top:60%;right:30%;animation-duration:18s;animation-delay:-3s; }
+
+        .gradient-orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--primary), transparent 70%);
+            top: -10%;
+            left: -10%;
+            animation-duration: 20s;
+        }
+
+        .gradient-orb:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--accent), transparent 70%);
+            top: 30%;
+            right: -15%;
+            animation-duration: 25s;
+            animation-delay: -5s;
+        }
+
+        .gradient-orb:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--neon-purple), transparent 70%);
+            bottom: 10%;
+            left: 20%;
+            animation-duration: 22s;
+            animation-delay: -10s;
+        }
+
+        .gradient-orb:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--neon-pink), transparent 70%);
+            top: 60%;
+            right: 30%;
+            animation-duration: 18s;
+            animation-delay: -3s;
+        }
 
         @keyframes orbFloat {
-            0%,100%{transform:translate(0,0) scale(1);}
-            25%{transform:translate(80px,-60px) scale(1.1);}
-            50%{transform:translate(-40px,40px) scale(0.95);}
-            75%{transform:translate(60px,80px) scale(1.05);}
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            25% {
+                transform: translate(80px, -60px) scale(1.1);
+            }
+
+            50% {
+                transform: translate(-40px, 40px) scale(0.95);
+            }
+
+            75% {
+                transform: translate(60px, 80px) scale(1.05);
+            }
         }
 
         /* ── PARTICLES ── */
-        .particles { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden; }
-        .particle {
-            position:absolute;border-radius:50%;
-            background:var(--primary-light);opacity:0;
-            animation:particleFloat linear infinite;
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary-light);
+            opacity: 0;
+            animation: particleFloat linear infinite;
+        }
+
         @keyframes particleFloat {
-            0%   { opacity:0;  transform:translateY(100vh) scale(0); }
-            10%  { opacity:0.5; }
-            90%  { opacity:0.5; }
-            100% { opacity:0;  transform:translateY(-100px) scale(1); }
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+
+            10% {
+                opacity: 0.5;
+            }
+
+            90% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1);
+            }
         }
 
         /* ── PAGE GLOW ── */
         .page-glow {
-            position:fixed; width:500px; height:500px; border-radius:50%;
-            background:radial-gradient(circle,rgba(79,70,229,0.06),transparent 70%);
-            pointer-events:none; z-index:0;
-            transition:transform 0.2s ease-out;
-            filter:blur(20px);
-            transform:translate(-50%,-50%);
-            top:0; left:0;
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.06), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.2s ease-out;
+            filter: blur(20px);
+            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
         }
 
         /* ── NAVBAR ── */
         .navbar {
-            position:fixed; top:0; left:0; right:0; z-index:1000;
-            padding:16px 40px;
-            display:flex; align-items:center; justify-content:space-between;
-            background:rgba(3,7,18,0.4);
-            backdrop-filter:blur(24px) saturate(200%);
-            border-bottom:1px solid rgba(148,163,184,0.06);
-            transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(3, 7, 18, 0.4);
+            backdrop-filter: blur(24px) saturate(200%);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .navbar.scrolled { padding:12px 40px; background:rgba(3,7,18,0.85); box-shadow:0 8px 32px rgba(0,0,0,0.3); }
 
-        .nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; cursor:pointer; }
-        .nav-logo-icon {
-            width:40px; height:40px; border-radius:12px; overflow:hidden;
-            box-shadow:0 0 20px var(--glow-primary);
-            animation:logoPulse 3s ease-in-out infinite;
-            transition:transform 0.3s;
+        .navbar.scrolled {
+            padding: 12px 40px;
+            background: rgba(3, 7, 18, 0.85);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-        .nav-logo:hover .nav-logo-icon { transform:rotate(10deg) scale(1.1); }
-        .nav-logo-icon img { width:100%; height:100%; object-fit:cover; }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px var(--glow-primary);
+            animation: logoPulse 3s ease-in-out infinite;
+            transition: transform 0.3s;
+        }
+
+        .nav-logo:hover .nav-logo-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .nav-logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         @keyframes logoPulse {
-            0%,100%{box-shadow:0 0 20px var(--glow-primary);}
-            50%{box-shadow:0 0 30px var(--glow-primary),0 0 60px var(--glow-accent);}
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px var(--glow-primary);
+            }
+
+            50% {
+                box-shadow: 0 0 30px var(--glow-primary), 0 0 60px var(--glow-accent);
+            }
         }
 
         .nav-logo-text {
-            font-family:'Plus Jakarta Sans',sans-serif;
-            font-size:22px; font-weight:800;
-            background:linear-gradient(135deg,var(--text-primary),var(--primary-light));
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-            letter-spacing:-0.5px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
         }
 
-        .nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
         .nav-links a {
-            color:var(--text-secondary); text-decoration:none;
-            font-size:14px; font-weight:500; letter-spacing:0.01em;
-            transition:color 0.3s; position:relative; cursor:pointer;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+            transition: color 0.3s;
+            position: relative;
+            cursor: pointer;
         }
+
         .nav-links a::after {
-            content:''; position:absolute; bottom:-4px; left:0;
-            width:0; height:2px;
-            background:linear-gradient(90deg,var(--primary),var(--accent));
-            transition:width 0.3s; border-radius:2px;
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+            border-radius: 2px;
         }
-        .nav-links a:hover, .nav-links a.active { color:var(--text-primary); }
-        .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
 
         .nav-cta {
-            padding:10px 24px; border-radius:12px;
-            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-            color:white!important; font-weight:600!important; font-size:14px;
-            border:none; cursor:pointer; transition:all 0.3s; text-decoration:none;
-            box-shadow:0 4px 20px var(--glow-primary);
-            font-family:'Outfit',sans-serif;
+            padding: 10px 24px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white !important;
+            font-weight: 600 !important;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 4px 20px var(--glow-primary);
+            font-family: 'Outfit', sans-serif;
         }
-        .nav-cta:hover { transform:translateY(-2px); box-shadow:0 6px 30px var(--glow-primary); }
-        .nav-cta::after { display:none!important; }
 
-        .mobile-menu-btn { display:none; background:none; border:none; color:var(--text-primary); font-size:24px; cursor:pointer; padding:8px; }
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--glow-primary);
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+        }
 
         /* ── HERO ── */
         .hero {
-            position:relative; min-height:100vh;
-            display:flex; align-items:center; justify-content:center;
-            padding:100px 32px 40px; z-index:1;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 100px 32px 40px;
+            z-index: 1;
         }
-        .hero-content { max-width:900px; text-align:center; position:relative; }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+        }
 
         .hero-badge {
-            display:inline-flex; align-items:center; gap:8px;
-            padding:8px 20px; border-radius:999px;
-            background:rgba(79,70,229,0.1);
-            border:1px solid rgba(79,70,229,0.3);
-            color:var(--primary-light);
-            font-size:13px; font-weight:600; letter-spacing:0.04em;
-            margin-bottom:20px;
-            animation:fadeInUp 0.8s 0.2s both;
-            backdrop-filter:blur(10px);
-            position:relative; overflow:hidden;
-            font-family:'Outfit',sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 999px;
+            background: rgba(79, 70, 229, 0.1);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            color: var(--primary-light);
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s 0.2s both;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
         }
+
         .hero-badge::before {
-            content:''; position:absolute; top:0; left:-100%;
-            width:100%; height:100%;
-            background:linear-gradient(90deg,transparent,rgba(79,70,229,0.2),transparent);
-            animation:shimmer 3s ease-in-out infinite;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.2), transparent);
+            animation: shimmer 3s ease-in-out infinite;
         }
-        @keyframes shimmer { 0%{left:-100%;} 100%{left:200%;} }
+
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 200%;
+            }
+        }
 
         .hero-badge-dot {
-            width:7px; height:7px; border-radius:50%;
-            background:var(--accent-glow);
-            animation:blink 2s ease-in-out infinite;
-            box-shadow:0 0 10px var(--accent-glow);
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
+
         @keyframes blink {
-            0%,100%{opacity:1;box-shadow:0 0 10px var(--accent-glow);}
-            50%{opacity:0.3;box-shadow:0 0 3px var(--accent-glow);}
+
+            0%,
+            100% {
+                opacity: 1;
+                box-shadow: 0 0 10px var(--accent-glow);
+            }
+
+            50% {
+                opacity: 0.3;
+                box-shadow: 0 0 3px var(--accent-glow);
+            }
         }
 
         .hero h1 {
-            font-family:'Plus Jakarta Sans',sans-serif;
-            font-size:clamp(36px,6vw,76px);
-            font-weight:800;
-            line-height:1.02;
-            letter-spacing:-0.02em;
-            margin-bottom:24px;
-            animation:heroTextIn 1s 0.4s both;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(36px, 6vw, 76px);
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            animation: heroTextIn 1s 0.4s both;
         }
+
         @keyframes heroTextIn {
-            from{opacity:0;transform:translateY(40px);filter:blur(10px);}
-            to{opacity:1;transform:translateY(0);filter:blur(0);}
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+                filter: blur(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
         }
 
         .gradient-text {
-            background:linear-gradient(135deg,var(--primary-light),var(--accent-glow),var(--neon-purple),var(--primary));
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-            background-size:300% 300%;
-            animation:gradientShift 4s ease infinite;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-glow), var(--neon-purple), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 300% 300%;
+            animation: gradientShift 4s ease infinite;
         }
-        @keyframes gradientShift { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
 
         .hero-subtitle {
-            font-size:clamp(16px,2vw,19px);
-            color:var(--text-secondary);
-            max-width:620px; margin:0 auto 36px;
-            line-height:1.75;
-            animation:fadeInUp 0.8s 0.6s both;
-            font-weight:400;
+            font-size: clamp(16px, 2vw, 19px);
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto 36px;
+            line-height: 1.75;
+            animation: fadeInUp 0.8s 0.6s both;
+            font-weight: 400;
         }
 
         .hero-actions {
-            display:flex; align-items:center; justify-content:center;
-            gap:20px; flex-wrap:wrap;
-            animation:fadeInUp 0.8s 0.8s both;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s 0.8s both;
         }
 
         .btn-primary {
-            display:inline-flex; align-items:center; gap:10px;
-            padding:15px 34px; border-radius:14px;
-            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-            color:white; font-size:15px; font-weight:600; letter-spacing:0.01em;
-            text-decoration:none; border:none; cursor:pointer;
-            transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
-            box-shadow:0 8px 32px var(--glow-primary),inset 0 1px 0 rgba(255,255,255,0.2);
-            position:relative; overflow:hidden;
-            font-family:'Outfit',sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 34px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
         }
-        .btn-primary svg, .btn-secondary svg, .btn-download svg {
-            width:18px; height:18px;
-            flex-shrink:0;
+
+        .btn-primary svg,
+        .btn-secondary svg,
+        .btn-download svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
         }
+
         .btn-primary::before {
-            content:''; position:absolute; top:0; left:-100%;
-            width:100%; height:100%;
-            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);
-            transition:left 0.6s;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+            transition: left 0.6s;
         }
-        .btn-primary:hover::before { left:100%; }
-        .btn-primary:hover { transform:translateY(-4px) scale(1.04); box-shadow:0 16px 48px var(--glow-primary),0 0 80px rgba(79,70,229,0.2); }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 16px 48px var(--glow-primary), 0 0 80px rgba(79, 70, 229, 0.2);
+        }
 
         .btn-secondary {
-            display:inline-flex; align-items:center; gap:10px;
-            padding:15px 34px; border-radius:14px;
-            background:rgba(15,23,42,0.4);
-            color:var(--text-primary); font-size:15px; font-weight:500;
-            text-decoration:none;
-            border:1px solid var(--border-subtle); cursor:pointer;
-            transition:all 0.4s; backdrop-filter:blur(16px);
-            font-family:'Outfit',sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 34px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.4);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.4s;
+            backdrop-filter: blur(16px);
+            font-family: 'Outfit', sans-serif;
         }
+
         .btn-secondary:hover {
-            background:rgba(15,23,42,0.8);
-            border-color:rgba(79,70,229,0.3);
-            transform:translateY(-3px) scale(1.02);
-            box-shadow:0 8px 32px rgba(0,0,0,0.3);
+            background: rgba(15, 23, 42, 0.8);
+            border-color: rgba(79, 70, 229, 0.3);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .hero-stats {
-            display:flex; justify-content:center; gap:40px;
-            margin-top:44px;
-            animation:fadeInUp 0.8s 1s both;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 44px;
+            animation: fadeInUp 0.8s 1s both;
         }
+
         .hero-stat {
-            text-align:center; padding:16px 20px; border-radius:18px;
-            background:rgba(15,23,42,0.3);
-            border:1px solid rgba(148,163,184,0.07);
-            backdrop-filter:blur(10px);
-            transition:all 0.4s;
+            text-align: center;
+            padding: 16px 20px;
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.3);
+            border: 1px solid rgba(148, 163, 184, 0.07);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s;
         }
-        .hero-stat:hover { transform:translateY(-4px) scale(1.05); border-color:rgba(79,70,229,0.25); box-shadow:0 12px 40px rgba(79,70,229,0.12); }
+
+        .hero-stat:hover {
+            transform: translateY(-4px) scale(1.05);
+            border-color: rgba(79, 70, 229, 0.25);
+            box-shadow: 0 12px 40px rgba(79, 70, 229, 0.12);
+        }
+
         .hero-stat-value {
-            font-family:'Plus Jakarta Sans',sans-serif;
-            font-size:38px; font-weight:800; letter-spacing:-0.03em;
-            background:linear-gradient(135deg,var(--text-primary),var(--primary-light));
-            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .hero-stat-label { font-size:12px; color:var(--text-muted); font-weight:500; margin-top:4px; letter-spacing:0.02em; }
+
+        .hero-stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 4px;
+            letter-spacing: 0.02em;
+        }
 
         /* ── FLOATING SHAPES ── */
-        .floating-shapes { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:-1; }
-        .floating-shape { position:absolute; border-radius:50%; opacity:0.07; animation:floatShape linear infinite; }
-        .floating-shape:nth-child(1){width:300px;height:300px;background:var(--primary);top:10%;left:-5%;animation-duration:15s;filter:blur(60px);}
-        .floating-shape:nth-child(2){width:200px;height:200px;background:var(--accent);top:60%;right:-5%;animation-duration:18s;animation-delay:-3s;filter:blur(50px);}
-        .floating-shape:nth-child(3){width:150px;height:150px;background:var(--neon-purple);bottom:20%;left:15%;animation-duration:12s;animation-delay:-7s;filter:blur(40px);}
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.07;
+            animation: floatShape linear infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 10%;
+            left: -5%;
+            animation-duration: 15s;
+            filter: blur(60px);
+        }
+
+        .floating-shape:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: var(--accent);
+            top: 60%;
+            right: -5%;
+            animation-duration: 18s;
+            animation-delay: -3s;
+            filter: blur(50px);
+        }
+
+        .floating-shape:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: var(--neon-purple);
+            bottom: 20%;
+            left: 15%;
+            animation-duration: 12s;
+            animation-delay: -7s;
+            filter: blur(40px);
+        }
+
         @keyframes floatShape {
-            0%,100%{transform:translate(0,0) rotate(0deg) scale(1);}
-            25%{transform:translate(30px,-40px) rotate(90deg) scale(1.15);}
-            50%{transform:translate(-20px,20px) rotate(180deg) scale(0.9);}
-            75%{transform:translate(40px,30px) rotate(270deg) scale(1.1);}
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg) scale(1);
+            }
+
+            25% {
+                transform: translate(30px, -40px) rotate(90deg) scale(1.15);
+            }
+
+            50% {
+                transform: translate(-20px, 20px) rotate(180deg) scale(0.9);
+            }
+
+            75% {
+                transform: translate(40px, 30px) rotate(270deg) scale(1.1);
+            }
         }
 
         /* ── PHONE SHOWCASE ── */
         .phone-showcase {
-            position:relative; padding:80px 32px 120px; z-index:1;
-            display:flex; justify-content:center;
+            position: relative;
+            padding: 80px 32px 120px;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
         }
+
         .phone-3d-wrapper {
-            display:flex; gap:40px; align-items:center;
-            justify-content:center; flex-wrap:wrap;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
         }
+
         .phone-mockup {
-            width:260px; height:564px; border-radius:36px;
-            background:#0F172A;
-            border:3px solid rgba(148,163,184,0.12);
-            position:relative; overflow:hidden;
-            box-shadow:0 40px 80px rgba(0,0,0,0.5),0 0 60px var(--glow-primary),inset 0 1px 0 rgba(255,255,255,0.08);
-            transition:transform 0.6s cubic-bezier(0.4,0,0.2,1),box-shadow 0.6s;
+            width: 260px;
+            height: 564px;
+            border-radius: 36px;
+            background: #0F172A;
+            border: 3px solid rgba(148, 163, 184, 0.12);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 60px var(--glow-primary), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s;
         }
-        .phone-mockup:nth-child(1){transform:rotateY(15deg) rotateX(5deg);animation:float1 6s ease-in-out infinite;}
-        .phone-mockup:nth-child(2){transform:rotateY(0deg) scale(1.08);z-index:2;animation:float2 6s ease-in-out infinite;box-shadow:0 50px 100px rgba(0,0,0,0.6),0 0 80px var(--glow-primary),0 0 120px var(--glow-accent);}
-        .phone-mockup:nth-child(3){transform:rotateY(-15deg) rotateX(5deg);animation:float3 6s ease-in-out infinite;}
-        .phone-mockup::before{content:'';position:absolute;inset:0;border-radius:36px;background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,transparent 50%,rgba(79,70,229,0.04) 100%);z-index:10;pointer-events:none;}
-        @keyframes float1{0%,100%{transform:rotateY(15deg) rotateX(5deg) translateY(0);}50%{transform:rotateY(15deg) rotateX(5deg) translateY(-15px);}}
-        @keyframes float2{0%,100%{transform:rotateY(0deg) scale(1.08) translateY(0);}50%{transform:rotateY(0deg) scale(1.08) translateY(-20px);}}
-        @keyframes float3{0%,100%{transform:rotateY(-15deg) rotateX(5deg) translateY(0);}50%{transform:rotateY(-15deg) rotateX(5deg) translateY(-15px);}}
-        .phone-screen{width:100%;height:100%;overflow:hidden;background:#0F172A;border-radius:33px;}
-        .phone-screen img{width:100%;height:100%;object-fit:fill;border-radius:33px;}
-        .phone-screen-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0F172A,#1E293B);padding:20px;text-align:center;}
-        .phone-screen-placeholder-icon{font-size:48px;margin-bottom:16px;opacity:0.6;}
-        .phone-screen-placeholder-text{font-size:13px;color:var(--text-muted);font-weight:500;}
+
+        .phone-mockup:nth-child(1) {
+            transform: rotateY(15deg) rotateX(5deg);
+            animation: float1 6s ease-in-out infinite;
+        }
+
+        .phone-mockup:nth-child(2) {
+            transform: rotateY(0deg) scale(1.08);
+            z-index: 2;
+            animation: float2 6s ease-in-out infinite;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.6), 0 0 80px var(--glow-primary), 0 0 120px var(--glow-accent);
+        }
+
+        .phone-mockup:nth-child(3) {
+            transform: rotateY(-15deg) rotateX(5deg);
+            animation: float3 6s ease-in-out infinite;
+        }
+
+        .phone-mockup::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 36px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, transparent 50%, rgba(79, 70, 229, 0.04) 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes float1 {
+
+            0%,
+            100% {
+                transform: rotateY(15deg) rotateX(5deg) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(15deg) rotateX(5deg) translateY(-15px);
+            }
+        }
+
+        @keyframes float2 {
+
+            0%,
+            100% {
+                transform: rotateY(0deg) scale(1.08) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(0deg) scale(1.08) translateY(-20px);
+            }
+        }
+
+        @keyframes float3 {
+
+            0%,
+            100% {
+                transform: rotateY(-15deg) rotateX(5deg) translateY(0);
+            }
+
+            50% {
+                transform: rotateY(-15deg) rotateX(5deg) translateY(-15px);
+            }
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #0F172A;
+            border-radius: 33px;
+        }
+
+        .phone-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            border-radius: 33px;
+        }
+
+        .phone-screen-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #0F172A, #1E293B);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .phone-screen-placeholder-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .phone-screen-placeholder-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
 
         /* ── GLOW DIVIDER ── */
-        .glow-divider{width:100%;height:2px;position:relative;margin:0;overflow:visible;}
-        .glow-divider::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--primary),var(--accent),var(--neon-purple),transparent);background-size:200% 100%;animation:dividerFlow 4s linear infinite;}
-        .glow-divider::after{content:'';position:absolute;top:-8px;left:0;right:0;height:16px;background:linear-gradient(90deg,transparent,rgba(79,70,229,0.15),rgba(6,182,212,0.1),transparent);background-size:200% 100%;animation:dividerFlow 4s linear infinite;filter:blur(8px);}
-        @keyframes dividerFlow{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
+        .glow-divider {
+            width: 100%;
+            height: 2px;
+            position: relative;
+            margin: 0;
+            overflow: visible;
+        }
+
+        .glow-divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), var(--neon-purple), transparent);
+            background-size: 200% 100%;
+            animation: dividerFlow 4s linear infinite;
+        }
+
+        .glow-divider::after {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 0;
+            right: 0;
+            height: 16px;
+            background: linear-gradient(90deg, transparent, rgba(79, 70, 229, 0.15), rgba(6, 182, 212, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: dividerFlow 4s linear infinite;
+            filter: blur(8px);
+        }
+
+        @keyframes dividerFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 200% 50%;
+            }
+        }
 
         /* ── SECTION HEADERS ── */
-        .section-header{text-align:center;max-width:700px;margin:0 auto 80px;}
-        .section-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:16px;font-family:'Outfit',sans-serif;}
-        .section-tag-line{width:20px;height:2px;background:var(--accent);border-radius:2px;}
-        .section-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(30px,4vw,50px);font-weight:800;line-height:1.08;letter-spacing:-0.02em;margin-bottom:20px;}
-        .section-subtitle{font-size:16px;color:var(--text-secondary);line-height:1.75;font-weight:400;}
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 80px;
+        }
+
+        .section-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 16px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .section-tag-line {
+            width: 20px;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(30px, 4vw, 50px);
+            font-weight: 800;
+            line-height: 1.08;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.75;
+            font-weight: 400;
+        }
 
         /* ── FEATURES ── */
-        .features{position:relative;z-index:1;padding:120px 32px;}
-        .features-grid{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+        .features {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
 
         .feature-card {
-            background:var(--bg-card);
-            border:1px solid var(--border-subtle);
-            border-radius:22px; padding:34px;
-            transition:all 0.5s cubic-bezier(0.4,0,0.2,1);
-            backdrop-filter:blur(20px);
-            position:relative; overflow:hidden; cursor:pointer;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 22px;
+            padding: 34px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
         }
-        .feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--primary),var(--accent),transparent);opacity:0;transition:opacity 0.5s;}
-        .feature-card:hover{transform:translateY(-8px);border-color:rgba(79,70,229,0.25);box-shadow:0 20px 60px rgba(0,0,0,0.35),0 0 40px var(--glow-primary);}
-        .feature-card:hover::before{opacity:1;}
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(79, 70, 229, 0.25);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 40px var(--glow-primary);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
 
         /* SVG icon container */
         .feature-icon {
-            width:52px; height:52px; border-radius:14px;
-            display:flex; align-items:center; justify-content:center;
-            margin-bottom:22px; position:relative; transition:transform 0.4s;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            position: relative;
+            transition: transform 0.4s;
         }
-        .feature-icon svg { width:26px; height:26px; }
-        .feature-icon::after{content:'';position:absolute;inset:-4px;border-radius:18px;background:inherit;filter:blur(18px);opacity:0.25;z-index:-1;}
-        .feature-card:hover .feature-icon{transform:scale(1.1) rotate(4deg);}
 
-        .feature-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:19px;font-weight:700;letter-spacing:-0.02em;margin-bottom:10px;}
-        .feature-desc{font-size:14px;color:var(--text-secondary);line-height:1.7;font-weight:400;}
+        .feature-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 18px;
+            background: inherit;
+            filter: blur(18px);
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(4deg);
+        }
+
+        .feature-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-weight: 400;
+        }
 
         /* ── GAMES ── */
-        .games-section{position:relative;z-index:1;padding:120px 32px;}
-        .games-carousel{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+        .games-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .games-carousel {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
 
         .game-card {
-            background:var(--bg-card);
-            border:1px solid var(--border-subtle);
-            border-radius:18px; padding:24px 20px; text-align:center;
-            transition:all 0.5s cubic-bezier(0.4,0,0.2,1);
-            backdrop-filter:blur(10px); cursor:pointer; position:relative; overflow:hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 24px 20px;
+            text-align: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
-        .game-card::after{content:'';position:absolute;inset:0;border-radius:18px;background:linear-gradient(135deg,rgba(255,255,255,0.02),transparent);pointer-events:none;}
-        .game-card:hover{transform:translateY(-7px) scale(1.02);border-color:rgba(79,70,229,0.3);box-shadow:0 20px 50px rgba(0,0,0,0.4),0 0 30px var(--glow-primary);}
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), transparent);
+            pointer-events: none;
+        }
+
+        .game-card:hover {
+            transform: translateY(-7px) scale(1.02);
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 0 0 30px var(--glow-primary);
+        }
 
         .game-card-icon {
-            width:58px; height:58px; border-radius:16px;
-            margin:0 auto 14px;
-            display:flex; align-items:center; justify-content:center;
-            position:relative; z-index:1; transition:transform 0.4s;
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s;
         }
-        .game-card-icon svg { width:28px; height:28px; }
-        .game-card:hover .game-card-icon{transform:scale(1.14) rotate(6deg);}
 
-        .game-card-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:-0.02em;margin-bottom:5px;position:relative;z-index:1;}
-        .game-card-area{font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:0.03em;position:relative;z-index:1;}
-        .game-card-desc{font-size:11px;color:var(--text-secondary);margin-top:9px;line-height:1.5;position:relative;z-index:1;font-weight:400;}
+        .game-card-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .game-card:hover .game-card-icon {
+            transform: scale(1.14) rotate(6deg);
+        }
+
+        .game-card-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-card-area {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            position: relative;
+            z-index: 1;
+        }
+
+        .game-card-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 9px;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
+            font-weight: 400;
+        }
 
         /* ── DOMAINS ── */
-        .domains-section{position:relative;z-index:1;padding:120px 32px;}
-        .domains-grid{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr);gap:14px;}
+        .domains-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+        }
+
+        .domains-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 14px;
+        }
 
         .domain-item {
-            text-align:center; padding:26px 10px;
-            background:var(--bg-card);
-            border:1px solid var(--border-subtle);
-            border-radius:18px; backdrop-filter:blur(10px);
-            transition:all 0.4s cubic-bezier(0.4,0,0.2,1); cursor:pointer;
+            text-align: center;
+            padding: 26px 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
         }
-        .domain-item:hover{transform:translateY(-8px) scale(1.05);border-color:rgba(79,70,229,0.3);box-shadow:0 16px 40px rgba(0,0,0,0.3),0 0 20px var(--glow-primary);}
 
-        .domain-icon{
-            width:44px; height:44px; border-radius:12px;
-            margin:0 auto 12px;
-            display:flex; align-items:center; justify-content:center;
-            transition:transform 0.4s;
+        .domain-item:hover {
+            transform: translateY(-8px) scale(1.05);
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 20px var(--glow-primary);
         }
-        .domain-icon svg { width:22px; height:22px; }
-        .domain-item:hover .domain-icon{transform:scale(1.2) rotate(8deg);}
-        .domain-name{font-size:11px;font-weight:700;color:var(--text-primary);line-height:1.3;font-family:'Outfit',sans-serif;letter-spacing:0.01em;}
+
+        .domain-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s;
+        }
+
+        .domain-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .domain-item:hover .domain-icon {
+            transform: scale(1.2) rotate(8deg);
+        }
+
+        .domain-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.01em;
+        }
 
         /* ── HOW ── */
-        .how-section{position:relative;z-index:1;padding:120px 32px;}
-        .how-steps{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:32px;position:relative;}
-        .how-steps::before{content:'';position:absolute;top:36px;left:70px;right:70px;height:1px;background:linear-gradient(90deg,var(--primary),var(--accent),var(--neon-purple),var(--primary));background-size:200% 100%;animation:flowLine 4s linear infinite;opacity:0.35;}
-        @keyframes flowLine{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
-        .how-step{text-align:center;position:relative;transition:all 0.4s;}
-        .how-step:hover{transform:translateY(-6px);}
-        .how-step-num{
-            width:52px; height:52px; border-radius:14px;
-            background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-            display:flex; align-items:center; justify-content:center;
-            font-family:'Plus Jakarta Sans',sans-serif; font-size:20px; font-weight:800;
-            margin:0 auto 18px;
-            box-shadow:0 8px 32px var(--glow-primary);
-            position:relative; z-index:2; transition:all 0.4s;
+        .how-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
         }
-        .how-step:hover .how-step-num{transform:scale(1.12) rotateZ(4deg);box-shadow:0 12px 40px var(--glow-primary);}
-        .how-step-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px;letter-spacing:-0.02em;}
-        .how-step-desc{font-size:13px;color:var(--text-secondary);line-height:1.65;font-weight:400;}
+
+        .how-steps {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            position: relative;
+        }
+
+        .how-steps::before {
+            content: '';
+            position: absolute;
+            top: 36px;
+            left: 70px;
+            right: 70px;
+            height: 1px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--neon-purple), var(--primary));
+            background-size: 200% 100%;
+            animation: flowLine 4s linear infinite;
+            opacity: 0.35;
+        }
+
+        @keyframes flowLine {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        .how-step {
+            text-align: center;
+            position: relative;
+            transition: all 0.4s;
+        }
+
+        .how-step:hover {
+            transform: translateY(-6px);
+        }
+
+        .how-step-num {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0 auto 18px;
+            box-shadow: 0 8px 32px var(--glow-primary);
+            position: relative;
+            z-index: 2;
+            transition: all 0.4s;
+        }
+
+        .how-step:hover .how-step-num {
+            transform: scale(1.12) rotateZ(4deg);
+            box-shadow: 0 12px 40px var(--glow-primary);
+        }
+
+        .how-step-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .how-step-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            font-weight: 400;
+        }
 
         /* ── TECH ── */
-        .tech-section{position:relative;z-index:1;padding:120px 32px;}
-        .tech-grid{max-width:800px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-        .tech-item{
-            background:var(--bg-card);
-            border:1px solid var(--border-subtle);
-            border-radius:18px; padding:26px; text-align:center;
-            backdrop-filter:blur(10px);
-            transition:all 0.5s cubic-bezier(0.4,0,0.2,1); cursor:pointer;
+        .tech-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
         }
-        .tech-item:hover{transform:translateY(-6px) scale(1.04);border-color:rgba(6,182,212,0.25);box-shadow:0 16px 40px rgba(0,0,0,0.3),0 0 30px var(--glow-accent);}
-        .tech-icon-wrap{width:48px;height:48px;border-radius:13px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;transition:transform 0.4s;}
-        .tech-icon-wrap svg{width:24px;height:24px;}
-        .tech-item:hover .tech-icon-wrap{transform:scale(1.18);}
-        .tech-name{font-size:14px;font-weight:700;color:var(--text-primary);font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:-0.01em;}
-        .tech-desc{font-size:11px;color:var(--text-muted);margin-top:4px;font-weight:400;}
+
+        .tech-grid {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .tech-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 26px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .tech-item:hover {
+            transform: translateY(-6px) scale(1.04);
+            border-color: rgba(6, 182, 212, 0.25);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--glow-accent);
+        }
+
+        .tech-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s;
+        }
+
+        .tech-icon-wrap svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .tech-item:hover .tech-icon-wrap {
+            transform: scale(1.18);
+        }
+
+        .tech-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        .tech-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 400;
+        }
 
         /* ── CTA ── */
-        .cta-section{position:relative;z-index:1;padding:120px 32px;text-align:center;}
-        .cta-box{
-            max-width:800px; margin:0 auto; padding:80px 48px;
-            background:linear-gradient(135deg,rgba(79,70,229,0.06),rgba(6,182,212,0.06));
-            border:1px solid rgba(79,70,229,0.15);
-            border-radius:28px; backdrop-filter:blur(24px);
-            position:relative; overflow:hidden; transition:all 0.5s;
+        .cta-section {
+            position: relative;
+            z-index: 1;
+            padding: 120px 32px;
+            text-align: center;
         }
-        .cta-box:hover{border-color:rgba(79,70,229,0.3);box-shadow:0 20px 80px rgba(79,70,229,0.1);}
-        .cta-box::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg at 50% 50%,transparent,rgba(79,70,229,0.07),transparent,rgba(6,182,212,0.05),transparent);animation:ctaRotate 8s linear infinite;}
-        @keyframes ctaRotate{to{transform:rotate(360deg);}}
-        .cta-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(28px,4vw,44px);font-weight:800;letter-spacing:-0.02em;margin-bottom:16px;position:relative;z-index:1;}
-        .cta-desc{font-size:16px;color:var(--text-secondary);margin-bottom:40px;position:relative;z-index:1;max-width:500px;margin-left:auto;margin-right:auto;line-height:1.7;font-weight:400;}
-        .cta-buttons{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1;}
 
-        .btn-download{
-            display:inline-flex; align-items:center; gap:12px;
-            padding:17px 38px; border-radius:14px;
-            background:linear-gradient(135deg,var(--primary),#6366F1);
-            color:white; font-size:16px; font-weight:600; letter-spacing:0.01em;
-            text-decoration:none; transition:all 0.4s;
-            box-shadow:0 8px 40px var(--glow-primary);
-            border:none; cursor:pointer; position:relative; overflow:hidden;
-            font-family:'Outfit',sans-serif;
+        .cta-box {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 48px;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.06), rgba(6, 182, 212, 0.06));
+            border: 1px solid rgba(79, 70, 229, 0.15);
+            border-radius: 28px;
+            backdrop-filter: blur(24px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s;
         }
-        .btn-download::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent);animation:btnShine 3s ease-in-out infinite;}
-        @keyframes btnShine{0%{left:-100%;}50%{left:100%;}100%{left:100%;}}
-        .btn-download:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 16px 60px var(--glow-primary);}
+
+        .cta-box:hover {
+            border-color: rgba(79, 70, 229, 0.3);
+            box-shadow: 0 20px 80px rgba(79, 70, 229, 0.1);
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, rgba(79, 70, 229, 0.07), transparent, rgba(6, 182, 212, 0.05), transparent);
+            animation: ctaRotate 8s linear infinite;
+        }
+
+        @keyframes ctaRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .cta-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 17px 38px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), #6366F1);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            text-decoration: none;
+            transition: all 0.4s;
+            box-shadow: 0 8px 40px var(--glow-primary);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-download::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: btnShine 3s ease-in-out infinite;
+        }
+
+        @keyframes btnShine {
+            0% {
+                left: -100%;
+            }
+
+            50% {
+                left: 100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        .btn-download:hover {
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 16px 60px var(--glow-primary);
+        }
 
         /* ── FOOTER ── */
-        .footer{position:relative;z-index:1;padding:48px 32px;border-top:1px solid var(--border-subtle);text-align:center;}
-        .footer-content{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
-        .footer-brand{display:flex;align-items:center;gap:10px;}
-        .footer-logo{width:32px;height:32px;border-radius:10px;overflow:hidden;}
-        .footer-logo img{width:100%;height:100%;object-fit:cover;border-radius:10px;}
-        .footer-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:16px;letter-spacing:-0.02em;}
-        .footer-copy{font-size:13px;color:var(--text-muted);font-weight:400;}
-        .footer-links{display:flex;gap:24px;}
-        .footer-links a{color:var(--text-secondary);text-decoration:none;font-size:13px;transition:color 0.3s;cursor:pointer;font-weight:500;}
-        .footer-links a:hover{color:var(--primary-light);}
+        .footer {
+            position: relative;
+            z-index: 1;
+            padding: 48px 32px;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
 
-        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .footer-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .footer-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.3s;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* ── RESPONSIVE ── */
-        @media(max-width:1024px){
-            .features-grid{grid-template-columns:repeat(2,1fr);}
-            .games-carousel{grid-template-columns:repeat(3,1fr);}
-            .domains-grid{grid-template-columns:repeat(4,1fr);}
-            .how-steps{grid-template-columns:repeat(2,1fr);gap:40px;}
-            .how-steps::before{display:none;}
+        @media(max-width:1024px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .games-carousel {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .domains-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .how-steps {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px;
+            }
+
+            .how-steps::before {
+                display: none;
+            }
         }
-        @media(max-width:768px){
-            .navbar{padding:12px 20px;}
-            .nav-links{display:none;}
-            .mobile-menu-btn{display:block;}
-            .nav-links.mobile-open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(3,7,18,0.95);backdrop-filter:blur(20px);padding:24px;gap:20px;border-bottom:1px solid var(--border-subtle);}
-            .hero{padding:100px 20px 60px;}
-            .hero-stats{gap:16px;flex-wrap:wrap;}
-            .hero-stat{flex:1;min-width:80px;}
-            .hero-stat-value{font-size:30px;}
-            .phone-showcase{padding:40px 0 80px;overflow:hidden;}
-            .phone-3d-wrapper{flex-wrap:nowrap;gap:20px;justify-content:flex-start;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:20px 24px;scrollbar-width:none;}
-            .phone-3d-wrapper::-webkit-scrollbar{display:none;}
-            .phone-mockup{flex-shrink:0;width:220px;height:478px;border-radius:30px;scroll-snap-align:center;}
-            .phone-mockup:nth-child(1),.phone-mockup:nth-child(2),.phone-mockup:nth-child(3){transform:none!important;animation:floatMobile 5s ease-in-out infinite!important;}
-            .phone-screen{border-radius:27px;}
-            .phone-screen img{border-radius:27px;}
-            .features-grid{grid-template-columns:1fr;}
-            .games-carousel{grid-template-columns:repeat(2,1fr);}
-            .domains-grid{grid-template-columns:repeat(3,1fr);}
-            .tech-grid{grid-template-columns:repeat(2,1fr);}
-            .how-steps{grid-template-columns:1fr;gap:32px;}
-            .cta-box{padding:48px 24px;}
-            .footer-content{flex-direction:column;text-align:center;}
+
+        @media(max-width:768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .nav-links.mobile-open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(3, 7, 18, 0.95);
+                backdrop-filter: blur(20px);
+                padding: 24px;
+                gap: 20px;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+
+            .hero {
+                padding: 100px 20px 60px;
+            }
+
+            .hero-stats {
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .hero-stat {
+                flex: 1;
+                min-width: 80px;
+            }
+
+            .hero-stat-value {
+                font-size: 30px;
+            }
+
+            .phone-showcase {
+                padding: 40px 0 80px;
+                overflow: hidden;
+            }
+
+            .phone-3d-wrapper {
+                flex-wrap: nowrap;
+                gap: 20px;
+                justify-content: flex-start;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                padding: 20px 24px;
+                scrollbar-width: none;
+            }
+
+            .phone-3d-wrapper::-webkit-scrollbar {
+                display: none;
+            }
+
+            .phone-mockup {
+                flex-shrink: 0;
+                width: 220px;
+                height: 478px;
+                border-radius: 30px;
+                scroll-snap-align: center;
+            }
+
+            .phone-mockup:nth-child(1),
+            .phone-mockup:nth-child(2),
+            .phone-mockup:nth-child(3) {
+                transform: none !important;
+                animation: floatMobile 5s ease-in-out infinite !important;
+            }
+
+            .phone-screen {
+                border-radius: 27px;
+            }
+
+            .phone-screen img {
+                border-radius: 27px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .games-carousel {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .domains-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .how-steps {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .cta-box {
+                padding: 48px 24px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
         }
-        @media(max-width:480px){
-            .games-carousel{grid-template-columns:1fr;}
-            .domains-grid{grid-template-columns:repeat(2,1fr);}
-            .tech-grid{grid-template-columns:1fr;}
-            .hero-actions{flex-direction:column;align-items:center;}
+
+        @media(max-width:480px) {
+            .games-carousel {
+                grid-template-columns: 1fr;
+            }
+
+            .domains-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
         }
-        @keyframes floatMobile{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+        @keyframes floatMobile {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<div class="gradient-mesh">
-    <div class="gradient-orb"></div>
-    <div class="gradient-orb"></div>
-    <div class="gradient-orb"></div>
-    <div class="gradient-orb"></div>
-</div>
-<canvas id="neural-canvas"></canvas>
-<div class="particles" id="particles"></div>
-<div class="page-glow" id="pageGlow"></div>
-
-<!-- NAVBAR -->
-<nav class="navbar" id="navbar">
-    <a href="#" class="nav-logo">
-        <div class="nav-logo-icon">
-            <img src="app_icon.png" alt="NöroDakika Logo">
-        </div>
-        <span class="nav-logo-text">NöroDakika</span>
-    </a>
-    <ul class="nav-links" id="navLinks">
-        <li><a href="#features">Özellikler</a></li>
-        <li><a href="#games">Oyunlar</a></li>
-        <li><a href="#domains">Kategoriler</a></li>
-        <li><a href="#how">Nasıl Çalışır</a></li>
-        <li><a href="#download" class="nav-cta">İndir — Ücretsiz</a></li>
-    </ul>
-    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menü">☰</button>
-</nav>
-
-<!-- HERO -->
-<section class="hero" id="hero">
-    <div class="floating-shapes">
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
-        <div class="floating-shape"></div>
+    <div class="gradient-mesh">
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
+        <div class="gradient-orb"></div>
     </div>
-    <div class="hero-content">
-        <div class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            Bilişsel Eğitim Platformu
-        </div>
-        <h1>Beynini Eğit,<br><span class="gradient-text">Her Dakika Güçlen.</span></h1>
-        <p class="hero-subtitle">
-            18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle kişiselleştirilmiş beyin antrenmanı.
-            Günde sadece birkaç dakika ayır, bilişsel kapasiteni kat kat artır.
-        </p>
-        <div class="hero-actions">
-            <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk" class="btn-primary">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                APK İndir
-            </a>
-            <a href="#features" class="btn-secondary">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                Keşfet
-            </a>
-        </div>
-        <div class="hero-stats">
-            <div class="hero-stat"><div class="hero-stat-value">18</div><div class="hero-stat-label">Mini Oyun</div></div>
-            <div class="hero-stat"><div class="hero-stat-value">7</div><div class="hero-stat-label">Bilişsel Alan</div></div>
-            <div class="hero-stat"><div class="hero-stat-value">8</div><div class="hero-stat-label">Zeka Türü</div></div>
-        </div>
-    </div>
-</section>
+    <canvas id="neural-canvas"></canvas>
+    <div class="particles" id="particles"></div>
+    <div class="page-glow" id="pageGlow"></div>
 
-<!-- PHONE SHOWCASE -->
-<section class="phone-showcase reveal">
-    <div class="phone-3d-wrapper" id="phoneWrapper">
-        <div class="phone-mockup">
-            <div class="phone-screen">
-                <img src="screenshot_home.png" alt="Ana Sayfa" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                <div class="phone-screen-placeholder" style="display:none;">
-                    <div class="phone-screen-placeholder-icon">🏠</div>
-                    <div class="phone-screen-placeholder-text">Ana Sayfa<br><small style="opacity:0.5">screenshot_home.png</small></div>
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">
+                <img src="app_icon.png" alt="NöroDakika Logo">
+            </div>
+            <span class="nav-logo-text">NöroDakika</span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#features">Özellikler</a></li>
+            <li><a href="#games">Oyunlar</a></li>
+            <li><a href="#domains">Kategoriler</a></li>
+            <li><a href="#how">Nasıl Çalışır</a></li>
+            <li><a href="#download" class="nav-cta">İndir — Ücretsiz</a></li>
+        </ul>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menü">☰</button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+        <div class="floating-shapes">
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+            <div class="floating-shape"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                Bilişsel Eğitim Platformu
+            </div>
+            <h1>Beynini Eğit,<br><span class="gradient-text">Her Dakika Güçlen.</span></h1>
+            <p class="hero-subtitle">
+                18 mini oyun, 7 bilişsel alan ve ELO tabanlı adaptif zorluk sistemiyle kişiselleştirilmiş beyin
+                antrenmanı.
+                Günde sadece birkaç dakika ayır, bilişsel kapasiteni kat kat artır.
+            </p>
+            <div class="hero-actions">
+                <a href="https://github.com/muhammedsali/norodakika/releases/download/v1.1.0/Norodakika-v1.1.0.apk"
+                    class="btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    APK İndir
+                </a>
+                <a href="#features" class="btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 16 16 12 12 8" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                    Keşfet
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">18</div>
+                    <div class="hero-stat-label">Mini Oyun</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">7</div>
+                    <div class="hero-stat-label">Bilişsel Alan</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">8</div>
+                    <div class="hero-stat-label">Zeka Türü</div>
                 </div>
             </div>
         </div>
-        <div class="phone-mockup">
-            <div class="phone-screen">
-                <img src="screenshot_games.png" alt="Oyunlar" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                <div class="phone-screen-placeholder" style="display:none;">
-                    <div class="phone-screen-placeholder-icon">🎮</div>
-                    <div class="phone-screen-placeholder-text">Oyunlar<br><small style="opacity:0.5">screenshot_games.png</small></div>
+    </section>
+
+    <!-- PHONE SHOWCASE -->
+    <section class="phone-showcase reveal">
+        <div class="phone-3d-wrapper" id="phoneWrapper">
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <img src="screenshot_home.png" alt="Ana Sayfa"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="phone-screen-placeholder" style="display:none;">
+                        <div class="phone-screen-placeholder-icon">🏠</div>
+                        <div class="phone-screen-placeholder-text">Ana Sayfa<br><small
+                                style="opacity:0.5">screenshot_home.png</small></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <img src="screenshot_games.png" alt="Oyunlar"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="phone-screen-placeholder" style="display:none;">
+                        <div class="phone-screen-placeholder-icon">🎮</div>
+                        <div class="phone-screen-placeholder-text">Oyunlar<br><small
+                                style="opacity:0.5">screenshot_games.png</small></div>
+                    </div>
+                </div>
+            </div>
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <img src="screenshot_stats.png" alt="İstatistikler"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="phone-screen-placeholder" style="display:none;">
+                        <div class="phone-screen-placeholder-icon">📊</div>
+                        <div class="phone-screen-placeholder-text">İstatistikler<br><small
+                                style="opacity:0.5">screenshot_stats.png</small></div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="phone-mockup">
-            <div class="phone-screen">
-                <img src="screenshot_stats.png" alt="İstatistikler" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                <div class="phone-screen-placeholder" style="display:none;">
-                    <div class="phone-screen-placeholder-icon">📊</div>
-                    <div class="phone-screen-placeholder-text">İstatistikler<br><small style="opacity:0.5">screenshot_stats.png</small></div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- ÖZELLİKLER -->
+    <section class="features" id="features">
+        <div class="section-header reveal">
+            <div class="section-tag"><span class="section-tag-line"></span>Özellikler<span
+                    class="section-tag-line"></span></div>
+            <h2 class="section-title">Neden <span class="gradient-text">NöroDakika</span>?</h2>
+            <p class="section-subtitle">Bilimsel temelli mini oyunlarla beyninin tam potansiyelini ortaya çıkar. Her
+                antrenman seansı, sana özel ayarlanır.</p>
+        </div>
+        <div class="features-grid stagger-children" id="featuresGrid">
+
+            <div class="feature-card">
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(79,70,229,0.18),rgba(79,70,229,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" />
+                        <path d="M8 21h8M12 17v4" />
+                        <path d="M7 8l3 3 4-4 3 3" />
+                    </svg>
                 </div>
+                <h3 class="feature-title">18 Mini Oyun</h3>
+                <p class="feature-desc">Tamamen Flutter ile geliştirilmiş, WebView kullanmayan 18 eşsiz mini oyun. Her
+                    biri farklı bilişsel beceriyi hedefler.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(6,182,212,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                        <path d="M2 17l10 5 10-5" />
+                        <path d="M2 12l10 5 10-5" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">ELO Adaptif Zorluk</h3>
+                <p class="feature-desc">Satranç dünyasından esinlenen ELO puanlama sistemiyle zorluk seviyesi otomatik
+                    olarak sana uyum sağlar.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Radar Grafik Profili</h3>
+                <p class="feature-desc">7 bilişsel alanındaki performansını interaktif radar grafik ile görselleştir.
+                    Güçlü ve zayıf yönlerini keşfet.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(245,158,11,0.18),rgba(245,158,11,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Günlük Plan</h3>
+                <p class="feature-desc">Her gün sana özel oluşturulan kişiselleştirilmiş antrenman planıyla zayıf
+                    alanlarına odaklan.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(236,72,153,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M9 12l2 2 4-4" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Firebase Altyapısı</h3>
+                <p class="feature-desc">Firebase Authentication ve Cloud Firestore ile güvenli kimlik doğrulama ve anlık
+                    veri senkronizasyonu.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon"
+                    style="background:linear-gradient(135deg,rgba(139,92,246,0.18),rgba(139,92,246,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="1" y1="1" x2="23" y2="23" />
+                        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+                        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+                        <path d="M10.71 5.05A16 16 0 0 1 22.56 9" />
+                        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+                        <line x1="12" y1="20" x2="12.01" y2="20" />
+                    </svg>
+                </div>
+                <h3 class="feature-title">Çevrimdışı Destek</h3>
+                <p class="feature-desc">SharedPreferences ile oturum verileri yerel olarak saklanır. İnternet olmadan da
+                    antrenman yapabilirsin.</p>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- OYUNLAR -->
+    <section class="games-section" id="games">
+        <div class="section-header reveal">
+            <div class="section-tag"><span class="section-tag-line"></span>Oyunlar<span class="section-tag-line"></span>
+            </div>
+            <h2 class="section-title">18 Farklı <span class="gradient-text">Mini Oyun</span></h2>
+            <p class="section-subtitle">Her biri farklı bir zeka türünü ve bilişsel kapasiteyi hedefleyen, tamamen
+                Flutter ile geliştirilmiş özgün oyunlar.</p>
+        </div>
+        <div class="games-carousel" id="gamesGrid"></div>
+    </section>
+
+    <div class="glow-divider"></div>
+
+    <!-- BİLİŞSEL KATEGORİLER -->
+    <section class="domains-section" id="domains">
+        <div class="section-header reveal">
+            <div class="section-tag"><span class="section-tag-line"></span>Bilişsel Alanlar<span
+                    class="section-tag-line"></span></div>
+            <h2 class="section-title">7 Farklı <span class="gradient-text">Bilişsel Alan</span></h2>
+            <p class="section-subtitle">Beyninin her köşesini eğit. Hafızadan dile, refleksten mantığa — tüm bilişsel
+                kapasiteni geliştir.</p>
+        </div>
+        <div class="domains-grid stagger-children reveal">
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(79,70,229,0.18),rgba(79,70,229,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14Z" />
+                        <path
+                            d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14Z" />
+                    </svg>
+                </div>
+                <span class="domain-name">Hafıza</span>
+            </div>
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(245,158,11,0.18),rgba(245,158,11,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="12" r="3" />
+                        <line x1="12" y1="2" x2="12" y2="5" />
+                        <line x1="12" y1="19" x2="12" y2="22" />
+                        <line x1="2" y1="12" x2="5" y2="12" />
+                        <line x1="19" y1="12" x2="22" y2="12" />
+                    </svg>
+                </div>
+                <span class="domain-name">Dikkat</span>
+            </div>
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(239,68,68,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                    </svg>
+                </div>
+                <span class="domain-name">Refleks</span>
+            </div>
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" />
+                    </svg>
+                </div>
+                <span class="domain-name">Mantık</span>
+            </div>
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(6,182,212,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M4 9h16M4 15h16M10 3 8 21M14 3l-2 18" />
+                    </svg>
+                </div>
+                <span class="domain-name">Sayısal Zeka</span>
+            </div>
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(168,85,247,0.18),rgba(168,85,247,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="2" />
+                        <path
+                            d="M12 2a4.97 4.97 0 0 1 3.54 1.46A4.97 4.97 0 0 1 17 7a4.97 4.97 0 0 1-1.46 3.54A4.97 4.97 0 0 1 12 12" />
+                        <circle cx="12" cy="12" r="8" stroke-dasharray="2 4" />
+                    </svg>
+                </div>
+                <span class="domain-name">Görsel Algı</span>
+            </div>
+            <div class="domain-item">
+                <div class="domain-icon"
+                    style="background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(236,72,153,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                </div>
+                <span class="domain-name">Dil</span>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<div class="glow-divider"></div>
+    <div class="glow-divider"></div>
 
-<!-- ÖZELLİKLER -->
-<section class="features" id="features">
-    <div class="section-header reveal">
-        <div class="section-tag"><span class="section-tag-line"></span>Özellikler<span class="section-tag-line"></span></div>
-        <h2 class="section-title">Neden <span class="gradient-text">NöroDakika</span>?</h2>
-        <p class="section-subtitle">Bilimsel temelli mini oyunlarla beyninin tam potansiyelini ortaya çıkar. Her antrenman seansı, sana özel ayarlanır.</p>
-    </div>
-    <div class="features-grid stagger-children" id="featuresGrid">
-
-        <div class="feature-card">
-            <div class="feature-icon" style="background:linear-gradient(135deg,rgba(79,70,229,0.18),rgba(79,70,229,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
-                    <path d="M7 8l3 3 4-4 3 3"/>
-                </svg>
+    <!-- NASIL ÇALIŞIR -->
+    <section class="how-section" id="how">
+        <div class="section-header reveal">
+            <div class="section-tag"><span class="section-tag-line"></span>Nasıl Çalışır<span
+                    class="section-tag-line"></span></div>
+            <h2 class="section-title">4 Adımda <span class="gradient-text">Beyin Eğitimi</span></h2>
+        </div>
+        <div class="how-steps stagger-children reveal">
+            <div class="how-step">
+                <div class="how-step-num">01</div>
+                <h3 class="how-step-title">APK İndir</h3>
+                <p class="how-step-desc">GitHub Releases sayfasından en son APK dosyasını indir ve kur.</p>
             </div>
-            <h3 class="feature-title">18 Mini Oyun</h3>
-            <p class="feature-desc">Tamamen Flutter ile geliştirilmiş, WebView kullanmayan 18 eşsiz mini oyun. Her biri farklı bilişsel beceriyi hedefler.</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(6,182,212,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-                </svg>
+            <div class="how-step">
+                <div class="how-step-num">02</div>
+                <h3 class="how-step-title">Hesap Oluştur</h3>
+                <p class="how-step-desc">Email/şifre veya Google ile hızlıca kayıt ol ve profilini oluştur.</p>
             </div>
-            <h3 class="feature-title">ELO Adaptif Zorluk</h3>
-            <p class="feature-desc">Satranç dünyasından esinlenen ELO puanlama sistemiyle zorluk seviyesi otomatik olarak sana uyum sağlar.</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
+            <div class="how-step">
+                <div class="how-step-num">03</div>
+                <h3 class="how-step-title">Antrenman Yap</h3>
+                <p class="how-step-desc">Günlük plan veya istediğin oyunu seç, günde 5–10 dakika antrenman yap.</p>
             </div>
-            <h3 class="feature-title">Radar Grafik Profili</h3>
-            <p class="feature-desc">7 bilişsel alanındaki performansını interaktif radar grafik ile görselleştir. Güçlü ve zayıf yönlerini keşfet.</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.18),rgba(245,158,11,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
-                </svg>
+            <div class="how-step">
+                <div class="how-step-num">04</div>
+                <h3 class="how-step-title">Gelişimini Takip Et</h3>
+                <p class="how-step-desc">Radar grafiğin ve istatistiklerinle bilişsel gelişimini görselleştir.</p>
             </div>
-            <h3 class="feature-title">Günlük Plan</h3>
-            <p class="feature-desc">Her gün sana özel oluşturulan kişiselleştirilmiş antrenman planıyla zayıf alanlarına odaklan.</p>
         </div>
+    </section>
 
-        <div class="feature-card">
-            <div class="feature-icon" style="background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(236,72,153,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="M9 12l2 2 4-4"/>
-                </svg>
+    <div class="glow-divider"></div>
+
+    <!-- TEKNOLOJİ -->
+    <section class="tech-section">
+        <div class="section-header reveal">
+            <div class="section-tag"><span class="section-tag-line"></span>Teknoloji<span
+                    class="section-tag-line"></span></div>
+            <h2 class="section-title">Güçlü <span class="gradient-text">Altyapı</span></h2>
+            <p class="section-subtitle">Modern ve güvenilir teknolojilerle inşa edildi.</p>
+        </div>
+        <div class="tech-grid stagger-children reveal">
+            <div class="tech-item">
+                <div class="tech-icon-wrap"
+                    style="background:linear-gradient(135deg,rgba(33,150,243,0.18),rgba(33,150,243,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 2l-5.5 9.5h11L12 2z" />
+                        <circle cx="12" cy="17" r="4" />
+                    </svg>
+                </div>
+                <div class="tech-name">Flutter</div>
+                <div class="tech-desc">Cross-platform UI</div>
             </div>
-            <h3 class="feature-title">Firebase Altyapısı</h3>
-            <p class="feature-desc">Firebase Authentication ve Cloud Firestore ile güvenli kimlik doğrulama ve anlık veri senkronizasyonu.</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.18),rgba(139,92,246,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-                </svg>
+            <div class="tech-item">
+                <div class="tech-icon-wrap"
+                    style="background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(6,182,212,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="16 18 22 12 16 6" />
+                        <polyline points="8 6 2 12 8 18" />
+                    </svg>
+                </div>
+                <div class="tech-name">Dart</div>
+                <div class="tech-desc">Tip güvenli dil</div>
             </div>
-            <h3 class="feature-title">Çevrimdışı Destek</h3>
-            <p class="feature-desc">SharedPreferences ile oturum verileri yerel olarak saklanır. İnternet olmadan da antrenman yapabilirsin.</p>
-        </div>
-
-    </div>
-</section>
-
-<div class="glow-divider"></div>
-
-<!-- OYUNLAR -->
-<section class="games-section" id="games">
-    <div class="section-header reveal">
-        <div class="section-tag"><span class="section-tag-line"></span>Oyunlar<span class="section-tag-line"></span></div>
-        <h2 class="section-title">18 Farklı <span class="gradient-text">Mini Oyun</span></h2>
-        <p class="section-subtitle">Her biri farklı bir zeka türünü ve bilişsel kapasiteyi hedefleyen, tamamen Flutter ile geliştirilmiş özgün oyunlar.</p>
-    </div>
-    <div class="games-carousel" id="gamesGrid"></div>
-</section>
-
-<div class="glow-divider"></div>
-
-<!-- BİLİŞSEL KATEGORİLER -->
-<section class="domains-section" id="domains">
-    <div class="section-header reveal">
-        <div class="section-tag"><span class="section-tag-line"></span>Bilişsel Alanlar<span class="section-tag-line"></span></div>
-        <h2 class="section-title">7 Farklı <span class="gradient-text">Bilişsel Alan</span></h2>
-        <p class="section-subtitle">Beyninin her köşesini eğit. Hafızadan dile, refleksten mantığa — tüm bilişsel kapasiteni geliştir.</p>
-    </div>
-    <div class="domains-grid stagger-children reveal">
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(79,70,229,0.18),rgba(79,70,229,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#818CF8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14Z"/>
-                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14Z"/>
-                </svg>
+            <div class="tech-item">
+                <div class="tech-icon-wrap"
+                    style="background:linear-gradient(135deg,rgba(251,146,60,0.18),rgba(251,146,60,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+                    </svg>
+                </div>
+                <div class="tech-name">Firebase</div>
+                <div class="tech-desc">Auth + Firestore</div>
             </div>
-            <span class="domain-name">Hafıza</span>
-        </div>
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.18),rgba(245,158,11,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-                    <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
-                </svg>
+            <div class="tech-item">
+                <div class="tech-icon-wrap"
+                    style="background:linear-gradient(135deg,rgba(139,92,246,0.18),rgba(139,92,246,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        <polyline points="7.5 4.21 12 6.81 16.5 4.21" />
+                        <polyline points="7.5 19.79 7.5 14.6 3 12" />
+                        <polyline points="21 12 16.5 14.6 16.5 19.79" />
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                        <line x1="12" y1="22.08" x2="12" y2="12" />
+                    </svg>
+                </div>
+                <div class="tech-name">Riverpod</div>
+                <div class="tech-desc">State yönetimi</div>
             </div>
-            <span class="domain-name">Dikkat</span>
-        </div>
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(239,68,68,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#F87171" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
+            <div class="tech-item">
+                <div class="tech-icon-wrap"
+                    style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10" />
+                        <line x1="12" y1="20" x2="12" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="14" />
+                    </svg>
+                </div>
+                <div class="tech-name">fl_chart</div>
+                <div class="tech-desc">Radar grafikler</div>
             </div>
-            <span class="domain-name">Refleks</span>
-        </div>
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/>
-                </svg>
+            <div class="tech-item">
+                <div class="tech-icon-wrap"
+                    style="background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(236,72,153,0.05));">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M8 12h8M12 8v8" />
+                    </svg>
+                </div>
+                <div class="tech-name">Material 3</div>
+                <div class="tech-desc">Modern tasarım</div>
             </div>
-            <span class="domain-name">Mantık</span>
         </div>
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(6,182,212,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 9h16M4 15h16M10 3 8 21M14 3l-2 18"/>
-                </svg>
-            </div>
-            <span class="domain-name">Sayısal Zeka</span>
-        </div>
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(168,85,247,0.18),rgba(168,85,247,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#C084FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="2"/><path d="M12 2a4.97 4.97 0 0 1 3.54 1.46A4.97 4.97 0 0 1 17 7a4.97 4.97 0 0 1-1.46 3.54A4.97 4.97 0 0 1 12 12"/>
-                    <circle cx="12" cy="12" r="8" stroke-dasharray="2 4"/>
-                </svg>
-            </div>
-            <span class="domain-name">Görsel Algı</span>
-        </div>
-        <div class="domain-item">
-            <div class="domain-icon" style="background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(236,72,153,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-            </div>
-            <span class="domain-name">Dil</span>
-        </div>
-    </div>
-</section>
+    </section>
 
-<div class="glow-divider"></div>
+    <div class="glow-divider"></div>
 
-<!-- NASIL ÇALIŞIR -->
-<section class="how-section" id="how">
-    <div class="section-header reveal">
-        <div class="section-tag"><span class="section-tag-line"></span>Nasıl Çalışır<span class="section-tag-line"></span></div>
-        <h2 class="section-title">4 Adımda <span class="gradient-text">Beyin Eğitimi</span></h2>
-    </div>
-    <div class="how-steps stagger-children reveal">
-        <div class="how-step">
-            <div class="how-step-num">01</div>
-            <h3 class="how-step-title">APK İndir</h3>
-            <p class="how-step-desc">GitHub Releases sayfasından en son APK dosyasını indir ve kur.</p>
-        </div>
-        <div class="how-step">
-            <div class="how-step-num">02</div>
-            <h3 class="how-step-title">Hesap Oluştur</h3>
-            <p class="how-step-desc">Email/şifre veya Google ile hızlıca kayıt ol ve profilini oluştur.</p>
-        </div>
-        <div class="how-step">
-            <div class="how-step-num">03</div>
-            <h3 class="how-step-title">Antrenman Yap</h3>
-            <p class="how-step-desc">Günlük plan veya istediğin oyunu seç, günde 5–10 dakika antrenman yap.</p>
-        </div>
-        <div class="how-step">
-            <div class="how-step-num">04</div>
-            <h3 class="how-step-title">Gelişimini Takip Et</h3>
-            <p class="how-step-desc">Radar grafiğin ve istatistiklerinle bilişsel gelişimini görselleştir.</p>
-        </div>
-    </div>
-</section>
-
-<div class="glow-divider"></div>
-
-<!-- TEKNOLOJİ -->
-<section class="tech-section">
-    <div class="section-header reveal">
-        <div class="section-tag"><span class="section-tag-line"></span>Teknoloji<span class="section-tag-line"></span></div>
-        <h2 class="section-title">Güçlü <span class="gradient-text">Altyapı</span></h2>
-        <p class="section-subtitle">Modern ve güvenilir teknolojilerle inşa edildi.</p>
-    </div>
-    <div class="tech-grid stagger-children reveal">
-        <div class="tech-item">
-            <div class="tech-icon-wrap" style="background:linear-gradient(135deg,rgba(33,150,243,0.18),rgba(33,150,243,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2l-5.5 9.5h11L12 2z"/><circle cx="12" cy="17" r="4"/>
-                </svg>
+    <!-- CTA -->
+    <section class="cta-section" id="download">
+        <div class="cta-box reveal">
+            <h2 class="cta-title">Beynini Eğitmeye<br><span class="gradient-text">Bugün Başla</span></h2>
+            <p class="cta-desc">18 mini oyun, adaptif zorluk, kişisel radar profil — hepsi ücretsiz. Hemen APK'yı indir
+                ve antrenmanına başla.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/muhammedsali/norodakika/releases/download/v1.1.0/Norodakika-v1.1.0.apk"
+                    class="btn-download">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                        <path
+                            d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z" />
+                    </svg>
+                    GitHub'dan APK İndir
+                </a>
             </div>
-            <div class="tech-name">Flutter</div>
-            <div class="tech-desc">Cross-platform UI</div>
+            <p
+                style="margin-top:20px;font-size:12px;color:var(--text-muted);position:relative;z-index:1;font-weight:400;letter-spacing:0.03em;">
+                Android 5.0+ · Tamamen Ücretsiz · Açık Kaynak</p>
         </div>
-        <div class="tech-item">
-            <div class="tech-icon-wrap" style="background:linear-gradient(135deg,rgba(6,182,212,0.18),rgba(6,182,212,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#22D3EE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
-                </svg>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo"><img src="app_icon.png" alt="NöroDakika"></div>
+                <span class="footer-name">NöroDakika</span>
             </div>
-            <div class="tech-name">Dart</div>
-            <div class="tech-desc">Tip güvenli dil</div>
-        </div>
-        <div class="tech-item">
-            <div class="tech-icon-wrap" style="background:linear-gradient(135deg,rgba(251,146,60,0.18),rgba(251,146,60,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#FB923C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
-                </svg>
+            <p class="footer-copy">© 2026 Muhammed Sali. Tüm hakları saklıdır.</p>
+            <div class="footer-links">
+                <a href="https://github.com/muhammedsali/norodakika" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/muhammedsali" target="_blank" rel="noopener">Geliştirici</a>
             </div>
-            <div class="tech-name">Firebase</div>
-            <div class="tech-desc">Auth + Firestore</div>
         </div>
-        <div class="tech-item">
-            <div class="tech-icon-wrap" style="background:linear-gradient(135deg,rgba(139,92,246,0.18),rgba(139,92,246,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                    <polyline points="7.5 4.21 12 6.81 16.5 4.21"/><polyline points="7.5 19.79 7.5 14.6 3 12"/><polyline points="21 12 16.5 14.6 16.5 19.79"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
-                </svg>
-            </div>
-            <div class="tech-name">Riverpod</div>
-            <div class="tech-desc">State yönetimi</div>
-        </div>
-        <div class="tech-item">
-            <div class="tech-icon-wrap" style="background:linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#34D399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-            </div>
-            <div class="tech-name">fl_chart</div>
-            <div class="tech-desc">Radar grafikler</div>
-        </div>
-        <div class="tech-item">
-            <div class="tech-icon-wrap" style="background:linear-gradient(135deg,rgba(236,72,153,0.18),rgba(236,72,153,0.05));">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#F472B6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/>
-                </svg>
-            </div>
-            <div class="tech-name">Material 3</div>
-            <div class="tech-desc">Modern tasarım</div>
-        </div>
-    </div>
-</section>
+    </footer>
 
-<div class="glow-divider"></div>
+    <script>
+        // ── GSAP ──
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-<!-- CTA -->
-<section class="cta-section" id="download">
-    <div class="cta-box reveal">
-        <h2 class="cta-title">Beynini Eğitmeye<br><span class="gradient-text">Bugün Başla</span></h2>
-        <p class="cta-desc">18 mini oyun, adaptif zorluk, kişisel radar profil — hepsi ücretsiz. Hemen APK'yı indir ve antrenmanına başla.</p>
-        <div class="cta-buttons">
-            <a href="https://github.com/muhammedsali/norodakika/releases/latest/download/norodakika.apk" class="btn-download">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
-                </svg>
-                GitHub'dan APK İndir
-            </a>
-        </div>
-        <p style="margin-top:20px;font-size:12px;color:var(--text-muted);position:relative;z-index:1;font-weight:400;letter-spacing:0.03em;">Android 5.0+ · Tamamen Ücretsiz · Açık Kaynak</p>
-    </div>
-</section>
+        // ── OYUN VERİLERİ ──
+        const gamesData = [
+            {
+                name: "Reflex Tap", area: "Refleks", desc: "Tepki süresi + Go/No-Go", color: "linear-gradient(135deg,#EF4444,#F87171)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
+            },
+            {
+                name: "Reflex Dash", area: "Refleks", desc: "Şeritlerde hızlı hedef yakalama", color: "linear-gradient(135deg,#DC2626,#EF4444)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`
+            },
+            {
+                name: "Stroop Tap", area: "Dikkat", desc: "Renk-kelime uyumsuzluğu testi", color: "linear-gradient(135deg,#F59E0B,#FBBF24)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>`
+            },
+            {
+                name: "Focus Line", area: "Dikkat + Görsel", desc: "Çizgi üzerinde hedef noktaları", color: "linear-gradient(135deg,#D97706,#F59E0B)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`
+            },
+            {
+                name: "Path Tracker", area: "Mantık + Hafıza", desc: "Görünmez nesneyi zihninde takip", color: "linear-gradient(135deg,#3B82F6,#60A5FA)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m10-11l2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/></svg>`
+            },
+            {
+                name: "Memory Board", area: "Hafıza + Görsel", desc: "Kart eşleştirme + görsel hafıza", color: "linear-gradient(135deg,#2563EB,#3B82F6)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="8" height="11" rx="1"/><rect x="14" y="3" width="8" height="11" rx="1"/><rect x="2" y="17" width="8" height="4" rx="1"/><rect x="14" y="17" width="8" height="4" rx="1"/></svg>`
+            },
+            {
+                name: "Recall Phase", area: "Dil + Hafıza", desc: "Kelimeleri göster ve hatırla", color: "linear-gradient(135deg,#7C3AED,#8B5CF6)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`
+            },
+            {
+                name: "Sequence Echo", area: "Hafıza + Dikkat", desc: "Gösterilen sırayı aynen tekrala", color: "linear-gradient(135deg,#6D28D9,#7C3AED)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`
+            },
+            {
+                name: "Logic Puzzle", area: "Mantık + Görsel", desc: "Mantık dizisi çözme oyunu", color: "linear-gradient(135deg,#8B5CF6,#A78BFA)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`
+            },
+            {
+                name: "Quick Math", area: "Sayısal Zeka", desc: "Zaman baskılı mental aritmetik", color: "linear-gradient(135deg,#10B981,#34D399)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3 8 21M14 3l-2 18"/></svg>`
+            },
+            {
+                name: "Odd One Out", area: "Görsel Algı", desc: "Farklı kartı hızlıca bul", color: "linear-gradient(135deg,#14B8A6,#2DD4BF)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>`
+            },
+            {
+                name: "Word Sprint", area: "Dil", desc: "Gerçek-uydurma kelime ayırt et", color: "linear-gradient(135deg,#EC4899,#F472B6)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>`
+            },
+            {
+                name: "Shape Swipe", area: "Görsel Algı + Refleks", desc: "Şekle uyumlu yöne hızlıca kaydır", color: "linear-gradient(135deg,#0284C7,#0EA5E9)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 20 4-4 4 4"/><path d="M12 16V4"/><path d="M4 12h16"/></svg>`
+            },
+            {
+                name: "Emotion Mirror", area: "Dil + Dikkat", desc: "Duygu ifadelerini eşleştir", color: "linear-gradient(135deg,#E11D48,#F43F5E)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`
+            },
+            {
+                name: "Nature Sort", area: "Mantık + Görsel", desc: "Doğa temalı nesneleri kategorile", color: "linear-gradient(135deg,#059669,#10B981)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 4.42-2.87 8.17-6.84 9.49"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49"/><path d="M12 2v20"/></svg>`
+            },
+            {
+                name: "Balance Tap", area: "Refleks", desc: "Dengeyi koru, hızlı dokunuşlar", color: "linear-gradient(135deg,#0891B2,#06B6D4)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M18.4 8.4 12 12l-6.4-3.6"/><path d="m18.4 15.6-6.4-3.6-6.4 3.6"/></svg>`
+            },
+            {
+                name: "Route Builder", area: "Mantık + Görsel", desc: "En kısa rotayı planla", color: "linear-gradient(135deg,#0284C7,#0EA5E9)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M5 9v3m0 0a9 9 0 0 0 7 3m-7-3h14m0-3v3m0 0a9 9 0 0 1-7 3"/></svg>`
+            },
+            {
+                name: "Focus Check-In", area: "Dikkat", desc: "Kısa odak check-in ve hedef", color: "linear-gradient(135deg,#7C3AED,#A78BFA)",
+                icon: `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg>`
+            },
+        ];
 
-<!-- FOOTER -->
-<footer class="footer">
-    <div class="footer-content">
-        <div class="footer-brand">
-            <div class="footer-logo"><img src="app_icon.png" alt="NöroDakika"></div>
-            <span class="footer-name">NöroDakika</span>
-        </div>
-        <p class="footer-copy">© 2026 Muhammed Sali. Tüm hakları saklıdır.</p>
-        <div class="footer-links">
-            <a href="https://github.com/muhammedsali/norodakika" target="_blank" rel="noopener">GitHub</a>
-            <a href="https://github.com/muhammedsali" target="_blank" rel="noopener">Geliştirici</a>
-        </div>
-    </div>
-</footer>
-
-<script>
-// ── GSAP ──
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-// ── OYUN VERİLERİ ──
-const gamesData = [
-    { name:"Reflex Tap",     area:"Refleks",          desc:"Tepki süresi + Go/No-Go",          color:"linear-gradient(135deg,#EF4444,#F87171)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>` },
-    { name:"Reflex Dash",    area:"Refleks",          desc:"Şeritlerde hızlı hedef yakalama",   color:"linear-gradient(135deg,#DC2626,#EF4444)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>` },
-    { name:"Stroop Tap",     area:"Dikkat",           desc:"Renk-kelime uyumsuzluğu testi",     color:"linear-gradient(135deg,#F59E0B,#FBBF24)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>` },
-    { name:"Focus Line",     area:"Dikkat + Görsel",  desc:"Çizgi üzerinde hedef noktaları",    color:"linear-gradient(135deg,#D97706,#F59E0B)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>` },
-    { name:"Path Tracker",   area:"Mantık + Hafıza",  desc:"Görünmez nesneyi zihninde takip",   color:"linear-gradient(135deg,#3B82F6,#60A5FA)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 0 0 1 1h3m10-11l2 2m-2-2v10a1 1 0 0 1-1 1h-3m-6 0a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1m-6 0h6"/></svg>` },
-    { name:"Memory Board",   area:"Hafıza + Görsel",  desc:"Kart eşleştirme + görsel hafıza",   color:"linear-gradient(135deg,#2563EB,#3B82F6)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="8" height="11" rx="1"/><rect x="14" y="3" width="8" height="11" rx="1"/><rect x="2" y="17" width="8" height="4" rx="1"/><rect x="14" y="17" width="8" height="4" rx="1"/></svg>` },
-    { name:"Recall Phase",   area:"Dil + Hafıza",     desc:"Kelimeleri göster ve hatırla",      color:"linear-gradient(135deg,#7C3AED,#8B5CF6)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>` },
-    { name:"Sequence Echo",  area:"Hafıza + Dikkat",  desc:"Gösterilen sırayı aynen tekrala",   color:"linear-gradient(135deg,#6D28D9,#7C3AED)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>` },
-    { name:"Logic Puzzle",   area:"Mantık + Görsel",  desc:"Mantık dizisi çözme oyunu",         color:"linear-gradient(135deg,#8B5CF6,#A78BFA)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>` },
-    { name:"Quick Math",     area:"Sayısal Zeka",     desc:"Zaman baskılı mental aritmetik",    color:"linear-gradient(135deg,#10B981,#34D399)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16M4 15h16M10 3 8 21M14 3l-2 18"/></svg>` },
-    { name:"Odd One Out",    area:"Görsel Algı",      desc:"Farklı kartı hızlıca bul",          color:"linear-gradient(135deg,#14B8A6,#2DD4BF)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="3" y1="3" x2="21" y2="21"/></svg>` },
-    { name:"Word Sprint",    area:"Dil",              desc:"Gerçek-uydurma kelime ayırt et",    color:"linear-gradient(135deg,#EC4899,#F472B6)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/></svg>` },
-    { name:"Shape Swipe",    area:"Görsel Algı + Refleks", desc:"Şekle uyumlu yöne hızlıca kaydır", color:"linear-gradient(135deg,#0284C7,#0EA5E9)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 20 4-4 4 4"/><path d="M12 16V4"/><path d="M4 12h16"/></svg>` },
-    { name:"Emotion Mirror", area:"Dil + Dikkat",     desc:"Duygu ifadelerini eşleştir",        color:"linear-gradient(135deg,#E11D48,#F43F5E)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>` },
-    { name:"Nature Sort",    area:"Mantık + Görsel",  desc:"Doğa temalı nesneleri kategorile",  color:"linear-gradient(135deg,#059669,#10B981)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 10 10c0 4.42-2.87 8.17-6.84 9.49"/><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49"/><path d="M12 2v20"/></svg>` },
-    { name:"Balance Tap",    area:"Refleks",          desc:"Dengeyi koru, hızlı dokunuşlar",    color:"linear-gradient(135deg,#0891B2,#06B6D4)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M18.4 8.4 12 12l-6.4-3.6"/><path d="m18.4 15.6-6.4-3.6-6.4 3.6"/></svg>` },
-    { name:"Route Builder",  area:"Mantık + Görsel",  desc:"En kısa rotayı planla",             color:"linear-gradient(135deg,#0284C7,#0EA5E9)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M5 9v3m0 0a9 9 0 0 0 7 3m-7-3h14m0-3v3m0 0a9 9 0 0 1-7 3"/></svg>` },
-    { name:"Focus Check-In", area:"Dikkat",           desc:"Kısa odak check-in ve hedef",       color:"linear-gradient(135deg,#7C3AED,#A78BFA)",
-      icon:`<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 6v6l4 2"/></svg>` },
-];
-
-// ── Oyun kartları oluştur ──
-const gamesGrid = document.getElementById('gamesGrid');
-if (gamesGrid) {
-    gamesGrid.className = 'games-carousel stagger-children';
-    gamesData.forEach(g => {
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        card.innerHTML = `
+        // ── Oyun kartları oluştur ──
+        const gamesGrid = document.getElementById('gamesGrid');
+        if (gamesGrid) {
+            gamesGrid.className = 'games-carousel stagger-children';
+            gamesData.forEach(g => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
             <div class="game-card-icon" style="background:${g.color};">${g.icon}</div>
             <div class="game-card-name">${g.name}</div>
             <div class="game-card-area">${g.area}</div>
             <div class="game-card-desc">${g.desc}</div>
         `;
-        gamesGrid.appendChild(card);
-    });
-}
-
-// ── PARTICLES ──
-(function() {
-    const c = document.getElementById('particles');
-    if (!c) return;
-    for (let i = 0; i < 28; i++) {
-        const p = document.createElement('div');
-        p.className = 'particle';
-        p.style.cssText = `left:${Math.random()*100}%;animation-duration:${8+Math.random()*12}s;animation-delay:${-Math.random()*15}s;width:${2+Math.random()*2.5}px;height:${2+Math.random()*2.5}px;`;
-        c.appendChild(p);
-    }
-})();
-
-// ── INTERSECTION OBSERVER — scroll reveal ──
-(function initReveal() {
-    const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('revealed');
-                io.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.12, rootMargin:'0px 0px -40px 0px' });
-
-    // .reveal elemanlar
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-    // .stagger-children'lar IntersectionObserver ile açılır (kendi children'larını .reveal gibi güncelle)
-    document.querySelectorAll('.stagger-children').forEach(el => {
-        const sio = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('revealed');
-                    sio.unobserve(e.target);
-                }
+                gamesGrid.appendChild(card);
             });
-        }, { threshold: 0.08, rootMargin:'0px 0px -30px 0px' });
-        sio.observe(el);
-    });
-})();
+        }
 
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
+        // ── PARTICLES ──
+        (function () {
+            const c = document.getElementById('particles');
+            if (!c) return;
+            for (let i = 0; i < 28; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.cssText = `left:${Math.random() * 100}%;animation-duration:${8 + Math.random() * 12}s;animation-delay:${-Math.random() * 15}s;width:${2 + Math.random() * 2.5}px;height:${2 + Math.random() * 2.5}px;`;
+                c.appendChild(p);
+            }
+        })();
 
-    // Navbar scroll
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 50);
-    }, { passive:true });
+        // ── INTERSECTION OBSERVER — scroll reveal ──
+        (function initReveal() {
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    // Smooth scroll & Active state
-    const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
-    navAnchors.forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const href = this.getAttribute('href');
-            if (href === '#') return;
-            e.preventDefault();
-            
-            navAnchors.forEach(a => a.classList.remove('active'));
-            this.classList.add('active');
+            // .reveal elemanlar
+            document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-            const target = document.querySelector(href);
-            if (target) gsap.to(window, { duration:1.1, scrollTo:target, ease:'power3.inOut' });
-        });
-    });
+            // .stagger-children'lar IntersectionObserver ile açılır (kendi children'larını .reveal gibi güncelle)
+            document.querySelectorAll('.stagger-children').forEach(el => {
+                const sio = new IntersectionObserver((entries) => {
+                    entries.forEach(e => {
+                        if (e.isIntersecting) {
+                            e.target.classList.add('revealed');
+                            sio.unobserve(e.target);
+                        }
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+                sio.observe(el);
+            });
+        })();
 
-    // ScrollSpy for Active Nav Links
-    const sections = document.querySelectorAll('section[id]');
-    window.addEventListener('scroll', () => {
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (scrollY >= sectionTop - 150) {
-                current = section.getAttribute('id');
+        // ── INIT ──
+        window.addEventListener('DOMContentLoaded', () => {
+
+            // Navbar scroll
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                navbar.classList.toggle('scrolled', window.scrollY > 50);
+            }, { passive: true });
+
+            // Smooth scroll & Active state
+            const navAnchors = document.querySelectorAll('.nav-links a[href^="#"]');
+            navAnchors.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+                    e.preventDefault();
+
+                    navAnchors.forEach(a => a.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const target = document.querySelector(href);
+                    if (target) gsap.to(window, { duration: 1.1, scrollTo: target, ease: 'power3.inOut' });
+                });
+            });
+
+            // ScrollSpy for Active Nav Links
+            const sections = document.querySelectorAll('section[id]');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= sectionTop - 150) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navAnchors.forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href') === `#${current}`) {
+                        a.classList.add('active');
+                    }
+                });
+            }, { passive: true });
+
+            // Mobile menu
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const navLinks = document.getElementById('navLinks');
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    const open = navLinks.classList.toggle('mobile-open');
+                    mobileMenuBtn.textContent = open ? '✕' : '☰';
+                });
+            }
+
+            // Page glow
+            const pageGlow = document.getElementById('pageGlow');
+            if (pageGlow) {
+                document.addEventListener('mousemove', e => {
+                    pageGlow.style.left = e.clientX + 'px';
+                    pageGlow.style.top = e.clientY + 'px';
+                }, { passive: true });
             }
         });
 
-        navAnchors.forEach(a => {
-            a.classList.remove('active');
-            if (a.getAttribute('href') === `#${current}`) {
-                a.classList.add('active');
+        // ── THREE.JS ──
+        (function () {
+            const canvas = document.getElementById('neural-canvas');
+            if (!canvas || typeof THREE === 'undefined') return;
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.z = 150;
+            const count = 2500;
+            const pos = new Float32Array(count * 3);
+            for (let i = 0; i < count; i++) {
+                pos[i * 3] = (Math.random() - .5) * 600;
+                pos[i * 3 + 1] = (Math.random() - .5) * 600;
+                pos[i * 3 + 2] = (Math.random() - .5) * 600;
             }
-        });
-    }, { passive:true });
-
-    // Mobile menu
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navLinks = document.getElementById('navLinks');
-    if (mobileMenuBtn && navLinks) {
-        mobileMenuBtn.addEventListener('click', () => {
-            const open = navLinks.classList.toggle('mobile-open');
-            mobileMenuBtn.textContent = open ? '✕' : '☰';
-        });
-    }
-
-    // Page glow
-    const pageGlow = document.getElementById('pageGlow');
-    if (pageGlow) {
-        document.addEventListener('mousemove', e => {
-            pageGlow.style.left = e.clientX + 'px';
-            pageGlow.style.top  = e.clientY + 'px';
-        }, { passive:true });
-    }
-});
-
-// ── THREE.JS ──
-(function() {
-    const canvas = document.getElementById('neural-canvas');
-    if (!canvas || typeof THREE === 'undefined') return;
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
-    camera.position.z = 150;
-    const count = 2500;
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-        pos[i*3]   = (Math.random()-.5)*600;
-        pos[i*3+1] = (Math.random()-.5)*600;
-        pos[i*3+2] = (Math.random()-.5)*600;
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-    const mat = new THREE.PointsMaterial({ size:2.2, color:0x4F46E5, transparent:true, opacity:0.55, blending:THREE.AdditiveBlending });
-    const pts = new THREE.Points(geo, mat);
-    scene.add(pts);
-    (function animate() { requestAnimationFrame(animate); pts.rotation.y += 0.0008; renderer.render(scene, camera); })();
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth/window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-})();
-</script>
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ size: 2.2, color: 0x4F46E5, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending });
+            const pts = new THREE.Points(geo, mat);
+            scene.add(pts);
+            (function animate() { requestAnimationFrame(animate); pts.rotation.y += 0.0008; renderer.render(scene, camera); })();
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        })();
+    </script>
 </body>
+
 </html>
