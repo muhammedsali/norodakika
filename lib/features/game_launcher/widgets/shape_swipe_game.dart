@@ -238,8 +238,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     _timer?.cancel();
     _timerBarController.stop();
     setState(() => _isPlaying = false);
-    final successRate =
-        _attempts > 0 ? _correctAttempts / _attempts : 0.0;
+    final successRate = _attempts > 0 ? _correctAttempts / _attempts : 0.0;
     widget.onComplete({
       'score': _score,
       'successRate': successRate,
@@ -375,8 +374,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeProvider);
     final bg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF0F4FF);
-    final textColor =
-        isDark ? Colors.white : const Color(0xFF0F172A);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Container(
       color: bg,
@@ -479,8 +477,9 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
           height: 6,
           child: LinearProgressIndicator(
             value: pct,
-            backgroundColor:
-                isDark ? Colors.white.withValues(alpha: 0.1) : const Color(0xFFE2E8F0),
+            backgroundColor: isDark
+                ? Colors.white.withValues(alpha: 0.1)
+                : const Color(0xFFE2E8F0),
             valueColor: AlwaysStoppedAnimation<Color>(barColor),
             minHeight: 6,
           ),
@@ -506,9 +505,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
           _statChip(
             Icons.timer_rounded,
             '$_timeLeft s',
-            _timeLeft <= 10
-                ? const Color(0xFFEF4444)
-                : const Color(0xFF059669),
+            _timeLeft <= 10 ? const Color(0xFFEF4444) : const Color(0xFF059669),
             isDark,
             big: _timeLeft <= 10,
           ),
@@ -523,8 +520,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     );
   }
 
-  Widget _statChip(
-      IconData icon, String value, Color color, bool isDark,
+  Widget _statChip(IconData icon, String value, Color color, bool isDark,
       {bool big = false}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -570,9 +566,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: _shapes
-              .map((s) => _dirChip(s, isDark))
-              .toList(),
+          children: _shapes.map((s) => _dirChip(s, isDark)).toList(),
         ),
       ),
     );
@@ -728,8 +722,8 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
               child: Transform.scale(
                 scale: _comboScale.value,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   decoration: BoxDecoration(
                     color: popup.color.withValues(alpha: 0.95),
                     borderRadius: BorderRadius.circular(30),
