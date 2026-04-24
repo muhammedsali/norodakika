@@ -30,11 +30,17 @@ class GameStartModal {
       barrierColor: Colors.black.withValues(alpha: isDarkMode ? 0.85 : 0.55),
       builder: (ctx) {
         // ─── Premium Tema Renkleri ──────────────────────────────
-        final Color dialogBg = isDarkMode ? const Color(0xFF111827) : Colors.white;
-        final Color titleColor = isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF0F172A);
-        final Color subtitleColor = isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF475569);
-        final Color cardBg = isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
-        final Color borderColor = isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05);
+        final Color dialogBg =
+            isDarkMode ? const Color(0xFF111827) : Colors.white;
+        final Color titleColor =
+            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF0F172A);
+        final Color subtitleColor =
+            isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF475569);
+        final Color cardBg =
+            isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9);
+        final Color borderColor = isDarkMode
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.05);
 
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -42,12 +48,21 @@ class GameStartModal {
           child: Container(
             constraints: const BoxConstraints(maxWidth: 400),
             decoration: BoxDecoration(
-              color: dialogBg,
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color.lerp(dialogBg, gameColor, isDarkMode ? 0.20 : 0.15)!,
+                  dialogBg,
+                ],
+                stops: const [0.0, 1.0],
+              ),
               borderRadius: BorderRadius.circular(32),
               border: Border.all(color: borderColor, width: 1),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: isDarkMode ? 0.6 : 0.15),
+                  color:
+                      Colors.black.withValues(alpha: isDarkMode ? 0.6 : 0.15),
                   blurRadius: 40,
                   offset: const Offset(0, 20),
                 ),
@@ -67,16 +82,6 @@ class GameStartModal {
                   // ─── Header: Glassmorphism Efekti ─────────────────
                   Container(
                     padding: const EdgeInsets.fromLTRB(24, 28, 16, 24),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          gameColor.withValues(alpha: isDarkMode ? 0.25 : 0.12),
-                          gameColor.withValues(alpha: isDarkMode ? 0.1 : 0.04),
-                        ],
-                      ),
-                    ),
                     child: Row(
                       children: [
                         // Oyun İkonu / Resmi
@@ -105,7 +110,8 @@ class GameStartModal {
                                   errorBuilder: (_, __, ___) => Container(
                                     color: gameColor,
                                     child: Center(
-                                      child: Text(emoji, style: const TextStyle(fontSize: 36)),
+                                      child: Text(emoji,
+                                          style: const TextStyle(fontSize: 36)),
                                     ),
                                   ),
                                 ),
@@ -144,22 +150,31 @@ class GameStartModal {
                               ),
                               const SizedBox(height: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: isDarkMode ? Colors.white.withValues(alpha: 0.1) : gameColor.withValues(alpha: 0.1),
+                                  color: isDarkMode
+                                      ? Colors.white.withValues(alpha: 0.1)
+                                      : gameColor.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.timer_rounded, size: 14, color: isDarkMode ? Colors.white70 : gameColor),
+                                    Icon(Icons.timer_rounded,
+                                        size: 14,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : gameColor),
                                     const SizedBox(width: 6),
                                     Text(
                                       s.approxTwoThreeMinutes,
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
-                                        color: isDarkMode ? Colors.white70 : gameColor,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : gameColor,
                                       ),
                                     ),
                                   ],
@@ -177,10 +192,13 @@ class GameStartModal {
                           icon: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: isDarkMode ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                              color: isDarkMode
+                                  ? Colors.white.withValues(alpha: 0.05)
+                                  : Colors.black.withValues(alpha: 0.05),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(Icons.close_rounded, size: 18, color: subtitleColor),
+                            child: Icon(Icons.close_rounded,
+                                size: 18, color: subtitleColor),
                           ),
                         ),
                       ],
@@ -212,7 +230,8 @@ class GameStartModal {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.auto_awesome_rounded, size: 18, color: gameColor),
+                                  Icon(Icons.auto_awesome_rounded,
+                                      size: 18, color: gameColor),
                                   const SizedBox(width: 10),
                                   Text(
                                     s.howToPlay,
@@ -244,12 +263,18 @@ class GameStartModal {
                           onTap: () {
                             HapticFeedback.mediumImpact();
                             Navigator.of(ctx).pop();
-                            final allGames = MemoryBank.games.map((g) => GameModel.fromMap(g)).toList();
-                            final selectedGame = allGames.firstWhere((g) => g.id == gameId, orElse: () => allGames.first);
+                            final allGames = MemoryBank.games
+                                .map((g) => GameModel.fromMap(g))
+                                .toList();
+                            final selectedGame = allGames.firstWhere(
+                                (g) => g.id == gameId,
+                                orElse: () => allGames.first);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => GamePlayScreen(game: selectedGame, isDarkOverride: isDarkMode),
+                                builder: (_) => GamePlayScreen(
+                                    game: selectedGame,
+                                    isDarkOverride: isDarkMode),
                               ),
                             );
                           },
@@ -258,7 +283,10 @@ class GameStartModal {
                             height: 64,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
-                                colors: [gameColor, gameColor.withValues(alpha: 0.8)],
+                                colors: [
+                                  gameColor,
+                                  gameColor.withValues(alpha: 0.8)
+                                ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                               ),
@@ -274,18 +302,11 @@ class GameStartModal {
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                // Parlama efekti (üst kısım)
-                                Positioned(
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  height: 1,
-                                  child: Container(color: Colors.white.withValues(alpha: 0.3)),
-                                ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 28),
+                                    const Icon(Icons.play_circle_fill_rounded,
+                                        color: Colors.white, size: 28),
                                     const SizedBox(width: 12),
                                     Text(
                                       s.startGame.toUpperCase(),
@@ -316,99 +337,117 @@ class GameStartModal {
 
   static Map<String, dynamic> getGameIconData(String gameId) {
     switch (gameId) {
-      case 'MEM01':
+      case 'REF01':
         return {
-          'icon': Icons.grid_on,
-          'color': const Color(0xFF6366F1),
-          'emoji': '🧩'
-        };
-      case 'ATT01':
-        return {
-          'icon': Icons.remove_red_eye,
-          'color': const Color(0xFFF59E0B),
-          'emoji': '👀'
-        };
-      case 'SPE01':
-        return {
-          'icon': Icons.bolt,
+          'icon': Icons.touch_app_rounded,
           'color': const Color(0xFFEF4444),
           'emoji': '⚡'
         };
-      case 'FLE01':
+      case 'REF02':
         return {
-          'icon': Icons.psychology,
+          'icon': Icons.directions_run_rounded,
           'color': const Color(0xFF10B981),
-          'emoji': '🧠'
+          'emoji': '🏃'
         };
-      case 'MATH01':
+      case 'ATT01':
         return {
-          'icon': Icons.calculate,
+          'icon': Icons.palette_rounded,
           'color': const Color(0xFF8B5CF6),
-          'emoji': '🔢'
+          'emoji': '🎨'
         };
-      case 'LANG01':
+      case 'ATT02':
         return {
-          'icon': Icons.translate,
+          'icon': Icons.remove_red_eye_rounded,
+          'color': const Color(0xFF06B6D4),
+          'emoji': '👀'
+        };
+      case 'MEM01':
+        return {
+          'icon': Icons.psychology_rounded,
           'color': const Color(0xFFEC4899),
-          'emoji': '🔤'
+          'emoji': '🧠'
         };
       case 'LOG01':
         return {
-          'icon': Icons.extension,
-          'color': const Color(0xFF3B82F6),
+          'icon': Icons.extension_rounded,
+          'color': const Color(0xFFF59E0B),
           'emoji': '🧩'
         };
-      case 'VER01':
+      case 'NUM01':
         return {
-          'icon': Icons.record_voice_over,
+          'icon': Icons.calculate_rounded,
+          'color': const Color(0xFF3B82F6),
+          'emoji': '🔢'
+        };
+      case 'MEM02':
+        return {
+          'icon': Icons.grid_view_rounded,
+          'color': const Color(0xFF14B8A6),
+          'emoji': '🎴'
+        };
+      case 'MEM03':
+        return {
+          'icon': Icons.text_fields_rounded,
           'color': const Color(0xFF6366F1),
-          'emoji': '🗣️'
+          'emoji': '📝'
         };
-      case 'VIS01':
+      case 'MEM04':
         return {
-          'icon': Icons.visibility,
-          'color': const Color(0xFFF59E0B),
-          'emoji': '👁️'
+          'icon': Icons.repeat_rounded,
+          'color': const Color(0xFFA855F7),
+          'emoji': '🔁'
         };
-      case 'MUS01':
+      case 'VIS02':
         return {
-          'icon': Icons.music_note,
-          'color': const Color(0xFFEC4899),
-          'emoji': '🎵'
+          'icon': Icons.find_in_page_rounded,
+          'color': const Color(0xFFF97316),
+          'emoji': '🔍'
+        };
+      case 'LANG02':
+        return {
+          'icon': Icons.speed_rounded,
+          'color': const Color(0xFF06B6D4),
+          'emoji': '💨'
+        };
+      case 'VIS03':
+        return {
+          'icon': Icons.swipe_rounded,
+          'color': const Color(0xFF0EA5E9),
+          'emoji': '👆'
         };
       case 'SOC01':
         return {
-          'icon': Icons.emoji_emotions,
+          'icon': Icons.emoji_emotions_rounded,
           'color': const Color(0xFFEC4899),
           'emoji': '🙂'
         };
       case 'NAT01':
         return {
-          'icon': Icons.nature,
+          'icon': Icons.nature_rounded,
           'color': const Color(0xFF10B981),
           'emoji': '🌿'
         };
       case 'KIN01':
         return {
-          'icon': Icons.sports_martial_arts,
+          'icon': Icons.sports_martial_arts_rounded,
           'color': const Color(0xFF3B82F6),
           'emoji': '⚖️'
         };
       case 'SPA01':
         return {
-          'icon': Icons.route,
+          'icon': Icons.route_rounded,
           'color': const Color(0xFF8B5CF6),
           'emoji': '🧭'
         };
       case 'INT01':
         return {
-          'icon': Icons.self_improvement,
+          'icon': Icons.self_improvement_rounded,
           'color': const Color(0xFF06B6D4),
           'emoji': '🧘'
         };
       default:
         return {
-          'icon': Icons.sports_esports,
+          'icon': Icons.sports_esports_rounded,
           'color': const Color(0xFF4F46E5),
           'emoji': '🎮'
         };
