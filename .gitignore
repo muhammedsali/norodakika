@@ -52,6 +52,9 @@ GoogleService-Info.plist
 .env
 .env.local
 
+# VS Code launch config (secrets içerebilir, yerine .vscode/launch.json.example kullan)
+.vscode/launch.json
+
 # Unity
 unity_build/
 
