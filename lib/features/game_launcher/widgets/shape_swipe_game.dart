@@ -101,10 +101,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
   late AnimationController _cardController;
   late Animation<double> _cardScale;
 
-  // Kart uçuş animasyonu (swipe yönüne doğru kayar)
-  late AnimationController _swipeController;
-  late Animation<Offset> _swipeOffset;
-  late Animation<double> _swipeFade;
 
   // Doğru/Yanlış flaş animasyonu
   late AnimationController _flashController;
@@ -132,18 +128,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
       CurvedAnimation(parent: _cardController, curve: Curves.easeOutBack),
     );
 
-    // Swipe uçuş
-    _swipeController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
-    _swipeOffset = Tween<Offset>(
-      begin: Offset.zero,
-      end: Offset.zero,
-    ).animate(_swipeController);
-    _swipeFade = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: _swipeController, curve: Curves.easeIn),
-    );
 
     // Flaş
     _flashController = AnimationController(
@@ -202,7 +186,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
   void dispose() {
     _timer?.cancel();
     _cardController.dispose();
-    _swipeController.dispose();
     _flashController.dispose();
     _comboController.dispose();
     _timerBarController.dispose();
@@ -296,8 +279,10 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     // Flaş
     _flashController.forward(from: 0.0);
 
-    // Kartı uçur
-    _launchCard(direction);
+    // Kısa gecikme sonrası yeni şekil
+    Future.delayed(const Duration(milliseconds: 120), () {
+      if (mounted && _isPlaying) _setNextShape();
+    });
   }
 
   // ─── Combo popup tetikle ─────────────────────────────────
@@ -322,39 +307,6 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     }
   }
 
-  // ─── Kartı yönüne uçur ───────────────────────────────────
-  void _launchCard(SwipeDirection dir) {
-    const double dist = 1.5;
-    Offset endOffset;
-    switch (dir) {
-      case SwipeDirection.up:
-        endOffset = const Offset(0, -dist);
-        break;
-      case SwipeDirection.down:
-        endOffset = const Offset(0, dist);
-        break;
-      case SwipeDirection.left:
-        endOffset = const Offset(-dist, 0);
-        break;
-      case SwipeDirection.right:
-        endOffset = const Offset(dist, 0);
-        break;
-    }
-
-    _swipeOffset = Tween<Offset>(
-      begin: Offset.zero,
-      end: endOffset,
-    ).animate(
-      CurvedAnimation(parent: _swipeController, curve: Curves.easeIn),
-    );
-
-    _swipeController.forward(from: 0.0).then((_) {
-      if (mounted && _isPlaying) {
-        _swipeController.reset();
-        _setNextShape();
-      }
-    });
-  }
 
   // ─── Pan/Swipe algıla ─────────────────────────────────────
   void _onPanEnd(DragEndDetails d) {
@@ -376,86 +328,87 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     final bg = isDark ? const Color(0xFF0F172A) : const Color(0xFFF0F4FF);
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
-    return Container(
-      color: bg,
-      child: SafeArea(
-        child: Stack(
-          children: [
-            // ── Ana kolon ──────────────────────────────────
-            Column(
-              children: [
-                // Zaman çubuğu
-                _buildTimerBar(isDark),
+    return Stack(
+      children: [
+        // ── Arka plan ──────────────────────────────────────
+        Container(color: bg),
 
-                const SizedBox(height: 10),
-
-                // Skor + Zaman + Combo
-                _buildTopBar(textColor, isDark),
-
-                const SizedBox(height: 16),
-
-                // Yön referans kılavuzu
-                _buildDirectionGuide(isDark),
-
-                const SizedBox(height: 8),
-
-                // Swipe alanı
-                Expanded(
-                  child: GestureDetector(
-                    onPanEnd: _onPanEnd,
-                    behavior: HitTestBehavior.opaque,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Flaş overlay
-                        AnimatedBuilder(
-                          animation: _flashAnim,
-                          builder: (_, __) => Container(
-                            color: _flashColor.withValues(
-                                alpha: _flashAnim.value * 0.18),
-                          ),
-                        ),
-
-                        // Yön ok göstergesi (ortada büyük, solukta)
-                        _buildSwipeArrow(),
-
-                        // Şekil kartı
-                        SlideTransition(
-                          position: _swipeOffset,
-                          child: FadeTransition(
-                            opacity: _swipeFade,
-                            child: ScaleTransition(
-                              scale: _cardScale,
-                              child: _buildShapeCard(isDark),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Alt bilgi
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                  child: Text(
-                    'Şekle göre yönü sürükle!',
-                    style: GoogleFonts.inter(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: textColor.withValues(alpha: 0.45),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
+        // ── TAM EKRAN flaş overlay (en dışta, SafeArea üstünde) ──
+        AnimatedBuilder(
+          animation: _flashAnim,
+          builder: (_, __) => Positioned.fill(
+            child: IgnorePointer(
+              child: Container(
+                color: _flashColor.withValues(alpha: _flashAnim.value * 0.22),
+              ),
             ),
-
-            // ── Combo popup overlay ────────────────────────
-            ..._popups.map((p) => _buildComboPopup(p)),
-          ],
+          ),
         ),
-      ),
+
+        // ── İçerik ────────────────────────────────────────
+        SafeArea(
+          child: Stack(
+            children: [
+              GestureDetector(
+                onPanEnd: _onPanEnd,
+                behavior: HitTestBehavior.opaque,
+                child: Column(
+                  children: [
+                    // Zaman çubuğu
+                    _buildTimerBar(isDark),
+
+                    const SizedBox(height: 10),
+
+                    // Skor + Zaman + Combo
+                    _buildTopBar(textColor, isDark),
+
+                    const SizedBox(height: 16),
+
+                    // Yön referans kılavuzu
+                    _buildDirectionGuide(isDark),
+
+                    const SizedBox(height: 8),
+
+                    // Şekil + ok göstergesi
+                    Expanded(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Yön ok göstergesi
+                          _buildSwipeArrow(),
+
+                          // Şekil kartı (sadece scale animasyonu)
+                          ScaleTransition(
+                            scale: _cardScale,
+                            child: _buildShapeCard(isDark),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Alt bilgi
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                      child: Text(
+                        'Şekle göre yönü sürükle!',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: textColor.withValues(alpha: 0.45),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ── Combo popup overlay ──────────────────────
+              ..._popups.map((p) => _buildComboPopup(p)),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
