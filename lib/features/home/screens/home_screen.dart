@@ -264,9 +264,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   return Container(
                     width: 44,
                     height: 44,
-                    decoration:
-                        _getNeuDecoration(isDarkMode: isDarkMode, isCircle: true)
-                            .copyWith(
+                    decoration: _getNeuDecoration(
+                            isDarkMode: isDarkMode, isCircle: true)
+                        .copyWith(
                       border: Border.all(
                           color: Colors.white.withValues(alpha: 0.5), width: 2),
                     ),
@@ -1274,8 +1274,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     style: GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color:
-                            isDarkMode ? Colors.white : const Color(0xFF111827))),
+                        color: isDarkMode
+                            ? Colors.white
+                            : const Color(0xFF111827))),
                 const SizedBox(height: 24),
                 GridView.builder(
                   shrinkWrap: true,
@@ -1287,47 +1288,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     childAspectRatio: 1,
                   ),
                   itemCount: AvatarData.avatars.length,
-              itemBuilder: (context, index) {
-                final avatar = AvatarData.avatars[index];
-                final isSelected = ref.watch(avatarProvider) == index;
-                return GestureDetector(
-                  onTap: () {
-                    ref.read(avatarProvider.notifier).setAvatar(index);
-                    Navigator.pop(context);
+                  itemBuilder: (context, index) {
+                    final avatar = AvatarData.avatars[index];
+                    final isSelected = ref.watch(avatarProvider) == index;
+                    return GestureDetector(
+                      onTap: () {
+                        ref.read(avatarProvider.notifier).setAvatar(index);
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: avatar['colors'] as List<Color>,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight),
+                          borderRadius: BorderRadius.circular(20),
+                          border: isSelected
+                              ? Border.all(color: Colors.white, width: 3)
+                              : null,
+                          boxShadow: [
+                            BoxShadow(
+                                color: (avatar['colors'] as List<Color>)[0]
+                                    .withValues(alpha: 0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4))
+                          ],
+                        ),
+                        child: Center(
+                          child: Icon(avatar['icon'] as IconData,
+                              color: Colors.white, size: 40),
+                        ),
+                      ),
+                    );
                   },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: avatar['colors'] as List<Color>,
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight),
-                      borderRadius: BorderRadius.circular(20),
-                      border: isSelected
-                          ? Border.all(color: Colors.white, width: 3)
-                          : null,
-                      boxShadow: [
-                        BoxShadow(
-                            color: (avatar['colors'] as List<Color>)[0]
-                                .withValues(alpha: 0.3),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4))
-                      ],
-                    ),
-                    child: Center(
-                      child: Icon(avatar['icon'] as IconData,
-                          color: Colors.white, size: 40),
-                    ),
-                  ),
-                );
-              },
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
-            const SizedBox(height: 16),
-          ],
+          ),
         ),
       ),
-     ),
-    ),
-   );
+    );
   }
 
   Map<String, dynamic> _getGameIconData(String gameId) {
@@ -1467,12 +1468,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       barrierDismissible: true,
       barrierColor: Colors.black.withValues(alpha: 0.55),
       builder: (ctx) {
-        // ─── Sabit renk şeması (gece/gündüz ayrımı yok) ───────
-        const Color dialogBg    = Color(0xFFFFFFFF);
-        const Color titleColor  = Color(0xFF0F172A);
-        const Color subtitleColor = Color(0xFF475569);
-        const Color cardBg      = Color(0xFFF8FAFF);
-        const Color borderColor = Color(0xFFE2E8F0);
+        // ─── Tema renkleri ─────────────────────────────────────
+        final Color dialogBg =
+            isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+        final Color titleColor =
+            isDarkMode ? const Color(0xFFF1F5F9) : const Color(0xFF0F172A);
+        final Color subtitleColor =
+            isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF475569);
+        final Color cardBg =
+            isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF8FAFF);
+        final Color borderColor =
+            isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -1600,10 +1606,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                  color: const Color(0xFFF1F5F9),
+                                  color: isDarkMode
+                                      ? const Color(0xFF334155)
+                                      : const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(12)),
-                              child: const Icon(Icons.close_rounded,
-                                  size: 20, color: Color(0xFF64748B)),
+                              child: Icon(Icons.close_rounded,
+                                  size: 20, color: subtitleColor),
                             ),
                           ),
                         ),
