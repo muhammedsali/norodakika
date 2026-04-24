@@ -134,29 +134,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                             width: 180,
                             height: 180,
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF4F46E5),
-                                  Color(0xFF7C3AED),
-                                ],
-                              ),
                               borderRadius: BorderRadius.circular(48),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF4F46E5)
-                                      .withValues(alpha: 0.5),
-                                  blurRadius: 30,
-                                  spreadRadius: 8,
+                                  color: const Color(0xFF00E0FF)
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 40,
+                                  spreadRadius: 5,
                                   offset: const Offset(0, 10),
+                                ),
+                                BoxShadow(
+                                  color: const Color(0xFF6E00FF)
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 40,
+                                  spreadRadius: -5,
+                                  offset: const Offset(0, 15),
                                 ),
                               ],
                             ),
-                            child: const Icon(
-                              Icons.psychology,
-                              size: 100,
-                              color: Colors.white,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(48),
+                              child: Image.asset(
+                                'assets/icons/app_icon.png',
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ],
