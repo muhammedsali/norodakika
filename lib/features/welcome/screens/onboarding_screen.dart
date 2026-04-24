@@ -58,6 +58,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _pulseScale;
 
 
+  // ─── Aydınlık tema renk sabitleri ──────────────────────
+  static const Color _bgColor       = Color(0xFFF0F4FF);
+  static const Color _titleColor    = Color(0xFF0F172A);
+  static const Color _subtitleColor = Color(0xFF475569);
+  static const Color _chipBg        = Color(0xFFE8EEFF);
+  static const Color _chipBorder    = Color(0xFFD1D9FF);
+  static const Color _chipText      = Color(0xFF334155);
+  static const Color _dotInactive   = Color(0xFFCBD5E1);
+  static const Color _progressBg    = Color(0xFFE2E8F0);
+
   static const List<_PageData> _pages = [
     _PageData(
       icon: Icons.psychology_rounded,
@@ -121,11 +131,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   void initState() {
     super.initState();
 
-    // Status bar'ı şeffaf yap
+    // Status bar'ı şeffaf yap (aydınlık tema — koyu ikonlar)
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
       ),
     );
 
@@ -224,12 +234,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final isLastPage = _currentPage == _pages.length - 1;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0F1E),
+      backgroundColor: _bgColor,
       body: Stack(
         children: [
-          // ── Sinapsis/Nöron Arka Planı ──
+          // ── Sinapsis/Nöron Arka Planı (aydınlık mod) ──
           const Positioned.fill(
-            child: NeuronBackground(isDarkMode: true),
+            child: NeuronBackground(isDarkMode: false),
           ),
 
           // ── Animasyonlu gradient blob (üst sol) ──
@@ -310,7 +320,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                              color: _titleColor,
                               letterSpacing: -0.3,
                             ),
                           ),
@@ -320,13 +330,13 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       TextButton(
                         onPressed: _goToWelcome,
                         style: TextButton.styleFrom(
-                          foregroundColor: Colors.white.withValues(alpha: 0.5),
+                          foregroundColor: _subtitleColor,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 6),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
-                            side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.15),
+                            side: const BorderSide(
+                              color: Color(0xFFCBD5E1),
                             ),
                           ),
                         ),
@@ -387,7 +397,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                               borderRadius: BorderRadius.circular(4),
                               color: isActive
                                   ? page.accentColor
-                                  : Colors.white.withValues(alpha: 0.2),
+                                  : _dotInactive,
                             ),
                           );
                         }),
@@ -527,7 +537,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               style: GoogleFonts.inter(
                 fontSize: 44,
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
+                color: _titleColor,
                 height: 1.05,
                 letterSpacing: -1.5,
               ),
@@ -558,7 +568,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             p.subtitle,
             style: GoogleFonts.inter(
               fontSize: 15,
-              color: Colors.white.withValues(alpha: 0.65),
+              color: _subtitleColor,
               height: 1.65,
               fontWeight: FontWeight.w400,
             ),
@@ -575,10 +585,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   padding: const EdgeInsets.symmetric(
                       horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.07),
+                    color: _chipBg,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.12),
+                      color: _chipBorder,
                     ),
                   ),
                   child: Row(
@@ -593,7 +603,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: _chipText,
                         ),
                       ),
                     ],
@@ -627,7 +637,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: Colors.white.withValues(alpha: 0.4),
+                color: _subtitleColor.withValues(alpha: 0.6),
               ),
             ),
             Text(
@@ -648,7 +658,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
             height: 3,
             child: LinearProgressIndicator(
               value: progress,
-              backgroundColor: Colors.white.withValues(alpha: 0.1),
+              backgroundColor: _progressBg,
               valueColor: AlwaysStoppedAnimation<Color>(p.accentColor),
               minHeight: 3,
             ),
