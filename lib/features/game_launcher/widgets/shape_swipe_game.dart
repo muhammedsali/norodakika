@@ -177,7 +177,7 @@ class _ShapeSwipeGameState extends ConsumerState<ShapeSwipeGame>
     // Zaman çubuğu
     _timerBarController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: _gameDurationSeconds),
+      duration: const Duration(seconds: _gameDurationSeconds),
     );
 
     _setNextShape(animate: false);
