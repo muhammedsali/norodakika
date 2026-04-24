@@ -1465,17 +1465,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      barrierColor: Colors.black.withValues(alpha: isDarkMode ? 0.75 : 0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.55),
       builder: (ctx) {
-        final themeBg = isDarkMode ? const Color(0xFF1F2937) : Colors.white;
-        final titleColor =
-            isDarkMode ? const Color(0xFFF9FAFB) : const Color(0xFF111827);
-        final textColor =
-            isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280);
-        final cardBg =
-            isDarkMode ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
-        final borderColor =
-            isDarkMode ? const Color(0xFF374151) : const Color(0xFFE5E7EB);
+        // ─── Sabit renk şeması (gece/gündüz ayrımı yok) ───────
+        const Color dialogBg    = Color(0xFFFFFFFF);
+        const Color titleColor  = Color(0xFF0F172A);
+        const Color subtitleColor = Color(0xFF475569);
+        const Color cardBg      = Color(0xFFF8FAFF);
+        const Color borderColor = Color(0xFFE2E8F0);
 
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -1485,22 +1482,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Container(
               constraints: const BoxConstraints(maxWidth: 420),
               decoration: BoxDecoration(
-                color: themeBg,
-                borderRadius: BorderRadius.circular(32),
+                color: dialogBg,
+                borderRadius: BorderRadius.circular(28),
                 border: Border.all(color: borderColor, width: 1.5),
                 boxShadow: [
                   BoxShadow(
-                      color: isDarkMode
-                          ? Colors.black.withValues(alpha: 0.6)
-                          : Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 50,
-                      spreadRadius: -10,
-                      offset: const Offset(0, 25)),
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: 40,
+                      spreadRadius: -8,
+                      offset: const Offset(0, 20)),
                   BoxShadow(
-                      color:
-                          gameColor.withValues(alpha: isDarkMode ? 0.1 : 0.05),
+                      color: gameColor.withValues(alpha: 0.08),
                       blurRadius: 30,
-                      spreadRadius: 0,
                       offset: const Offset(0, 10)),
                 ],
               ),
@@ -1513,15 +1506,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: isDarkMode
-                            ? [
-                                gameColor.withValues(alpha: 0.2),
-                                gameColor.withValues(alpha: 0.08)
-                              ]
-                            : [
-                                gameColor.withValues(alpha: 0.15),
-                                gameColor.withValues(alpha: 0.05)
-                              ],
+                        colors: [
+                          gameColor.withValues(alpha: 0.12),
+                          gameColor.withValues(alpha: 0.04),
+                        ],
                       ),
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(32),
@@ -1612,12 +1600,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               width: 36,
                               height: 36,
                               decoration: BoxDecoration(
-                                  color: isDarkMode
-                                      ? const Color(0xFF374151)
-                                      : const Color(0xFFF3F4F6),
+                                  color: const Color(0xFFF1F5F9),
                                   borderRadius: BorderRadius.circular(12)),
-                              child: Icon(Icons.close_rounded,
-                                  size: 20, color: textColor),
+                              child: const Icon(Icons.close_rounded,
+                                  size: 20, color: Color(0xFF64748B)),
                             ),
                           ),
                         ),
@@ -1634,16 +1620,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
                             color: cardBg,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: borderColor, width: 1),
                             boxShadow: [
                               BoxShadow(
-                                  color: isDarkMode
-                                      ? Colors.black.withValues(alpha: 0.3)
-                                      : Colors.black.withValues(alpha: 0.03),
-                                  blurRadius: 10,
-                                  spreadRadius: 0,
-                                  offset: const Offset(0, 4))
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2))
                             ],
                           ),
                           child: Column(
@@ -1674,7 +1657,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   style: GoogleFonts.inter(
                                       fontSize: 14,
                                       height: 1.65,
-                                      color: textColor,
+                                      color: subtitleColor,
                                       fontWeight: FontWeight.w400,
                                       letterSpacing: 0.1)),
                             ],
