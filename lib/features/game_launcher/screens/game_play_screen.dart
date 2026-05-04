@@ -431,13 +431,16 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(color: effectiveIsDark ? Colors.white12 : Colors.black12, width: 1),
                               ),
-                              child: Text(
-                                s.playAgain.toUpperCase(),
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1.2,
-                                  color: titleColor,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  s.playAgain.toUpperCase(),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                    color: titleColor,
+                                  ),
                                 ),
                               ),
                             ),
