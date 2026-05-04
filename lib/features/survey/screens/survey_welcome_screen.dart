@@ -6,8 +6,13 @@ import '../../../core/widgets/neuron_background.dart';
 
 class SurveyWelcomeScreen extends ConsumerWidget {
   final VoidCallback onStart;
+  final bool isPostTest;
 
-  const SurveyWelcomeScreen({super.key, required this.onStart});
+  const SurveyWelcomeScreen({
+    super.key,
+    required this.onStart,
+    this.isPostTest = false,
+  });
 
   BoxDecoration _getNeuDecoration({required bool isDarkMode}) {
     final bgColor = isDarkMode 
@@ -60,14 +65,18 @@ class SurveyWelcomeScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.1),
+                          color: (isPostTest ? Colors.blue : Colors.green).withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+                        child: Icon(
+                          isPostTest ? Icons.auto_awesome : Icons.check_circle_outline, 
+                          size: 64, 
+                          color: isPostTest ? Colors.blue : Colors.green,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'HOŞ GELDİNİZ',
+                        isPostTest ? 'TEBRİKLER!' : 'HOŞ GELDİNİZ',
                         style: GoogleFonts.inter(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
@@ -78,7 +87,9 @@ class SurveyWelcomeScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Kaydınız başarıyla oluşturuldu!\n\nNörodakika deneyimine başlamadan ve oyunları oynamadan önce bilişsel profilinizi oluşturabilmemiz için çok kısa bir ön test anketini tamamlamanız gerekmektedir.',
+                        isPostTest 
+                          ? 'Belirli bir eğitim aşamasını başarıyla tamamladınız!\n\nGelişiminizi analiz edebilmemiz ve programın etkisini ölçebilmemiz için son bir değerlendirme anketini doldurmanızı rica ediyoruz.'
+                          : 'Kaydınız başarıyla oluşturuldu!\n\nNörodakika deneyimine başlamadan ve oyunları oynamadan önce bilişsel profilinizi oluşturabilmemiz için çok kısa bir ön test anketini tamamlamanız gerekmektedir.',
                         style: GoogleFonts.inter(
                           fontSize: 16,
                           color: subtitleColor,

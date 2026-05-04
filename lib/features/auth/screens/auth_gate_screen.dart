@@ -16,7 +16,8 @@ class AuthGateScreen extends ConsumerStatefulWidget {
 }
 
 class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
-  bool _showSurvey = false;
+  bool _showPreSurvey = false;
+  bool _showPostSurvey = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +47,11 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
               }
 
               if (!userData.hasCompletedPreTest) {
-                if (!_showSurvey) {
+                if (!_showPreSurvey) {
                   return SurveyWelcomeScreen(
                     onStart: () {
                       setState(() {
-                        _showSurvey = true;
+                        _showPreSurvey = true;
                       });
                     },
                   );
@@ -65,8 +66,20 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
               }
 
               // Kullanıcı 15 tur oyun tamamladıysa ve son testi çözmediyse
+              // User has completed 15 rounds of games and has not taken the post-test survey
               if (userData.history.length >= 15 &&
                   !userData.hasCompletedPostTest) {
+                if (!_showPostSurvey) {
+                  return SurveyWelcomeScreen(
+                    isPostTest: true,
+                    onStart: () {
+                      setState(() {
+                        _showPostSurvey = true;
+                      });
+                    },
+                  );
+                }
+
                 return PostTestSurveyScreen(
                   onCompleted: () async {
                     // Kullanıcı tamamladığında Firestore'da true olacak
