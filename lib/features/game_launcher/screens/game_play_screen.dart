@@ -469,13 +469,16 @@ class _GamePlayScreenState extends ConsumerState<GamePlayScreen>
                                   ),
                                 ],
                               ),
-                              child: Text(
-                                s.backToHome.toUpperCase(),
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.2,
-                                  color: Colors.white,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  s.backToHome.toUpperCase(),
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.5,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
