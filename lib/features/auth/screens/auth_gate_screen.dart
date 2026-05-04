@@ -65,9 +65,9 @@ class _AuthGateScreenState extends ConsumerState<AuthGateScreen> {
                 );
               }
 
-              // Kullanıcı 15 tur oyun tamamladıysa ve son testi çözmediyse
-              // User has completed 15 rounds of games and has not taken the post-test survey
-              if (userData.history.length >= 15 &&
+              // Kullanıcı 7 tur oyun tamamladıysa ve son testi çözmediyse
+              // User has completed 7 rounds of games and has not taken the post-test survey
+              if (userData.history.length >= 7 &&
                   !userData.hasCompletedPostTest) {
                 if (!_showPostSurvey) {
                   return SurveyWelcomeScreen(
